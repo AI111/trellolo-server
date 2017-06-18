@@ -4,17 +4,17 @@
 import {Instance} from "sequelize";
 
 export interface UserAttributes {
-    _id: number,
-    name: string,
-    email: string
-    role: string
-    password: string
-    provider: string,
-    salt: string,
-    facebook: string,
-    twitter: string,
-    google: string,
-    github: string
+    _id?: number,
+    name?: string,
+    email?: string
+    role?: string
+    password?: string
+    provider?: string,
+    salt?: string,
+    facebook?: string,
+    twitter?: string,
+    google?: string,
+    github?: string
 }
 
 export interface UserInstance extends Instance<UserAttributes> {

@@ -1,10 +1,13 @@
 'use strict';
 
-import app from '../..';
+import * as app from '../../';
+import {expect, use}  from 'chai';
+import * as chaiAsPromised from 'chai-as-promised'
 import {db} from '../../sqldb';
 const User = db.User;
-var user;
-var genUser = function() {
+use(chaiAsPromised);
+let user;
+const genUser = function() {
   user = User.build({
     provider: 'local',
     name: 'Fake User',

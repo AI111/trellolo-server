@@ -23,7 +23,7 @@ function handleError(res, statusCode) {
  * restriction: 'admin'
  */
 export function index(req, res) {
-  return User.findAll({
+  return db.User.findAll({
     attributes: [
       '_id',
       'name',
@@ -42,10 +42,10 @@ export function index(req, res) {
  * Creates a new user
  */
 export function create(req, res) {
-  var newUser = User.build(req.body);
-  newUser.setDataValue('provider', 'local');
-  newUser.setDataValue('role', 'user');
-  return newUser.save()
+  var newdb.User = db.User.build(req.body);
+  newdb.User.setDataValue('provider', 'local');
+  newdb.User.setDataValue('role', 'user');
+  return newdb.User.save()
     .then(function(user) {
       var token = jwt.sign({ _id: user._id }, config.secrets.session, {
         expiresIn: 60 * 60 * 5
@@ -61,7 +61,7 @@ export function create(req, res) {
 export function show(req, res, next) {
   var userId = req.params.id;
 
-  return User.find({
+  return db.User.find({
     where: {
       _id: userId
     }
@@ -80,7 +80,7 @@ export function show(req, res, next) {
  * restriction: 'admin'
  */
 export function destroy(req, res) {
-  return User.destroy({ where: { _id: req.params.id } })
+  return db.User.destroy({ where: { _id: req.params.id } })
     .then(function() {
       res.status(204).end();
     })
@@ -95,7 +95,7 @@ export function changePassword(req, res) {
   var oldPass = String(req.body.oldPassword);
   var newPass = String(req.body.newPassword);
 
-  return User.find({
+  return db.User.find({
     where: {
       _id: userId
     }
@@ -120,7 +120,7 @@ export function changePassword(req, res) {
 export function me(req, res, next) {
   var userId = req.user._id;
 
-  return User.find({
+  return db.User.find({
     where: {
       _id: userId
     },
