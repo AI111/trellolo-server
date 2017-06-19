@@ -1,5 +1,5 @@
 "use strict";
-
+import {captureServiceInstance} from "../../common/captcha.service";
 import {NextFunction, Request, Response} from "express";
 import * as jwt from "jsonwebtoken";
 import {Model} from "sequelize";
@@ -28,12 +28,15 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
     /**
      * Creates a new user
      */
-    public create(req: Request, res: Response){
-        const User = this.entity.build(req.body);
-        User.setDataValue("provider", "local");
-        User.setDataValue("role", "user");
-        return User.save()
-            .then(function(user: IUserAttributes) {
+    public create(req: Request, res: Response) {
+            return captureServiceInstance.verifyCaptcha(req.body.token)
+            .then(() => {
+                const User = this.entity.build(req.body);
+                User.setDataValue("provider", "local");
+                User.setDataValue("role", "user");
+                return User.save();
+            })
+            .then((user: IUserAttributes) => {
                 const token = jwt.sign({_id: user._id} as object, config.secrets.session, {
                     expiresIn: 60 * 60 * 5,
                 });
