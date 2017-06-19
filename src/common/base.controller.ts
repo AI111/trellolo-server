@@ -28,7 +28,7 @@ export class BaseController<Entity extends Model<any,any>>{
     return function(entity) {
         try {
             // eslint-disable-next-line prefer-reflect
-            jsonpatch.apply(entity, patches, /*validate*/ true);
+            jsonpatch.default.apply(entity, patches, /*validate*/ true);
         } catch(err) {
             return Promise.reject(err);
         }
