@@ -1,16 +1,16 @@
-// 'use strict';
-//
-// import {Router} from 'express';
-// import * as controller from './user.controller';
-// import * as auth from '../../auth/auth.service';
-//
-// const router =  Router();
-//
-// router.get('/', auth.hasRole('admin'), controller.index);
-// router.delete('/:id', auth.hasRole('admin'), controller.destroy);
-// router.get('/me', auth.isAuthenticated(), controller.me);
-// router.put('/:id/password', auth.isAuthenticated(), controller.changePassword);
-// router.get('/:id', auth.isAuthenticated(), controller.show);
-// router.post('/', controller.create);
-//
-// module.exports = router;
+"use strict";
+
+import {Router} from "express";
+import {hasRole, isAuthenticated} from "../../auth/auth.service";
+import {controller} from "./user.controller";
+
+export default function(): Router {
+    const router =  Router();
+    router.get("/", hasRole("admin"), controller.index);
+    router.delete("/:id", hasRole("admin"), controller.destroy);
+    router.get("/me", isAuthenticated(), controller.me);
+    router.put("/:id/password", isAuthenticated(), controller.changePassword);
+    router.get("/:id", isAuthenticated(), controller.show);
+    router.post("/", controller.create);
+    return router;
+}

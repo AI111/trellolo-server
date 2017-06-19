@@ -1,24 +1,24 @@
 /**
  * Created by sasha on 6/7/17.
  */
-import {Instance} from "sequelize";
+import {Instance, Model} from "sequelize";
 
-export interface UserAttributes {
-    _id?: number,
-    name?: string,
-    email?: string
-    role?: string
-    password?: string
-    provider?: string,
-    salt?: string,
-    facebook?: string,
-    twitter?: string,
-    google?: string,
-    github?: string
+export interface IUserAttributes {
+    _id?: number;
+    name?: string;
+    email?: string;
+    role?: string;
+    password?: string;
+    provider?: string;
+    salt?: string;
+    facebook?: string;
+    twitter?: string;
+    google?: string;
+    github?: string;
 }
 
-export interface UserInstance extends Instance<UserAttributes> {
-    dataValues: UserAttributes;
+export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttributes {
+    dataValues: IUserAttributes;
 
     /**
      * Authenticate - check if the passwords are the same
@@ -28,7 +28,7 @@ export interface UserInstance extends Instance<UserAttributes> {
      * @return {Boolean}
      * @api public
      */
-    authenticate(password: string, callback: (err:Error, sucess: boolean) => void);
+    authenticate(password: string, callback?: (err: Error, sucess: boolean) => void);
 
     /**
      * Make salt
@@ -55,5 +55,9 @@ export interface UserInstance extends Instance<UserAttributes> {
      * @return {String}
      * @api public
      */
-    updatePassword(fn: Error|string)
+    updatePassword(fn: Error|string);
+    profile(): IUserAttributes;
+}
+export interface IUserModel extends Model<IUserInstance, IUserAttributes>{
+
 }
