@@ -3,44 +3,44 @@
  * to disable, edit config/environment/index.js, and set `seedDB: false`
  */
 
-'use strict';
-import {db} from './index';
-import {Config as config} from '../config/environment'
-import {UserAttributes, UserInstance} from "../models/user/IUser";
+"use strict";
+import {Config as config} from "../config/environment";
+import {IUserAttributes, IUserInstance} from "../models/user/IUser";
+import {db} from "./index";
 
 export function seedDatabase() {
-    let User= db.User  ;
-    if(config.seedDB) {
+    const User = db.User  ;
+    if (config.seedDB) {
         User.destroy({where: {}})
             .then(() => User.bulkCreate([{
-                provider: 'local',
-                name: 'Test User',
-                email: 'test@example.com',
-                password: 'test'
+                provider: "local",
+                name: "Test User",
+                email: "test@example.com",
+                password: "test",
             }, {
-                provider: 'local',
-                name: 'Test User2',
-                email: 'test2@example.com',
-                password: 'test'
+                provider: "local",
+                name: "Test User2",
+                email: "test2@example.com",
+                password: "test",
             }, {
-                provider: 'local',
-                name: 'Test User3',
-                email: 'test3@example.com',
-                password: 'test'
+                provider: "local",
+                name: "Test User3",
+                email: "test3@example.com",
+                password: "test",
             }, {
-                provider: 'local',
-                name: 'Test User4',
-                email: 'test4@example.com',
-                password: 'test'
+                provider: "local",
+                name: "Test User4",
+                email: "test4@example.com",
+                password: "test",
             }, {
-                provider: 'local',
-                role: 'admin',
-                name: 'Admin',
-                email: 'admin@example.com',
-                password: 'admin'
+                provider: "local",
+                role: "admin",
+                name: "Admin",
+                email: "admin@example.com",
+                password: "admin",
             }])
-                .then(() => console.log('finished populating users'))
-                .catch(err => console.log('error populating users', err)));
+                .then(() => console.log("finished populating users"))
+                .catch((err) => console.log("error populating users", err)));
     }
 
 }

@@ -1,149 +1,140 @@
-// 'use strict';
-//
-// import {db} from '../../sqldb';
-// import {Config as config } from '../../config/environment';
-// import * as jwt from 'jsonwebtoken';
-//
-// function validationError(res, statusCode) {
-//   statusCode = statusCode || 422;
-//   return function(err) {
-//     return res.status(statusCode).json(err);
-//   };
-// }
-//
-// function handleError(res, statusCode) {
-//   statusCode = statusCode || 500;
-//   return function(err) {
-//     return res.status(statusCode).send(err);
-//   };
-// }
-//
-// /**
-//  * Get list of users
-//  * restriction: 'admin'
-//  */
-// export function index(req, res) {
-//   return db.User.findAll({
-//     attributes: [
-//       '_id',
-//       'name',
-//       'email',
-//       'role',
-//       'provider'
-//     ]
-//   })
-//     .then(users => {
-//       res.status(200).json(users);
-//     })
-//     .catch(handleError(res));
-// }
-//
-// /**
-//  * Creates a new user
-//  */
-// export function create(req, res) {
-//   var User = db.User.build(req.body);
-//   User.setDataValue('provider', 'local');
-//   User.setDataValue('role', 'user');
-//   return newdb.User.save()
-//     .then(function(user) {
-//       var token = jwt.sign({ _id: user._id }, config.secrets.session, {
-//         expiresIn: 60 * 60 * 5
-//       });
-//       res.json({ token });
-//     })
-//     .catch(validationError(res));
-// }
-//
-// /**
-//  * Get a single user
-//  */
-// export function show(req, res, next) {
-//   var userId = req.params.id;
-//
-//   return db.User.find({
-//     where: {
-//       _id: userId
-//     }
-//   })
-//     .then(user => {
-//       if(!user) {
-//         return res.status(404).end();
-//       }
-//       res.json(user.profile);
-//     })
-//     .catch(err => next(err));
-// }
-//
-// /**
-//  * Deletes a user
-//  * restriction: 'admin'
-//  */
-// export function destroy(req, res) {
-//   return db.User.destroy({ where: { _id: req.params.id } })
-//     .then(function() {
-//       res.status(204).end();
-//     })
-//     .catch(handleError(res));
-// }
-//
-// /**
-//  * Change a users password
-//  */
-// export function changePassword(req, res) {
-//   var userId = req.user._id;
-//   var oldPass = String(req.body.oldPassword);
-//   var newPass = String(req.body.newPassword);
-//
-//   return db.User.find({
-//     where: {
-//       _id: userId
-//     }
-//   })
-//     .then(user => {
-//       if(user.authenticate(oldPass)) {
-//         user.password = newPass;
-//         return user.save()
-//           .then(() => {
+"use strict";
+
+import {NextFunction, Request, Response} from "express";
+import * as jwt from "jsonwebtoken";
+import {Model} from "sequelize";
+import {BaseController} from "../../common/base.controller";
+import {Config as config} from "../../config/environment";
+import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
+import {db} from "../../sqldb";
+export class UserController extends BaseController<Model<IUserInstance, IUserAttributes>> {
+    constructor() {
+        super(db.User);
+    }
+    public index(req: Request, res: Response) {
+        return db.User.findAll({
+            attributes: [
+                "_id",
+                "name",
+                "email",
+                "role",
+                "provider",
+            ],
+        })
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
+
+    /**
+     * Creates a new user
+     */
+    public create(req: Request, res: Response){
+        const User = this.entity.build(req.body);
+        User.setDataValue("provider", "local");
+        User.setDataValue("role", "user");
+        return User.save()
+            .then(function(user: IUserAttributes) {
+                const token = jwt.sign({_id: user._id} as object, config.secrets.session, {
+                    expiresIn: 60 * 60 * 5,
+                });
+                return {token};
+            })
+            .then(this.respondWithResult(res))
+            .catch(this.validationError(res));
+    }
+
+    /**
+     * Get a single user
+     */
+    public show(req: Request, res: Response, next) {
+        const userId = req.params.id;
+
+        return db.User.find({
+            where: {
+                _id: userId,
+            },
+        })
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).end();
+                }
+                res.json(user.profile);
+            })
+            .catch((err) => next(err));
+    }
+
+    /**
+     * Deletes a user
+     * restriction: 'admin'
+     */
+//      destroy(req, res) {
+//     return db.User.destroy({ where: { _id: req.params.id } })
+//         .then(function() {
 //             res.status(204).end();
-//           })
-//           .catch(validationError(res));
-//       } else {
-//         return res.status(403).end();
-//       }
-//     });
+//         })
+//         .catch(handleError(res));
 // }
-//
-// /**
-//  * Get my info
-//  */
-// export function me(req, res, next) {
-//   var userId = req.user._id;
-//
-//   return db.User.find({
-//     where: {
-//       _id: userId
-//     },
-//     attributes: [
-//       '_id',
-//       'name',
-//       'email',
-//       'role',
-//       'provider'
-//     ]
-//   })
-//     .then(user => { // don't ever give out the password or salt
-//       if(!user) {
-//         return res.status(401).end();
-//       }
-//       res.json(user);
-//     })
-//     .catch(err => next(err));
-// }
-//
-// /**
-//  * Authentication callback
-//  */
-// export function authCallback(req, res) {
-//   res.redirect('/');
-// }
+
+    /**
+     * Change a users password
+     */
+    public changePassword(req: Request, res: Response) {
+        const userId = req.user._id;
+        const oldPass = String(req.body.oldPassword);
+        const newPass = String(req.body.newPassword);
+
+        return this.entity.find({
+            where: {
+                _id: userId,
+            },
+        })
+            .then((user) => {
+                if (user.authenticate(oldPass)) {
+                    user.password = newPass;
+                    return user.save()
+                        .then(() => {
+                            res.status(204).end();
+                        })
+                        .catch(this.validationError(res));
+                } else {
+                    return res.status(403).end();
+                }
+            });
+    }
+
+    /**
+     * Get my info
+     */
+    public me(req: Request, res: Response, next: NextFunction) {
+        const userId = req.user._id;
+
+        return db.User.find({
+            where: {
+                _id: userId,
+            },
+            attributes: [
+                "_id",
+                "name",
+                "email",
+                "role",
+                "provider",
+            ],
+        })
+            .then((user) => { // don't ever give out the password or salt
+                if (!user) {
+                    return res.status(401).end();
+                }
+                res.json(user);
+            })
+            .catch((err) => next(err));
+    }
+
+    /**
+     * Authentication callback
+     */
+    public authCallback(req: Request, res: Response) {
+        res.redirect("/");
+    }
+
+}
+export const controller = new UserController();
