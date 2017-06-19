@@ -10,7 +10,7 @@ export class ProdConfig extends ServerConfig{
 || 8080;
   seedDB = true;
   dbConfig = {
-    dbName: 'node-typescript-dev',
+    dbName: 'trellolo-prod',
     name: 'root',
     password: 'hello',
     options: {
