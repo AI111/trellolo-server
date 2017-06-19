@@ -5,9 +5,10 @@
 
 'use strict';
 import {db} from './index';
+import {UserAttributes, UserInstance} from "../models/user/IUser";
 
 export function seedDatabase() {
-    let User = db.User as any;
+    let User= db.User  ;
 
 
     User.destroy({ where: {} })
