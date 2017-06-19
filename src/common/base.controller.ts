@@ -39,9 +39,9 @@ export class BaseController<Entity extends Model <any, any>>{
     }
 
 // Creates a new Thing in the DB
-    public create(req: Request, res: Response) {
+    public create(req: Request, res: Response){
         return this.entity.create(req.body)
-            .then(this.respondWithResult(res, 201))
+        .then(this.respondWithResult(res, 201))
             .catch(this.handleError(res));
     }
 

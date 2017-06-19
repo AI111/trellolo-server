@@ -10,7 +10,8 @@ export interface IDBConfig{
     options?: Options
 }
 export  interface ISecrets{
-    session: string
+    session: string;
+    reCaptchaSecrer: string;
 }
 export interface ISocialCreds{
     clientID: string;
