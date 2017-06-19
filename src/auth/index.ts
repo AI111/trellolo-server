@@ -17,4 +17,5 @@ export default function() {
 // router.use('/facebook', require('./facebook').default);
 // router.use('/twitter', require('./twitter').default);
 // router.use('/google', require('./google').default);
+    return router;
 }
