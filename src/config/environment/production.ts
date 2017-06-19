@@ -8,7 +8,10 @@ export class ProdConfig extends ServerConfig{
   port = process.env.OPENSHIFT_NODEJS_PORT
 || process.env.PORT
 || 8080;
-  seedDB = true;
+  seedDB = false;
+  secrets = {
+    session: 'trellolo & trollolo'
+  };
   dbConfig = {
     dbName: 'trellolo-prod',
     name: 'root',
