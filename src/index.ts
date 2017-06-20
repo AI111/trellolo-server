@@ -5,6 +5,7 @@ import * as debug from "debug";
 import * as http from "http";
 import App from "./app";
 import {db} from "./sqldb";
+// global.Promise = require("sequelize").Promise;
 import {seedDatabase} from "./sqldb/seed";
 debug("ts-express:server");
 

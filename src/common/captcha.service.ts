@@ -3,15 +3,16 @@
  */
 import {post, RequestResponse} from "request";
 import {Config} from "../config/environment";
-import * as Bluebird from "bluebird";
-
+import * as debug from "debug";
+import * as Promise from "bluebird";
 const API_URL = "https://www.google.com/recaptcha/api/siteverify";
-
+debug("ts-express:server");
 export class GoogleCaptchaService{
-    public verifyCaptcha(token: string): Bluebird<any>{
-        return new Bluebird((resolve: () => void, reject: (any) => void) => {
-            post(API_URL, { body: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
+    public verifyCaptcha(token: string): Promise<any>{
+        return new Promise((resolve: () => void, reject: (any) => void) => {
+            post(API_URL,{json: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
                 (error, res: RequestResponse, body) => {
+                debug(`${error} \n ${body}`);
                 if (error) return reject(error);
                 return resolve();
             });
