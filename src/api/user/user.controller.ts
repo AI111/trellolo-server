@@ -28,10 +28,12 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
     /**
      * Creates a new user
      */
-    public create(req: Request, res: Response) {
-            return captureServiceInstance.verifyCaptcha(req.body.token)
+    public create = (req: Request, res: Response) => {
+        console.log(this);
+        return captureServiceInstance.verifyCaptcha(req.body.token).bind(this)
             .then(() => {
-                const User = this.entity.build(req.body);
+                console.log(this);
+                let User = db.User.build(req.body);
                 User.setDataValue("provider", "local");
                 User.setDataValue("role", "user");
                 return User.save();
