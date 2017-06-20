@@ -38,10 +38,10 @@ export default function(sequelize, DataTypes) {
     },
     provider: DataTypes.STRING,
     salt: DataTypes.STRING,
-    facebook: DataTypes.JSON,
-    twitter: DataTypes.JSON,
-    google: DataTypes.JSON,
-    github: DataTypes.JSON
+    facebook: DataTypes.STRING,
+    twitter: DataTypes.STRING,
+    google: DataTypes.STRING,
+    github: DataTypes.STRING
 
   }, {
 
