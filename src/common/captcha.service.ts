@@ -10,9 +10,9 @@ debug("ts-express:server");
 export class GoogleCaptchaService{
     public verifyCaptcha(token: string): Promise<any>{
         return new Promise((resolve: () => void, reject: (any) => void) => {
-            post(API_URL,{json: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
+            post(API_URL,{form: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
                 (error, res: RequestResponse, body) => {
-                if (error || !body.success) return reject(error);
+                if (error || !body.success) return reject(error || body);
                 return resolve();
             });
         });
