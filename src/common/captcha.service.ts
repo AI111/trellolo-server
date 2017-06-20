@@ -12,8 +12,7 @@ export class GoogleCaptchaService{
         return new Promise((resolve: () => void, reject: (any) => void) => {
             post(API_URL,{json: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
                 (error, res: RequestResponse, body) => {
-                debug(`${error} \n ${body}`);
-                if (error) return reject(error);
+                if (error || !body.success) return reject(error);
                 return resolve();
             });
         });
