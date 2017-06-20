@@ -3,9 +3,11 @@ import * as express from "express";
 import {Router} from "express";
 import {Config as config} from "../config/environment";
 import {db} from "../sqldb";
-import {setup} from "./local/passport";
+import {setup as localSetup} from "./local/passport";
+import {setup as googleSetup} from "./google/passport";
 // Passport Configuration
-setup(db.User, config);
+localSetup(db.User, config);
+googleSetup(db.User, config);
 // require('./facebook/passport').setup(DBConnection.User, config);
 // require('./google/passport').setup(DBConnection.User, config);
 // require('./twitter/passport').setup(DBConnection.User, config);
@@ -16,6 +18,6 @@ export default function() {
     router.use("/local", require("./local").default);
 // router.use('/facebook', require('./facebook').default);
 // router.use('/twitter', require('./twitter').default);
-// router.use('/google', require('./google').default);
+    router.use('/google', require('./google').default);
     return router;
 }
