@@ -7,6 +7,7 @@ import {BaseController} from "../../common/base.controller";
 import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
+import * as Joi from 'joi';
 export class UserController extends BaseController<Model<IUserInstance, IUserAttributes>> {
     constructor() {
         super(db.User);
@@ -24,7 +25,11 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-
+    public createValidator = Joi.object().keys({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(4).max(30).required(),
+        token: Joi.string().required()
+    });
     /**
      * Creates a new user
      */
@@ -50,7 +55,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
     /**
      * Get a single user
      */
-    public show(req: Request, res: Response, next) {
+    public show (req: Request, res: Response, next) {
         const userId = req.params.id;
 
         return db.User.find({
@@ -111,7 +116,6 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
      */
     public me(req: Request, res: Response, next: NextFunction) {
         const userId = req.user._id;
-
         return db.User.find({
             where: {
                 _id: userId,
