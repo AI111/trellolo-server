@@ -8,6 +8,7 @@ import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as errorHandler from "errorhandler";
 import {Application} from "express";
+import * as cors from "cors";
 import * as session from "express-session";
 // import * as lusca from "lusca";
 import * as  methodOverride from "method-override";
@@ -22,7 +23,7 @@ const Store = expressSequelizeSession(session.Store);
 
 export function configExpress(app: Application) {
     let env = app.get("env");
-
+    app.use(cors());
     app.use(morgan("dev"));
     app.use(shrinkRay());
     app.use(bodyParser.urlencoded({ extended: false }));
