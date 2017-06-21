@@ -4,6 +4,7 @@
 import  {Options} from 'sequelize'
 import * as path from "path";
 export interface IDBConfig{
+    uri?:string;
     dbName?: string,
     name?: string,
     password?: string,

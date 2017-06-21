@@ -3,12 +3,14 @@
  */
 import {Instance, Model} from "sequelize";
 import {IUserInstance} from "../user/IUser";
+import {IBoardInstance} from "../board/IBoard";
 
 export interface IProjectAttributes {
     _id?: number;
     name?: string;
     creator: IUserInstance;
-    board: IBoardInstance
+    board: IBoardInstance;
+    columns: [ICol]
 }
 
 export interface IProjectInstance  extends Instance<IProjectAttributes>, IProjectAttributes {

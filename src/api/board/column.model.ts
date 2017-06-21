@@ -12,6 +12,7 @@ export default function(sequelize, DataTypes) {
         name: DataTypes.STRING,
         info: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
+        order: DataTypes.INTEGER,
         boardId: {
             type: DataTypes.INTEGER,
             modal: 'Board',

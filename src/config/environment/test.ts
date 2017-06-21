@@ -6,7 +6,7 @@ import {ServerConfig} from "../../models/IConfig";
 // ===========================
 
 export class TestConfig extends ServerConfig{
-  seedDB = true;
+  seedDB = false;
   dbConfig = {
     uri: 'sqlite://',
     options: {
