@@ -9,7 +9,6 @@ before_install:
   - npm install -g typescript node-gyp nyc
 env:
   - CXX=g++-4.8
-  - NODE_ENV=test
 addons:
   apt:
     sources:
