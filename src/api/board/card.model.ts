@@ -1,8 +1,9 @@
+
 /**
  * Created by sasha on 6/20/17.
  */
 export default function(sequelize, DataTypes) {
-    const ProjectColumn = sequelize.define('ProjectColumn', {
+    const Card = sequelize.define('Card', {
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -10,20 +11,17 @@ export default function(sequelize, DataTypes) {
             autoIncrement: true
         },
         name: DataTypes.STRING,
-        info: DataTypes.STRING,
+        description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
-        boardId: {
-            type: DataTypes.INTEGER,
-            modal: 'Board',
-            key:  '_id',
-            onDelete: 'cascade'
-        }
+        order: DataTypes.INTEGER,
+
     },{
         classMethods:{
             associate: (models) => {
-                ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' })
+                Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+                Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
             }
         }
     });
-    return ProjectColumn;
+    return Card;
 }

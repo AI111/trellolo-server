@@ -5,13 +5,14 @@ env:
   - CXX=g++-4.8
   - NODE_ENV=test
 addons:
+before_install:
+    - npm install node-pre-gyp typescript -g
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-before_install:
-    - "npm install node-pre-gyp typescript -g"
+
 install:
     - npm install
 script:

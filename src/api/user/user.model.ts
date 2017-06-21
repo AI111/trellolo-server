@@ -8,7 +8,7 @@ var validatePresenceOf = function(value) {
 };
 
 export default function(sequelize, DataTypes) {
-  var User = sequelize.define('User', {
+  const User = sequelize.define('User', {
 
     _id: {
       type: DataTypes.INTEGER,
@@ -44,7 +44,17 @@ export default function(sequelize, DataTypes) {
     github: DataTypes.STRING
 
   }, {
-
+    classMethods:{
+      associate: (models) => {
+        User.belongsToMany(models.Project,{
+          through:{
+            model: models.Team,
+            unique: false,
+          },
+          foreignKey: "userIs"
+        })
+      }
+    },
     /**
      * Virtual Getters
      */
