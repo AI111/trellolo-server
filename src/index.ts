@@ -15,7 +15,7 @@ App.set("port", port);
 const server: http.Server = http.createServer(App);
 db.connection.sync()
     .then(startServer)
-    .then(seedDatabase)
+    // .then(seedDatabase)
     .catch(function(err) {
         console.log("Server failed to start due to error: %s", err);
     });
@@ -53,3 +53,4 @@ function onListening(): void {
     const bind = (typeof addr === "string") ? `pipe ${addr}` : `port ${addr.port}`;
     console.log(`Listening on ${bind}`);
 }
+export default App;

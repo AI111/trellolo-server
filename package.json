@@ -8,7 +8,8 @@
     "serve": "ts-node src/index.ts",
     "build": "tsc",
     "test": "NODE_ENV=test nyc mocha",
-    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov | coveralls"
+    "test:integration": "NODE_ENV=test nyc mocha --opts ./test/mocha.integration.opts",
+    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov "
   },
   "nyc": {
     "include": [

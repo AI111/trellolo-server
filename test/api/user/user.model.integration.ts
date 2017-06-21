@@ -2,8 +2,7 @@
 
 import {expect, use}  from "chai";
 import * as chaiAsPromised from "chai-as-promised";
-import * as app from "../../";
-import {db} from "../../sqldb";
+import {db} from "../../../src/sqldb";
 const User = db.User;
 use(chaiAsPromised);
 let user;

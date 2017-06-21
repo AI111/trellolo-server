@@ -15,11 +15,8 @@ import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
 import * as shrinkRay from "shrink-ray";
-import {db} from "../sqldb";
-import {Config as config} from "./environment";
-import * as  expressSequelizeSession from "express-sequelize-session";
 
-const Store = expressSequelizeSession(session.Store);
+
 
 export function configExpress(app: Application) {
     let env = app.get("env");
@@ -31,16 +28,6 @@ export function configExpress(app: Application) {
     app.use(methodOverride());
     app.use(cookieParser());
     app.use(initialize());
-
-    // Persist sessions with MongoStore / sequelizeStore
-    // We need to enable sessions for passport-twitter because it's an
-    // oauth 1.0 strategy, and Lusca depends on sessions
-    app.use(session({
-        secret: config.secrets.session,
-        saveUninitialized: true,
-        resave: false,
-        store: new Store(db.connection),
-    }));
 
     /**
      * Lusca - express server security
