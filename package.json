@@ -9,7 +9,7 @@
     "build": "tsc",
     "test": "NODE_ENV=test nyc mocha",
     "test:integration": "NODE_ENV=test nyc mocha --opts ./test/mocha.integration.opts",
-    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov "
+    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov | coveralls"
   },
   "nyc": {
     "include": [
@@ -58,6 +58,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^7.0.0",
     "chai-http": "^3.0.0",
+    "coveralls": "^2.13.1",
     "gulp-typescript": "^3.1.1",
     "mocha": "^3.1.2",
     "mongoose": "^4.9.8",
@@ -67,7 +68,8 @@
     "sqlite3": "^3.1.8",
     "ts-node": "^1.6.1",
     "tslint": "^5.4.3",
-    "typescript": "^2.3.4"
+    "typescript": "^2.3.4",
+    "supertest": "^3.0.0"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
