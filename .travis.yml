@@ -1,18 +1,21 @@
 language: node_js
 node_js:
-  - 7
+  - 6
+matrix:
+  fast_finish: true
+  allow_failures:
+    - node_js: 5.12.0
+before_install:
+  - npm install -g typescript node-gyp
 env:
   - CXX=g++-4.8
   - NODE_ENV=test
 addons:
-before_install:
-    - npm install node-pre-gyp typescript -g
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
-
+    - g++-4.8
 install:
     - npm install
 script:
