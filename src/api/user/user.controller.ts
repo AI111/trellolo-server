@@ -12,7 +12,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
     constructor() {
         super(db.User);
     }
-    public index(req: Request, res: Response) {
+    public index = (req: Request, res: Response) =>{
         return db.User.findAll({
             attributes: [
                 "_id",
@@ -24,7 +24,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
         })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    }
+    };
     public createValidator = Joi.object().keys({
         email: Joi.string().email().required(),
         password: Joi.string().min(4).max(30).required(),
@@ -50,12 +50,12 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
             })
             .then(this.respondWithResult(res))
             .catch(this.validationError(res));
-    }
+    };
 
     /**
      * Get a single user
      */
-    public show (req: Request, res: Response, next) {
+    public show = (req: Request, res: Response, next) => {
         const userId = req.params.id;
 
         return db.User.find({
@@ -87,7 +87,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
     /**
      * Change a users password
      */
-    public changePassword(req: Request, res: Response) {
+    public changePassword = (req: Request, res: Response) => {
         const userId = req.user._id;
         const oldPass = String(req.body.oldPassword);
         const newPass = String(req.body.newPassword);
@@ -109,12 +109,12 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
                     return res.status(403).end();
                 }
             });
-    }
+    };
 
     /**
      * Get my info
      */
-    public me(req: Request, res: Response, next: NextFunction) {
+    public me = (req: Request, res: Response, next: NextFunction) => {
         const userId = req.user._id;
         return db.User.find({
             where: {
@@ -135,7 +135,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
                 res.json(user);
             })
             .catch((err) => next(err));
-    }
+    };
 
     /**
      * Authentication callback
