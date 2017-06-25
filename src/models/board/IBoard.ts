@@ -1,7 +1,4 @@
 /**
- * Created by sasha on 6/21/17.
- */
-/**
  * Created by sasha on 6/7/17.
  */
 import {Instance, Model} from "sequelize";

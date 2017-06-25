@@ -3,7 +3,7 @@
  */
 import {NextFunction, Request, Response} from "express";
 import * as jsonpatch from "fast-json-patch";
-import { Model } from "sequelize";
+import {Model, SequelizeStaticAndInstance} from "sequelize";
 export class BaseController<Entity extends Model <any, any>>{
     constructor(protected entity: Entity) {
 

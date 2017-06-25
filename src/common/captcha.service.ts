@@ -9,14 +9,15 @@ const API_URL = "https://www.google.com/recaptcha/api/siteverify";
 debug("ts-express:server");
 export class GoogleCaptchaService{
     public verifyCaptcha(token: string): Promise<any>{
-        return new Promise((resolve: () => void, reject: (any) => void) => {
-            // if(Config.env === 'test') return resolve();
-            post(API_URL,{form: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
-                (error, res: RequestResponse, body) => {
-                if (error || !JSON.parse(body).success) return reject(error || body);
-                return resolve();
-            });
-        });
+        return Promise.resolve();
+        // return new Promise((resolve: () => void, reject: (any) => void) => {
+        //     // if(Config.env === 'test') return resolve();
+        //     post(API_URL,{form: {secret: Config.secrets.reCaptchaSecrer, response: token}} ,
+        //         (error, res: RequestResponse, body) => {
+        //         if (error || !JSON.parse(body).success) return reject(error || body);
+        //         return resolve();
+        //     });
+        // });
     }
 }
 export const captureServiceInstance = new GoogleCaptchaService();

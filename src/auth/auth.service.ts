@@ -3,9 +3,9 @@ import {Config as config} from '../config/environment';
 import {sign} from 'jsonwebtoken';
 import * as expressJwt from 'express-jwt';
 const  compose  = require('composable-middleware');
-import {db} from '../sqldb';
+import {db} from '../sqldb/index';
 
-var validateJwt = expressJwt({
+const validateJwt = expressJwt({
   secret: config.secrets.session
 });
 
@@ -29,14 +29,18 @@ export function isAuthenticated() {
     })
     // Attach user to request
     .use(function(req, res, next) {
-      db.User.find({
+        console.log('db.User.find',db.User.find);
+
+        db.User.find({
         where: {
           _id: req.user._id
         }
       })
         .then(user => {
           if(!user) {
-            return res.status(401).end();
+              console.log('db.User.find({',user);
+
+              return res.status(401).end();
           }
           req.user = user;
           next();

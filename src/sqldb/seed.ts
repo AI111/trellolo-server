@@ -10,7 +10,7 @@ import {db} from "./index";
 
 export function seedDatabase() {
     const User = db.User  ;
-    if (config.seedDB) {
+    // if (config.seedDB) {
         User.destroy({where: {}})
             .then(() => User.bulkCreate([{
                 provider: "local",
@@ -41,6 +41,24 @@ export function seedDatabase() {
             }])
                 .then(() => console.log("finished populating users"))
                 .catch((err) => console.log("error populating users", err)));
-    }
+       var  user = db.User.build({
+            name: 'Fake User',
+            email: 'fake@example.com',
+            password: 'password'
+        });
+        return user.save()
+            .then(user => db.Project.create({
+                name: 'name',
+                description:'trollolo',
+                active: true
+            }))
+            .then(p => {
+                db.Team.create({
+                    project: p._id,
+                    user: user._id,
+                    teamName:'test'
+                })
+            })
+    // }
 
 }

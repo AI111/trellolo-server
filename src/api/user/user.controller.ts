@@ -34,7 +34,8 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
      * Creates a new user
      */
     public create = (req: Request, res: Response) => {
-        console.log('create ');
+        console.log(req.body);
+        if(req.file)req.body.avatar = req.file.path;
         return captureServiceInstance.verifyCaptcha(req.body.token)
             .then(() => {
                 let User = this.entity.build(req.body);

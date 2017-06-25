@@ -3,31 +3,47 @@
  */
 
 export default function(sequelize, DataTypes) {
-    return sequelize.define('team', {
-        id : {
+    const Team =  sequelize.define('Team', {
+        id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        userId:{
+        user: {
             type: DataTypes.INTEGER,
             modal: 'User',
-            key:  '_id',
-            onDelete: 'cascade'
+            key: '_id',
+            onDelete: 'cascade',
+            unique: 'compositeIndex'
         },
-        teamName:{
+        teamName: {
             type: DataTypes.STRING
         },
-        projectId: {
+        project: {
             type: DataTypes.INTEGER,
             modal: 'Project',
-            key:  '_id',
-            onDelete: 'cascade'
+            key: '_id',
+            onDelete: 'cascade',
+            unique: 'compositeIndex'
         },
         accessRights: {
-            type:   DataTypes.ENUM,
+            type: DataTypes.ENUM,
             values: ['user', 'admin', 'creator'],
-            defaultValue:'user'
+            defaultValue: 'user'
         }
-    });
+    },
+        {
+            classMethods:{
+                associate: (models) => {
+                    console.log('associate',models);
+                    // Team.belongsTo(models.User,{
+                    //     foreignKey: "user",
+                    // });
+                    // Team.belongsTo(models.Project,{
+                    //     foreignKey: "project",
+                    // });
+                }
+            }
+        });
+    return Team;
 }

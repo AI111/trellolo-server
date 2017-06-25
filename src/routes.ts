@@ -9,8 +9,8 @@ export function initRouter(app: Application) {
     // app.use('/api/users', require('./api/user'));
 
     app.use("/auth", require("./auth").default());
-    app.use("/api/users", require("./api/user").default());
-
+    app.use("/api/users", require("./api/user"));
+    app.use("/api/projects", require("./api/project").default());
     // All undefined asset or api routes should return a 404
 
 }

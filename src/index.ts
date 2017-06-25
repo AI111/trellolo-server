@@ -14,8 +14,8 @@ App.set("port", port);
 
 const server: http.Server = http.createServer(App);
 db.connection.sync()
-    .then(startServer)
     // .then(seedDatabase)
+    .then(startServer)
     .catch(function(err) {
         console.log("Server failed to start due to error: %s", err);
     });

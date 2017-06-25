@@ -2,7 +2,7 @@
  * Created by sasha on 6/20/17.
  */
 export default function(sequelize, DataTypes) {
-    const Board = sequelize.define('Project', {
+    const Board = sequelize.define('Board', {
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -12,8 +12,12 @@ export default function(sequelize, DataTypes) {
         name: {
             type: DataTypes.STRING,
             validate:{
-                isLength: {min:0, max: 50}
+                isLength: {min:0, max: 50},
+                notEmpty: true
             }
+        },
+        description: {
+            type: DataTypes.STRING
         },
         info: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
@@ -21,8 +25,8 @@ export default function(sequelize, DataTypes) {
     },{
         classMethods:{
             associate: (models) => {
-                Board.belongsTo(models.Project, {foreignKey: 'board'});
-                Board.hasMany(models.ProjectColumn, {foreignKey:'board', as: 'columns'});
+                Board.belongsTo(models.Project);
+                // Board.hasMany(models.ProjectColumn, {foreignKey:'', as: 'columns'});
             }
         }
     });

@@ -9,7 +9,6 @@ var validatePresenceOf = function(value) {
 
 export default function(sequelize, DataTypes) {
   const User = sequelize.define('User', {
-
     _id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -17,6 +16,7 @@ export default function(sequelize, DataTypes) {
       autoIncrement: true
     },
     name: DataTypes.STRING,
+    avatar: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
       unique: {
@@ -51,7 +51,8 @@ export default function(sequelize, DataTypes) {
             model: models.Team,
             unique: false,
           },
-          foreignKey: "userIs"
+          foreignKey: "user",
+          as: 'projects'
         })
       }
     },

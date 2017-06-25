@@ -7,12 +7,12 @@
 import * as Sequelize from "sequelize";
 import {Config as config} from "../config/environment/index";
 import {IUserAttributes, IUserInstance} from "../models/user/IUser";
-import {Model} from "sequelize";
+import {Associations, Model} from "sequelize";
 import {IProjectAttributes, IProjectInstance} from "../models/project/IProject";
 import {IBoardAttributes, IBoardInstance} from "../models/board/IBoard";
 import {IColumnAttributes, IColumnInstance} from "../models/board/IColumn";
 import {ICardAttributes, ICardInstance} from "../models/board/ICard";
-
+import {ITeamAttributes, ITeamInstance} from "../models/team/ITeam";
 const connection = config.env === 'test' &&new Sequelize(config.dbConfig.uri, config.dbConfig.options) ||
     new Sequelize(config.dbConfig.dbName, config.dbConfig.name, config.dbConfig.password,
     config.dbConfig.options);
@@ -20,10 +20,17 @@ export class DBConnection{
     public connection: Sequelize.Sequelize= connection;
     // public Thing: Sequelize.Model<any,any> = connection.import('../api/thing/user.model');
     public User: Model<IUserInstance, IUserAttributes> =  connection.import("../api/user/user.model") as Model<IUserInstance, IUserAttributes>;
-    public Project: Model<IProjectInstance,IProjectAttributes> =  connection.import("../api/project/project.module") as  Model<IProjectInstance,IProjectAttributes>;
+    public Project: Model<IProjectInstance,IProjectAttributes> =  connection.import("../api/project/project.model") as  Model<IProjectInstance,IProjectAttributes>;
     public Board: Model<IBoardInstance,IBoardAttributes> =  connection.import("../api/board/board.model") as  Model<IBoardInstance,IBoardAttributes>;
-    public ProjectColumn: Model<IColumnInstance,IColumnAttributes> =  connection.import("../api/board/column.model.ts") as  Model<IColumnInstance,IColumnAttributes>;
+    public ProjectColumn: Model<IColumnInstance,IColumnAttributes> =  connection.import("../api/board/column.model") as  Model<IColumnInstance,IColumnAttributes>;
     public Card: Model<ICardInstance,ICardAttributes> =  connection.import("../api/board/card.model") as  Model<ICardInstance,ICardAttributes>;
+    public Team: Model<ITeamInstance,ITeamAttributes> =  connection.import("../api/team/team.model") as  Model<ITeamInstance,ITeamAttributes>;
 
+    constructor(){
+        for(let pr in this){
+           if((<any>this[pr]).associate)(<any>this[pr]).associate(connection.models)
+        }
+        // (<any>this.Team).associate(connection.models)
+    }
 }
 export const db = new DBConnection();

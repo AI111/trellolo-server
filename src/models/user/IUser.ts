@@ -2,6 +2,7 @@
  * Created by sasha on 6/7/17.
  */
 import {Instance, Model} from "sequelize";
+import {IProjectAttributes} from "../project/IProject";
 
 export interface IUserAttributes {
     _id?: number;
@@ -15,6 +16,7 @@ export interface IUserAttributes {
     twitter?: string;
     google?: string;
     github?: string;
+    projects?: [IProjectAttributes]
 }
 
 export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttributes {

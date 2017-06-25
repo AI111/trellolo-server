@@ -11,30 +11,29 @@ export default function(sequelize, DataTypes) {
             primaryKey: true,
             autoIncrement: true
         },
-        name: DataTypes.STRING,
-        info: DataTypes.STRING,
-        active: DataTypes.BOOLEAN,
-        creator: {
-            type: DataTypes.INTEGER,
-            modal: 'User',
-            key:  '_id',
-            onDelete: 'cascade'
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate:{
+                isLength: {min:0, max: 50},
+                notEmpty: {
+                    msg: 'Name is a required field'
+                }
+            }
         },
-        board: {
-            type: DataTypes.INTEGER,
-            modal: 'Board',
-            key:  '_id',
-            onDelete: 'cascade'
-        },
+        icon: DataTypes.STRING,
+        description: DataTypes.STRING,
+        active: DataTypes.BOOLEAN
     },{
         classMethods:{
             associate: (models) => {
                 Project.belongsToMany(models.User,{
-                    through:{
+                    through: {
                         model: models.Team,
                         unique: false,
                     },
-                    foreignKey: "projectId"
+                    foreignKey: "project",
+                    as:"users"
                 })
             }
         }
