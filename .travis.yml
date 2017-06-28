@@ -6,7 +6,7 @@ matrix:
   allow_failures:
     - node_js: 5.12.0
 before_install:
-  - npm install -g typescript node-gyp nyc
+  - npm install -g typescript@2.3.4 node-gyp nyc
 env:
   - CXX=g++-4.8
 addons:
