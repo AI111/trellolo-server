@@ -13,9 +13,9 @@ const requestSpec = {
 const captchaService = proxyquire('../../src/common/captcha.service',{
     "request":requestSpec
 });
-describe('Captcha service', function () {
-    it('should send request to google server',(done) => {
-        requestSpec.post.callsFake(() => Promise.resolve());
-        expect(captchaService.captureServiceInstance.verifyCaptcha("123")).to.be.fulfilled.and.notify(done);
-    })
-})
+// describe('Captcha service', function () {
+//     it('should send request to google server',(done) => {
+//         requestSpec.post.callsFake(() => Promise.resolve());
+//         expect(captchaService.captureServiceInstance.verifyCaptcha("123")).to.be.fulfilled.and.notify(done);
+//     })
+// })

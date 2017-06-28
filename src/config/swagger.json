@@ -14,6 +14,7 @@
     }
   },
   "host": "trellolo.com",
+  "basePath": "/api",
   "tags": [
     {
       "name": "pet",
@@ -567,7 +568,7 @@
         }
       }
     },
-    "/user": {
+    "/users": {
       "post": {
         "tags": [
           "user"
@@ -575,19 +576,36 @@
         "summary": "Create user",
         "description": "This can only be done by the logged in user.",
         "operationId": "createUser",
-        "produces": [
-          "application/xml",
-          "application/json"
+        "consumes": [
+          "multipart/form-data"
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
-            "description": "Created user object",
+            "in": "formData",
+            "name": "avatar",
+            "type": "file",
+            "description": "The file to upload."
+          },
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
+            "description": "Description of file contents."
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string",
+            "required": true,
+            "description": "Description of file contents."
+          },
+          {
+            "in": "formData",
+            "name": "name",
+            "type": "string",
+            "required": false,
+            "description": "Description of file contents."
           }
         ],
         "responses": {
