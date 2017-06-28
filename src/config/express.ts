@@ -16,7 +16,7 @@ import * as  morgan from "morgan";
 import {initialize} from "passport";
 import * as shrinkRay from "shrink-ray";
 import * as swaggerUi from 'swagger-ui-express';
-const swaggerDocument = require('./swagger.json');
+const swaggerDocument = require('../../swagger.json');
 
 
 
