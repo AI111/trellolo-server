@@ -13,7 +13,7 @@ export default function(): Router {
     const router =  Router();
     router.get("/", isAuthenticated(), controller.show);
     router.delete("/:id", hasRole("admin"), controller.destroy);
-    router.put("/:id", isAuthenticated(), controller.update);
+    // router.put("/:id", isAuthenticated(), controller.update);
     router.post("/",isAuthenticated(), projectUpload, controller.create);
     return router;
 }
