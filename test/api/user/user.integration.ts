@@ -66,4 +66,41 @@ describe('User API:', function() {
                 .end(done);
         });
     });
+    // describe('GET /api/users/me', function() {
+    //     var token;
+    //
+    //     before(function(done) {
+    //         agent
+    //             .post('/auth/local')
+    //             .send({
+    //                 email: 'test@example.com',
+    //                 password: 'password'
+    //             })
+    //             .expect(200)
+    //             .expect('Content-Type', /json/)
+    //             .end((err, res) => {
+    //                 token = res.body.token;
+    //                 done();
+    //             });
+    //     });
+    //
+    //     it('should respond with a user profile when authenticated', function(done) {
+    //         agent
+    //             .get('/api/users/me')
+    //             .set('authorization', `Bearer ${token}`)
+    //             .expect(200)
+    //             .expect('Content-Type', /json/)
+    //             .end((err, res) => {
+    //                 expect(res.body._id.toString()).to.equal(user._id.toString());
+    //                 done();
+    //             });
+    //     });
+    //
+    //     it('should respond with a 401 when not authenticated', function(done) {
+    //         agent
+    //             .get('/api/users/me')
+    //             .expect(401)
+    //             .end(done);
+    //     });
+    // });
 });

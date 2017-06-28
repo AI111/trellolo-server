@@ -2,8 +2,11 @@
  * Created by sasha on 6/24/17.
  */
 // import * as authService from '../../src/auth/auth.service'
+const compose = require('composable-middleware');
 import {expect, use}  from "chai";
 import {spy,stub} from 'sinon'
+import * as async from "async";
+
 use(require('sinon-chai'));
 use(require('chai-as-promised'));
 use(require('chai-things'));
@@ -51,22 +54,26 @@ describe('Auth Service middleware:', function() {
         });
     });
     // describe('check isAuthenticated',function () {
-    //     it('it should authenticate user and append instance in request ',function () {
+    //     it('it should authenticate user and append instance in request ',function (done) {
     //         expressJwtSpec.callsFake((req,res,next)=>{
     //             req.user={_id:111};
     //             console.log('expressJwtSpec');
     //             next()
     //         });
     //         dbSpec.User.find.callsFake(()=>{
-    //             console.log('+++++++++++++++++');
     //             return Promise.resolve({_id:2222})
     //         });
     //
-    //         let next=;
+    //         // let next=;
     //         let req ={};
     //         let res ={};
-    //         authService.isAuthenticated()(req,res,next)
-    //         expect(expressJwtSpec).to.have.been.calledWith(req,res,next)
+    //
+    //                 authService.isAuthenticated()(req,res,next);
+    //                 expect(expressJwtSpec).to.have.been.calledWith(req,res,next)
+    //                 expect(true).to.be.equal(false);
+    //
+    //
+    //
     //     })
     // })
 });

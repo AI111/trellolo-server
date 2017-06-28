@@ -44,7 +44,7 @@ export interface IConfig{
 }
 export class ServerConfig implements IConfig{
     userRoles: Array<string> = ['guest', 'user', 'admin'];
-    root=path.normalize(`${__dirname}/../../..`);
+    root=path.normalize(`${__dirname}/../../`);
     env= process.env.NODE_ENV;
     port: number;
     ip: string;
