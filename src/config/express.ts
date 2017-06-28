@@ -15,6 +15,8 @@ import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
 import * as shrinkRay from "shrink-ray";
+import * as swaggerUi from 'swagger-ui-express';
+const swaggerDocument = require('./swagger.json');
 
 
 
@@ -27,6 +29,8 @@ export function configExpress(app: Application) {
     app.use(bodyParser.json());
     app.use(methodOverride());
     app.use(cookieParser());
+    app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
     app.use(initialize());
 
     /**

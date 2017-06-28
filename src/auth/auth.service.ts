@@ -29,8 +29,6 @@ export function isAuthenticated() {
     })
     // Attach user to request
     .use(function(req, res, next) {
-        console.log('db.User.find',db.User.find);
-
         db.User.find({
         where: {
           _id: req.user._id
@@ -38,8 +36,6 @@ export function isAuthenticated() {
       })
         .then(user => {
           if(!user) {
-              console.log('db.User.find({',user);
-
               return res.status(401).end();
           }
           req.user = user;

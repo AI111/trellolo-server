@@ -6,7 +6,9 @@ import {db} from '../../../src/sqldb';
 import * as request from 'supertest';
 import {expect, use}  from "chai";
 import {config} from "./test.config"
-import {unlink} from "fs";
+import {Config} from "../../../src/config/environment"
+import {unlink, stat} from "fs";
+import * as path from "path";
 use(require('sinon-chai'));
 use(require('chai-as-promised'));
 use(require('chai-things'));
@@ -52,13 +54,6 @@ describe('Project API:', function() {
         var token;
 
         before(function(done) {
-            // agent.get('/api/users')
-            //     .expect('Content-Type', /json/)
-            //     .end((err, res) => {
-            //         console.log('project',res.body);
-            //         // expect(res.body._id.toString()).to.equal(project._id.toString());
-            //         done();
-            //     });
             agent
                 .post('/auth/local')
                 .send({
@@ -68,7 +63,6 @@ describe('Project API:', function() {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .end((err, res) => {
-                console.log('REASAADSASD',err, res.body);
                     token = res.body.token;
                     done();
                 });
@@ -134,6 +128,71 @@ describe('Project API:', function() {
                     .get('/api/projects')
                     .expect(401)
                     .end(done);
+            });
+            it('should save img file', function(done) {
+                db.Project.findById(testProject._id)
+                    .then(project => {
+                        stat(path.join(Config.root, project.dataValues.icon),(err) =>{
+                            expect(err).is.null;
+                            return done()
+                        })
+                    })
+            });
+            after( (done) => {
+                unlink(testProject.icon,(err) => {
+                    if(err)console.error(err);
+                   return done()
+                })
+            })
+        })
+        describe('Check update exist project POST /api/projects', function () {
+            let testProject;
+            before(function (done) {
+
+                    agent.post('/api/projects')
+                        .field('name', config.projectName)
+                        .attach('icon', config.icon)
+                        .set('authorization', `Bearer ${token}`)
+                        .expect(200)
+                        .expect('Content-Type', /json/)
+                        .end((err, res) => {
+                            testProject = res.body;
+                            done();
+                        });
+            });
+            it('Check new Project in DB',  (done) => {
+                db.Project.find({where:{name:config.projectName}})
+                    .then(project => {
+                        project.dataValues.createdAt = (project.dataValues.createdAt as Date).toISOString();
+                        project.dataValues.updatedAt = (project.dataValues.updatedAt as Date).toISOString();
+                        expect(project.dataValues).to.deep.include(testProject);
+                        done();
+                    })
+            });
+            it('Should return error without required field name', (done)=>{
+                agent.post('/api/projects')
+                    .set('authorization', `Bearer ${token}`)
+                    .expect(500)
+                    .expect('Content-Type', /json/)
+                    .end((err, res) => {
+                        expect(res.body.errors[0].message).to.be.equal('name cannot be null');
+                        done();
+                    });
+            });
+            it('should respond with a 401 when not authenticated', function(done) {
+                agent
+                    .get('/api/projects')
+                    .expect(401)
+                    .end(done);
+            });
+            it('should save img file', function(done) {
+                db.Project.findById(testProject._id)
+                    .then(project => {
+                        stat(path.join(Config.root, project.dataValues.icon),(err) =>{
+                            expect(err).is.null;
+                            return done()
+                        })
+                    })
             });
             after( (done) => {
                 unlink(testProject.icon,(err) => {
