@@ -4,7 +4,7 @@ import {IConfig} from "../../models/IConfig";
 import {Sequelize} from "sequelize";
 
 function localAuthenticate(User, email, password, done) {
-  User.find({
+ return User.find({
     where: {
       email: email.toLowerCase()
     }
@@ -15,10 +15,7 @@ function localAuthenticate(User, email, password, done) {
           message: 'This email is not registered.'
         });
       }
-      user.authenticate(password, function(authError, authenticated) {
-        if(authError) {
-          return done(authError);
-        }
+      user.authenticate(password).then(authenticated => {
         if(!authenticated) {
           return done(null, false, { message: 'This password is not correct.' });
         } else {

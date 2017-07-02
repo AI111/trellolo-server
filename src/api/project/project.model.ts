@@ -24,19 +24,18 @@ export default function(sequelize, DataTypes) {
         icon: DataTypes.STRING,
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN
-    },{
-        classMethods:{
-            associate: (models) => {
-                Project.belongsToMany(models.User,{
-                    through: {
-                        model: models.Team,
-                        unique: false,
-                    },
-                    foreignKey: "project",
-                    as:"users"
-                })
-            }
-        }
     });
+
+    Project.associate = function(models)  {
+        console.log('Project',models);
+        Project.belongsToMany(models.User,{
+            through: {
+                model: models.Team,
+                unique: false,
+            },
+            foreignKey: "project",
+            as:"users"
+        })
+    };
     return Project;
 }

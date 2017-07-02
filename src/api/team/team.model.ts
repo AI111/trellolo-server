@@ -31,19 +31,10 @@ export default function(sequelize, DataTypes) {
             values: ['user', 'admin', 'creator'],
             defaultValue: 'user'
         }
-    },
-        {
-            classMethods:{
-                associate: (models) => {
-                    console.log('associate',models);
-                    // Team.belongsTo(models.User,{
-                    //     foreignKey: "user",
-                    // });
-                    // Team.belongsTo(models.Project,{
-                    //     foreignKey: "project",
-                    // });
-                }
-            }
-        });
+    });
+    Team.associate = function(models)  {
+        console.log('Team',models);
+
+    };
     return Team;
 }

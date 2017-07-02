@@ -19,12 +19,9 @@ export default function(sequelize, DataTypes) {
             key:  '_id',
             onDelete: 'cascade'
         }
-    },{
-        classMethods:{
-            associate: (models) => {
-                ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' })
-            }
-        }
     });
+    ProjectColumn.associate = function(models)  {
+        ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+    };
     return ProjectColumn;
 }

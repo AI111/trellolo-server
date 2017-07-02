@@ -32,7 +32,7 @@ describe('Auth Service middleware:', function() {
     describe('check setTokenCookie', function () {
         it('It should not work with unauthorized request', function (){
             let res = {
-                status:stub(),
+                    status:stub(),
                 send:spy()
             },req ={};
             res.status.returns(res);
@@ -53,6 +53,15 @@ describe('Auth Service middleware:', function() {
             expect(res.redirect).to.have.been.calledWith("/");
         });
     });
+    describe('check hasRole',function () {
+        it('It should check if role exist ',function () {
+            expect(authService.hasRole).to.throw(Error,'Required role needs to be set')
+        });
+        // it('It should send 401 if role lower then required', function () {
+        //    let isAuthStub = stub(authService,"isAuthenticated");
+        //    isAuthStub.
+        // });
+    })
     // describe('check isAuthenticated',function () {
     //     it('it should authenticate user and append instance in request ',function (done) {
     //         expressJwtSpec.callsFake((req,res,next)=>{
@@ -64,7 +73,7 @@ describe('Auth Service middleware:', function() {
     //             return Promise.resolve({_id:2222})
     //         });
     //
-    //         // let next=;
+    //         let next= spy();
     //         let req ={};
     //         let res ={};
     //

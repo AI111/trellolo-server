@@ -5,7 +5,7 @@ import * as app from '../../../src/index';
 import {db} from '../../../src/sqldb';
 import * as request from 'supertest';
 import {expect, use}  from "chai";
-import {config} from "./test.config"
+import {config} from "../../test.config"
 import {Config} from "../../../src/config/environment"
 import {unlink, stat} from "fs";
 import * as path from "path";
@@ -23,7 +23,7 @@ describe('Project API:', function() {
                 email: 'test@example.com',
                 password: 'password'
             });
-            return user.save()
+                return user.save()
                 .then(user => db.Project.create({
                     name: 'name',
                     icon:"icon",
@@ -31,6 +31,7 @@ describe('Project API:', function() {
                     active: true
                 }))
                 .then(p => {
+                    console.log("CREATE");
                     project = p;
                     db.Team.create({
                         project: p._id,
@@ -64,6 +65,9 @@ describe('Project API:', function() {
                 .expect('Content-Type', /json/)
                 .end((err, res) => {
                     token = res.body.token;
+                    console.log("TOKEN",err,token);
+                    db.User.findAll({}).then(users => console.log("USERS //////////",users[0].toJSON()));
+
                     done();
                 });
         });
@@ -89,62 +93,62 @@ describe('Project API:', function() {
                     .end(done);
             });
         });
-        describe('Check create new project POST /api/projects', function () {
-            let testProject;
-            before(function (done) {
-
-                    agent.post('/api/projects')
-                        .field('name', config.projectName)
-                        .attach('icon', config.icon)
-                        .set('authorization', `Bearer ${token}`)
-                        .expect(200)
-                        .expect('Content-Type', /json/)
-                        .end((err, res) => {
-                            testProject = res.body;
-                            done();
-                        });
-            });
-            it('Check new Project in DB',  (done) => {
-                db.Project.find({where:{name:config.projectName}})
-                    .then(project => {
-                        project.dataValues.createdAt = (project.dataValues.createdAt as Date).toISOString();
-                        project.dataValues.updatedAt = (project.dataValues.updatedAt as Date).toISOString();
-                        expect(project.dataValues).to.deep.include(testProject);
-                        done();
-                    })
-            });
-            it('Should return error without required field name', (done)=>{
-                agent.post('/api/projects')
-                    .set('authorization', `Bearer ${token}`)
-                    .expect(500)
-                    .expect('Content-Type', /json/)
-                    .end((err, res) => {
-                        expect(res.body.errors[0].message).to.be.equal('name cannot be null');
-                        done();
-                    });
-            });
-            it('should respond with a 401 when not authenticated', function(done) {
-                agent
-                    .get('/api/projects')
-                    .expect(401)
-                    .end(done);
-            });
-            it('should save img file', function(done) {
-                db.Project.findById(testProject._id)
-                    .then(project => {
-                        stat(path.join(Config.root, project.dataValues.icon),(err) =>{
-                            expect(err).is.null;
-                            return done()
-                        })
-                    })
-            });
-            after( (done) => {
-                unlink(testProject.icon,(err) => {
-                    if(err)console.error(err);
-                   return done()
-                })
-            })
-        })
+        // describe('Check create new project POST /api/projects', function () {
+        //     let testProject;
+        //     before(function (done) {
+        //
+        //         agent.post('/api/projects')
+        //             .field('name', config.projectName)
+        //             .attach('icon', config.icon)
+        //             .set('authorization', `Bearer ${token}`)
+        //             .expect(200)
+        //             .expect('Content-Type', /json/)
+        //             .end((err, res) => {
+        //                 testProject = res.body;
+        //                 done();
+        //             });
+        //     });
+        //     it('Check new Project in DB',  (done) => {
+        //         db.Project.find({where:{name:config.projectName}})
+        //             .then(project => {
+        //                 project.dataValues.createdAt = (project.dataValues.createdAt as Date).toISOString();
+        //                 project.dataValues.updatedAt = (project.dataValues.updatedAt as Date).toISOString();
+        //                 expect(project.dataValues).to.deep.include(testProject);
+        //                 done();
+        //             })
+        //     });
+        //     it('Should return error without required field name', (done)=>{
+        //         agent.post('/api/projects')
+        //             .set('authorization', `Bearer ${token}`)
+        //             .expect(500)
+        //             .expect('Content-Type', /json/)
+        //             .end((err, res) => {
+        //                 expect(res.body.errors[0].message).to.be.equal('name cannot be null');
+        //                 done();
+        //             });
+        //     });
+        //     it('should respond with a 401 when not authenticated', function(done) {
+        //         agent
+        //             .get('/api/projects')
+        //             .expect(401)
+        //             .end(done);
+        //     });
+        //     it('should save img file', function(done) {
+        //         db.Project.findById(testProject._id)
+        //             .then(project => {
+        //                 stat(path.join(Config.root, project.dataValues.icon),(err) =>{
+        //                     expect(err).is.null;
+        //                     return done()
+        //                 })
+        //             })
+        //     });
+        //     after( (done) => {
+        //         unlink(testProject.icon,(err) => {
+        //             if(err)console.error(err);
+        //             return done()
+        //         })
+        //     })
+        // })
         // describe('Check update exist project POST /api/projects', function () {
         //     let testProject;
         //     before(function (done) {

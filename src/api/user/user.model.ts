@@ -1,240 +1,193 @@
 'use strict';
 
 import {randomBytes, pbkdf2Sync, pbkdf2} from 'crypto';
+const Sequilize = require("sequelize");
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
 var validatePresenceOf = function(value) {
-  return value && value.length;
+    return value && value.length;
 };
-
-export default function(sequelize, DataTypes) {
-  const User = sequelize.define('User', {
-    _id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
-    },
-    name: DataTypes.STRING,
-    avatar: DataTypes.STRING,
-    email: {
-      type: DataTypes.STRING,
-      unique: {
-        msg: 'The specified email address is already in use.'
-      },
-      validate: {
-        isEmail: true
-      }
-    },
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: 'user'
-    },
-    password: {
-      type: DataTypes.STRING,
-      validate: {
-        notEmpty: true
-      }
-    },
-    provider: DataTypes.STRING,
-    salt: DataTypes.STRING,
-    facebook: DataTypes.STRING,
-    twitter: DataTypes.STRING,
-    google: DataTypes.STRING,
-    github: DataTypes.STRING
-
-  }, {
-    classMethods:{
-      associate: (models) => {
+export class User extends Sequilize.Model{
+    static  associate (models)  {
         User.belongsToMany(models.Project,{
-          through:{
-            model: models.Team,
-            unique: false,
-          },
-          foreignKey: "user",
-          as: 'projects'
+            through:{
+                model: models.Team,
+                unique: false,
+            },
+            foreignKey: "user",
+            as: 'projects'
         })
-      }
-    },
+    };
     /**
-     * Virtual Getters
+     * Authenticate - check if the passwords are the same
+     *
+     * @param {String} password
+     * @param {Function} callback
+     * @return {Boolean}
+     * @api public
      */
-    getterMethods: {
-      // Public profile information
-      profile() {
-        return {
-          name: this.name,
-          role: this.role
-        };
-      },
-
-      // Non-sensitive info we'll be putting in the token
-      token() {
-        return {
-          _id: this._id,
-          role: this.role
-        };
-      }
-    },
-
-    /**
-     * Pre-save hooks
-     */
-    hooks: {
-      beforeBulkCreate(users, fields, fn) {
-        var totalUpdated = 0;
-        users.forEach(user => {
-          user.updatePassword(err => {
-            if(err) {
-              return fn(err);
-            }
-            totalUpdated += 1;
-            if(totalUpdated === users.length) {
-              return fn();
-            }
-          });
-        });
-      },
-      beforeCreate(user, fields, fn) {
-        user.updatePassword(fn);
-      },
-      beforeUpdate(user, fields, fn) {
-        if(user.changed('password')) {
-          return user.updatePassword(fn);
-        }
-        fn();
-      }
-    },
-
-    /**
-     * Instance Methods
-     */
-    instanceMethods: {
-      /**
-       * Authenticate - check if the passwords are the same
-       *
-       * @param {String} password
-       * @param {Function} callback
-       * @return {Boolean}
-       * @api public
-       */
-      authenticate(password, callback) {
-        if(!callback) {
-          return this.password === this.encryptPassword(password);
-        }
-
+    authenticate(password): Promise<boolean> {
         var _this = this;
-        this.encryptPassword(password, function(err, pwdGen) {
-          if(err) {
-            callback(err);
-          }
+        return this.encryptPassword(password)
+            .then( pwdGen => _this.password === pwdGen);
+    };
 
-          if(_this.password === pwdGen) {
-            callback(null, true);
-          } else {
-            callback(null, false);
-          }
-        });
-      },
+    /**
+     * Make salt
+     *
+     * @param {Number} [byteSize] - Optional salt byte size, default to 16
+     * @param {Function} callback
+     * @return {String}
+     * @api public
+     */
+    makeSalt(byteSize: number =16): Promise<string> {
+        return new Sequilize.Promise((resolve: (string) => void, reject: (string) => void) => {
+            return randomBytes(byteSize, function(err, salt) {
+                if(err) return reject(err);
+                return resolve(salt.toString('base64'));
+            });
+        })
 
-      /**
-       * Make salt
-       *
-       * @param {Number} [byteSize] - Optional salt byte size, default to 16
-       * @param {Function} callback
-       * @return {String}
-       * @api public
-       */
-      makeSalt(...args) {
-        let byteSize;
-        let callback;
-        let defaultByteSize = 16;
+    };
 
-        if(typeof arguments[0] === 'function') {
-          callback = arguments[0];
-          byteSize = defaultByteSize;
-        } else if(typeof arguments[1] === 'function') {
-          callback = arguments[1];
-        } else {
-          throw new Error('Missing Callback');
-        }
-
-        if(!byteSize) {
-          byteSize = defaultByteSize;
-        }
-
-        return randomBytes(byteSize, function(err, salt) {
-          if(err) {
-            callback(err);
-          }
-          return callback(null, salt.toString('base64'));
-        });
-      },
-
-      /**
-       * Encrypt password
-       *
-       * @param {String} password
-       * @param {Function} callback
-       * @return {String}
-       * @api public
-       */
-      encryptPassword(password: string, callback) {
-        if(!password || !this.salt) {
-          return callback ? callback(null) : null;
-        }
-
+    /**
+     * Encrypt password
+     *
+     * @param {String} password
+     * @param {Function} callback
+     * @return {String}
+     * @api public
+     */
+    encryptPassword (password: string) : Promise<string> {
         const defaultIterations = 10000;
         const defaultKeyLength = 64;
         const salt = new Buffer(this.salt, 'base64');
 
-        if(!callback) {
-          // eslint-disable-next-line no-sync
-          return pbkdf2Sync(password, salt, defaultIterations, defaultKeyLength, 'sha1')
-                       .toString('base64');
-        }
+        return new Sequilize.Promise((resolve:(string) => void, reject: (any) => void) =>{
+            return pbkdf2(password, salt, defaultIterations, defaultKeyLength, 'sha1',
+                (err, key) => {
+                    if(err) return reject(err);
+                    return resolve(key.toString('base64'));
+                });
+        })
 
-        return pbkdf2(password, salt, defaultIterations, defaultKeyLength, 'sha1',
-          function(err, key) {
-            if(err) {
-              callback(err);
-            }
-            return callback(null, key.toString('base64'));
-          });
-      },
-
-      /**
-       * Update password field
-       *
-       * @param {Function} fn
-       * @return {String}
-       * @api public
-       */
-      updatePassword(fn) {
+    };
+    /**
+     * Encrypt password sync
+     *
+     * @param {String} password
+     * @return {String}
+     * @api public
+     */
+    encryptPassworSync(password: string) :string {
+        const defaultIterations = 10000;
+        const defaultKeyLength = 64;
+        const salt = new Buffer(this.salt, 'base64');
+        // eslint-disable-next-line no-sync
+        return pbkdf2Sync(password, salt, defaultIterations, defaultKeyLength, 'sha1')
+            .toString('base64');
+    };
+    /**
+     * Update password field
+     *
+     * @param {Function} fn
+     * @return {String}
+     * @api public
+     */
+    updatePassword() :Promise<void>  {
         // Handle new/update passwords
-        if(!this.password) return fn(null);
+        if(!this.password) return Sequilize.Promise.resolve();
 
         if(!validatePresenceOf(this.password) && authTypes.indexOf(this.provider) === -1) {
-          fn(new Error('Invalid password'));
+            return Sequilize.Promise.reject(new Error('Invalid password'));
         }
-
         // Make salt with a callback
-        this.makeSalt((saltErr, salt) => {
-          if(saltErr) {
-            return fn(saltErr);
-          }
-          this.salt = salt;
-          this.encryptPassword(this.password, (encryptErr, hashedPassword) => {
-            if(encryptErr) {
-              fn(encryptErr);
-            }
-            this.password = hashedPassword;
-            fn(null);
-          });
-        });
-      }
-    }
-  });
+        return this.makeSalt()
+            .then(salt => {
+                this.salt = salt;
+                return this.encryptPassword(this.password)
+                    .then(hashedPassword => {
+                        this.password = hashedPassword;
+                        return;
+                    });
+            });
+    };
+}
 
-  return User;
+export default function(sequelize, DataTypes) {
+    User.init({
+            _id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                primaryKey: true,
+                autoIncrement: true
+            },
+            name: DataTypes.STRING,
+            avatar: DataTypes.STRING,
+            email: {
+                type: DataTypes.STRING,
+                unique: {
+                    msg: 'The specified email address is already in use.'
+                },
+                validate: {
+                    isEmail: true
+                }
+            },
+            role: {
+                type: DataTypes.STRING,
+                defaultValue: 'user'
+            },
+            password: {
+                type: DataTypes.STRING,
+                validate: {
+                    notEmpty: true
+                }
+            },
+            provider: DataTypes.STRING,
+            salt: DataTypes.STRING,
+            facebook: DataTypes.STRING,
+            twitter: DataTypes.STRING,
+            google: DataTypes.STRING,
+            github: DataTypes.STRING
+
+        },
+        {
+            sequelize,
+            /**
+             * Virtual Getters
+             */
+            getterMethods: {
+                // Public profile information
+                profile() {
+                    return {
+                        name: this.name,
+                        role: this.role
+                    };
+                },
+
+                // Non-sensitive info we'll be putting in the token
+                token() {
+                    return {
+                        _id: this._id,
+                        role: this.role
+                    };
+                }
+            },
+            /**
+             * Pre-save hooks
+             */
+            hooks: {
+                beforeBulkCreate(users, fields) {
+                    return sequelize.Promise.all(users.map(user => user.updatePassword()))
+                },
+                beforeCreate(user, fields, fn) {
+                    return user.updatePassword();
+                },
+                beforeUpdate(user, fields, fn) {
+                    if(user.changed('password')) return user.updatePassword();
+                    return sequelize.Promise.resolve();
+                }
+            },
+        });
+    return User;
 }

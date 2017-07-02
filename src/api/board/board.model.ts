@@ -22,13 +22,9 @@ export default function(sequelize, DataTypes) {
         info: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
 
-    },{
-        classMethods:{
-            associate: (models) => {
-                Board.belongsTo(models.Project);
-                // Board.hasMany(models.ProjectColumn, {foreignKey:'', as: 'columns'});
-            }
-        }
     });
+    Board.associate = function(models)  {
+        Board.belongsTo(models.Project);
+    };
     return Board;
 }

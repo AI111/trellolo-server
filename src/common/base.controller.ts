@@ -8,18 +8,7 @@ export class BaseController<Entity extends Model <any, any>>{
     constructor(protected entity: Entity) {
 
     }
-    protected patchUpdates(patches) {
-        return function(entity) {
-            try {
-                // eslint-disable-next-line prefer-reflect
-                jsonpatch.default.apply(entity, patches, /*validate*/ true);
-            } catch (err) {
-                return Promise.reject(err);
-            }
 
-            return entity.save();
-        };
-    }
     public index = (req: Request, res: Response) => {
         return this.entity.findAll()
             .then(this.respondWithResult(res))
@@ -87,6 +76,7 @@ export class BaseController<Entity extends Model <any, any>>{
             .then(this.removeEntity(res))
             .catch(this.handleError(res));
     };
+
     protected handleError(res: Response, statusCode: number= 500) {
         return function(err) {
             return res.status(statusCode).send(err);
@@ -122,6 +112,18 @@ export class BaseController<Entity extends Model <any, any>>{
                         res.status(204).end();
                     });
             }
+        };
+    }
+    protected patchUpdates(patches) {
+        return function(entity) {
+            try {
+                // eslint-disable-next-line prefer-reflect
+                jsonpatch.default.apply(entity, patches, /*validate*/ true);
+            } catch (err) {
+                return Promise.reject(err);
+            }
+
+            return entity.save();
         };
     }
 }
