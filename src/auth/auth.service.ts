@@ -29,6 +29,7 @@ export function isAuthenticated() {
     })
     // Attach user to request
     .use(function(req, res, next) {
+        console.log("USER ",req);
         db.User.find({
         where: {
           _id: req.user._id
@@ -52,7 +53,6 @@ export function hasRole(roleRequired) {
   if(!roleRequired) {
     throw new Error('Required role needs to be set');
   }
-
   return compose()
     .use(isAuthenticated())
     .use(function meetsRequirements(req, res, next) {

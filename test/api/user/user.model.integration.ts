@@ -58,11 +58,11 @@ describe("User Model", function() {
     });
 
     it("should authenticate user if valid", function() {
-      expect(user.authenticate("password")).to.be.true;
+     return  expect(user.authenticate("password")).to.eventually.true;
     });
 
     it("should not authenticate user if invalid", function() {
-      expect(user.authenticate("blah")).to.not.be.true;
+     return expect(user.authenticate("blah")).to.eventually.false;
     });
 
     it("should remain the same hash unless the password is updated", function() {

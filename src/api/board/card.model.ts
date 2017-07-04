@@ -15,13 +15,10 @@ export default function(sequelize, DataTypes) {
         active: DataTypes.BOOLEAN,
         order: DataTypes.INTEGER,
 
-    },{
-        classMethods:{
-            associate: (models) => {
-                Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
-                Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
-            }
-        }
     });
+    Card.associate = function(models)  {
+        Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+        Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
+    };
     return Card;
 }

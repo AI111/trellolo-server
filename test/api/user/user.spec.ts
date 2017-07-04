@@ -1,13 +1,17 @@
 // /**
 //  * Created by sasha on 6/22/17.
 //  */
-// 'use strict';
-// import {expect, use}  from "chai";
-// import {spy} from "sinon"
-// const proxyquire = require('proxyquire').noPreserveCache();
-// use(require('sinon-chai'));
-// use(require('chai-as-promised'));
-// use(require('chai-things'));
+'use strict';
+import {expect, use}  from "chai";
+import {spy} from "sinon"
+const proxyquire = require('proxyquire').noPreserveCache();
+use(require('sinon-chai'));
+use(require('chai-as-promised'));
+use(require('chai-things'));
+import {BaseController} from '../../../src/common/base.controller'
+import {Model} from "sequelize";
+import {IUserAttributes, IUserInstance} from "../../../src/models/user/IUser";
+
 //
 // var userCtrlStub = {
 //     index: 'userCtrl.index',
