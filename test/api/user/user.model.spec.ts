@@ -12,10 +12,10 @@ use(require('chai-things'));
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
 
 describe("Check User model instance methods",function () {
-    describe("Check makeSalt", function () {
-        it("It should return promise ",function () {
-            let user = db.User()
-        })
-    })
+    // describe("Check makeSalt", function () {
+    //     it("It should return promise ",function () {
+    //         let user = db.User()
+    //     })
+    // })
 
 })
