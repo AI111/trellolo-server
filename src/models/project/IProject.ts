@@ -9,7 +9,7 @@ import {IDBInstance} from "../IDBInstance";
 
 export interface IProjectAttributes extends IDBInstance{
     _id?: number;
-    name?: string;
+    title?: string;
     description?: string;
     active?: boolean;
     icon?: string;

@@ -2,17 +2,18 @@
 import {captureServiceInstance} from "../../common/captcha.service";
 import {NextFunction, Request, Response} from "express";
 import * as jwt from "jsonwebtoken";
-import {Model} from "sequelize";
+import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
 import * as Joi from 'joi';
-export class UserController extends BaseController<Model<IUserInstance, IUserAttributes>> {
+export class UserController extends BaseController<Sequelize.Model<IUserInstance, IUserAttributes>> {
     constructor() {
         super(db.User);
     }
-    public index = (req: Request, res: Response) =>{
+
+    public index = (req: Request, res: Response) => {
         return db.User.findAll({
             attributes: [
                 "_id",
@@ -26,31 +27,28 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
             .catch(this.handleError(res));
     };
     public createValidator = Joi.object().keys({
+        name: Joi.string().optional(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(4).max(30).required(),
+        password: Joi.string().min(6).max(30).required(),
         token: Joi.string().required()
     });
     /**
      * Creates a new user
      */
     public create = (req: Request, res: Response) => {
-        console.log(req.body);
-        if(req.file)req.body.avatar = req.file.path;
-        return captureServiceInstance.verifyCaptcha(req.body.token)
-            .then(() => {
-                let User = this.entity.build(req.body);
-                User.setDataValue("provider", "local");
-                User.setDataValue("role", "user");
-                return User.save();
-            })
-            .then((user: IUserAttributes) => {
-                const token = jwt.sign({_id: user._id} as object, config.secrets.session, {
+        let User = this.entity.build(req.body);
+        if (req.file) User.setDataValue("avatar", req.file.path);
+        User.setDataValue("provider", "local");
+        User.setDataValue("role", "user");
+        return User.save()
+            .then((user) => {
+                const token = jwt.sign({_id: user.getDataValue('_id')}, config.secrets.session, {
                     expiresIn: 60 * 60 * 5,
                 });
                 return {token};
             })
             .then(this.respondWithResult(res))
-            .catch(this.validationError(res));
+            .catch(this.handleError(res));
     };
 
     /**
@@ -71,19 +69,7 @@ export class UserController extends BaseController<Model<IUserInstance, IUserAtt
                 res.json(user.profile);
             })
             .catch((err) => next(err));
-    }
-
-    /**
-     * Deletes a user
-     * restriction: 'admin'
-     */
-//      destroy(req, res) {
-//     return db.User.destroy({ where: { _id: req.params.id } })
-//         .then(function() {
-//             res.status(204).end();
-//         })
-//         .catch(handleError(res));
-// }
+    };
 
     /**
      * Change a users password

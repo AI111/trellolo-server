@@ -17,6 +17,12 @@
   "basePath": "/api",
   "tags": [
     {
+      "name": "Project"
+    },
+    {
+      "name": "Board"
+    },
+    {
       "name": "pet",
       "description": "Everything about your Pets",
       "externalDocs": {
@@ -45,17 +51,15 @@
     "/pet": {
       "post": {
         "tags": [
-          "pet"
+          "Project"
         ],
-        "summary": "Add a new pet to the store",
+        "summary": "Create a new Project",
         "description": "",
         "operationId": "addPet",
         "consumes": [
-          "application/json",
-          "application/xml"
+          "application/json"
         ],
         "produces": [
-          "application/xml",
           "application/json"
         ],
         "parameters": [
@@ -65,7 +69,7 @@
             "description": "Pet object that needs to be added to the store",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Pet"
+              "$ref": "#/definitions/Project"
             }
           }
         ],
@@ -87,15 +91,13 @@
         "tags": [
           "pet"
         ],
-        "summary": "Update an existing pet",
+        "summary": "Update an existing Project",
         "description": "",
-        "operationId": "updatePet",
+        "operationId": "updateProject",
         "consumes": [
-          "application/json",
-          "application/xml"
+          "application/json"
         ],
         "produces": [
-          "application/xml",
           "application/json"
         ],
         "parameters": [
@@ -114,7 +116,7 @@
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Pet not found"
+            "description": "Project not found"
           },
           "405": {
             "description": "Validation exception"
@@ -931,17 +933,34 @@
         "name": "Category"
       }
     },
+    "Project":{
+      "type": "object",
+      "properties": {
+        "title":{
+          "type": "string"
+        },
+        "description":{
+          "type": "string"
+        },
+        "icon":{
+          "type": "string"
+        }
+      }
+    },
     "User": {
       "type": "object",
       "properties": {
-        "id": {
+        "_id": {
           "type": "integer",
           "format": "int64"
         },
-        "username": {
+        "name": {
           "type": "string"
         },
         "firstName": {
+          "type": "string"
+        },
+        "avatar": {
           "type": "string"
         },
         "lastName": {
@@ -951,9 +970,6 @@
           "type": "string"
         },
         "password": {
-          "type": "string"
-        },
-        "phone": {
           "type": "string"
         },
         "userStatus": {

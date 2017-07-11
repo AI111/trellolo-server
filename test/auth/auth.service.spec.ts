@@ -1,3 +1,4 @@
+import {req, res} from "../test.config";
 /**
  * Created by sasha on 6/24/17.
  */
@@ -11,6 +12,7 @@ use(require('sinon-chai'));
 use(require('chai-as-promised'));
 use(require('chai-things'));
 import * as Promise from "bluebird";
+import {log} from "util";
 
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
 
@@ -32,7 +34,7 @@ describe('Auth Service middleware:', function() {
     describe('check setTokenCookie', function () {
         it('It should not work with unauthorized request', function (){
             let res = {
-                    status:stub(),
+                status:stub(),
                 send:spy()
             },req ={};
             res.status.returns(res);
@@ -57,9 +59,23 @@ describe('Auth Service middleware:', function() {
         it('It should check if role exist ',function () {
             expect(authService.hasRole).to.throw(Error,'Required role needs to be set')
         });
-        // it('It should send 401 if role lower then required', function () {
-        //    let isAuthStub = stub(authService,"isAuthenticated");
-        //    isAuthStub.
+        // it('It should send 401 if role lower then required', function (done) {
+        //
+        //    let isAuthStub = stub(authService, 'isAuthenticated').callsFake(function() {
+        //        return compose()
+        //            .use(function (req, res, next) {
+        //                console.log('asdsad');
+        //                next();
+        //            });
+        //    });
+        //    let next= spy();
+        //    res.status.returns(res);
+        //   let r =  authService.hasRole('guest');
+        //    expect(isAuthStub).to.be.calledOnce;
+        //    expect(res.status).to.be.calledWith(403);
+        //    expect(res.send).to.be.calledWith('Forbidden');
+        //    done()
+        //
         // });
     })
     // describe('check isAuthenticated',function () {

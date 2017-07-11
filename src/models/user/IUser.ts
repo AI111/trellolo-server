@@ -9,6 +9,7 @@ export interface IUserAttributes {
     name?: string;
     email?: string;
     role?: string;
+    avatar?:string;
     password?: string;
     provider?: string;
     salt?: string;

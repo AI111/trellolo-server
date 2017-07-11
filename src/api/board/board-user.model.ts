@@ -1,11 +1,12 @@
-/**
- * Created by sasha on 6/21/17.
- */
 
+/**
+ * Created by sasha on 6/20/17.
+ */
 export default function(sequelize, DataTypes) {
-    const Team =  sequelize.define('Team', {
-        id: {
+    const BoardToUser = sequelize.define('BoardToUser', {
+        _id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             primaryKey: true,
             autoIncrement: true
         },
@@ -16,24 +17,19 @@ export default function(sequelize, DataTypes) {
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
-        teamName: {
+        role: {
             type: DataTypes.STRING
         },
-        projectId: {
+        boardId: {
             type: DataTypes.INTEGER,
-            modal: 'Project',
+            modal: 'Board',
             key: '_id',
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
-        accessRights: {
-            type: DataTypes.ENUM,
-            values: ['user', 'admin', 'creator'],
-            defaultValue: 'user'
-        }
     });
-    Team.associate = function(models)  {
+    BoardToUser.associate = function(models) {
 
     };
-    return Team;
+    return BoardToUser;
 }

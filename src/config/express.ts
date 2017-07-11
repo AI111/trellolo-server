@@ -10,13 +10,14 @@ import * as errorHandler from "errorhandler";
 import {Application} from "express";
 import * as cors from "cors";
 import * as session from "express-session";
-// import * as lusca from "lusca";
 import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
 import * as shrinkRay from "shrink-ray";
+import {Config} from './environment'
 import * as swaggerUi from 'swagger-ui-express';
-const swaggerDocument = require('../../swagger.json');
+import * as path from "path";
+const swaggerDocument = require(path.join(Config.root,'swagger.json'));
 
 
 

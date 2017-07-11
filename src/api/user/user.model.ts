@@ -14,8 +14,16 @@ export class User extends Sequilize.Model{
                 model: models.Team,
                 unique: false,
             },
-            foreignKey: "user",
+            foreignKey: "userId",
             as: 'projects'
+        });
+        User.belongsToMany(models.Board,{
+            through:{
+                model: models.BoardToUser,
+                unique: false,
+            },
+            foreignKey: "userId",
+            as: 'boards'
         })
     };
     /**

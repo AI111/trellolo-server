@@ -11,13 +11,13 @@ export default function(sequelize, DataTypes) {
             primaryKey: true,
             autoIncrement: true
         },
-        name: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false,
             validate:{
                 isLength: {min:0, max: 50},
                 notEmpty: {
-                    msg: 'Name is a required field'
+                    msg: 'Title is a required field'
                 }
             }
         },
@@ -27,13 +27,12 @@ export default function(sequelize, DataTypes) {
     });
 
     Project.associate = function(models)  {
-        console.log('Project',models);
         Project.belongsToMany(models.User,{
             through: {
                 model: models.Team,
                 unique: false,
             },
-            foreignKey: "project",
+            foreignKey: "projectId",
             as:"users"
         })
     };

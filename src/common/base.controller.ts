@@ -3,8 +3,11 @@
  */
 import {NextFunction, Request, Response} from "express";
 import * as jsonpatch from "fast-json-patch";
-import {Model, SequelizeStaticAndInstance} from "sequelize";
-export class BaseController<Entity extends Model <any, any>>{
+import {ValidationError} from "sequelize";
+import * as Sequelize from "sequelize";
+
+import {ServerError} from "../models/IError";
+export class BaseController<Entity extends Sequelize.Model <any, any>>{
     constructor(protected entity: Entity) {
 
     }
@@ -51,6 +54,7 @@ export class BaseController<Entity extends Model <any, any>>{
 
 // Updates an existing Thing in the DB
     public patch = (req: Request, res: Response) => {
+        console.log('    public patch = (req: Request, res: Response) => {');
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
@@ -77,8 +81,14 @@ export class BaseController<Entity extends Model <any, any>>{
             .catch(this.handleError(res));
     };
 
-    protected handleError(res: Response, statusCode: number= 500) {
+    protected handleError(res: Response, statusCode: number = 500) {
         return function(err) {
+            console.log('handleError',err);
+            if(err instanceof ServerError){
+                return res.status(err.status).send(err.error);
+            }else if(err instanceof ValidationError){
+                return res.status(422).json((<ValidationError>err).errors||err);
+            }
             return res.status(statusCode).send(err);
         };
     }

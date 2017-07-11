@@ -6,12 +6,14 @@ import {Response} from "express";
 
 export const config = {
     projectName:'TEST PROJECT name 777',
+    testEmail: 'test_email@trellolo.com',
     icon:"./test/assets/test.icon.jpeg"
 };
 export const req: any ={
     body:{
         user:{
-            _id:777
+            _id:777,
+            role:'user'
         },
     }
 

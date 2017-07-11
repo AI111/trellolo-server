@@ -2,17 +2,17 @@
  * Created by sasha on 6/20/17.
  */
 import {use}from 'passport';
-import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
+import {Strategy as GitHubStrategy} from 'passport-github';
 import {IConfig} from "../../models/IConfig";
 
 export function setup(User, config?: IConfig) {
-    use(new GoogleStrategy({
-            clientID: config.authConfig.get('google').clientID,
-            clientSecret: config.authConfig.get('google').clientSecret,
-            callbackURL: config.authConfig.get('google').callbackURL
+    use(new GitHubStrategy({
+            clientID: config.authConfig.get('github').clientID,
+            clientSecret: config.authConfig.get('github').clientSecret,
+            callbackURL: config.authConfig.get('github').callbackURL
         },
         function(accessToken, refreshToken, profile, done) {
-            User.find({where: {'google': profile.id}})
+            User.find({where: {'github': profile.id}})
                 .then(user => {
                     if(user) {
                         return done(null, user);
