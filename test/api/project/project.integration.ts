@@ -204,24 +204,24 @@ describe('Project API:', function() {
                 .expect(401)
                 .end(done);
         });
-        // it('should change only title',function (done) {
-        //     agent
-        //         .put(`/api/projects/${project._id}`)
-        //         .set('authorization', `Bearer ${token}`)
-        //         .field('title','updated project')
-        //         .end((err,res) => {
-        //             console.log('++++++++++++++++++',err,res.body);
-        //             // return done()
-        //            return db.Project.findById(project._id)
-        //                 .then(pr => {
-        //                     console.log('**********************',pr.dataValues);
-        //                     expect(pr.dataValues.title).to.be.equal('updated project');
-        //                     expect(pr.dataValues.icon).to.be.equal('icon1');
-        //                     expect(pr.dataValues.description).to.be.equal('trollolo test');
-        //                   return  done();
-        //                 })
-        //         });
-        // })
+        it('should change only title',function (done) {
+            agent
+                .put(`/api/projects/${project._id}`)
+                .set('authorization', `Bearer ${token}`)
+                .field('title','updated project')
+                .end((err,res) => {
+                    console.log('++++++++++++++++++',err,res.body);
+                    // return done()
+                   return db.Project.findById(project._id)
+                        .then(pr => {
+                            console.log('**********************',pr.dataValues);
+                            expect(pr.dataValues.title).to.be.equal('updated project');
+                            expect(pr.dataValues.icon).to.be.equal('icon1');
+                            expect(pr.dataValues.description).to.be.equal('trollolo test');
+                          return  done();
+                        })
+                });
+        })
 
 
     });
