@@ -169,6 +169,9 @@ export default function(sequelize, DataTypes) {
                 profile() {
                     return {
                         name: this.name,
+                        avatar: this.avatar,
+                        email: this.email,
+                        provider: this.provider,
                         role: this.role
                     };
                 },

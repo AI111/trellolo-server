@@ -37,11 +37,11 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .then(() => this.entity.find({
                 where: {
                     _id: req.params.id,
-                }})
+                }}))
                 .then(this.handleEntityNotFound(res))
                 .then(project => project.updateAttributes(req.body,{validate:true}))
                 .then(this.respondWithResult(res))
-                .catch(this.handleError(res)));
+                .catch(this.handleError(res));
     };
 
     public create = (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .then(project => db.Team.create({
                 user: req.user._id,
                 project: project._id,
-                accessRights: ProjectAccessRights.creator
+                accessRights: 'creator'
             }).then(t => project))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res))

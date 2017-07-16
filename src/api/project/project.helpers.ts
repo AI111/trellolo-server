@@ -2,13 +2,13 @@ import {db} from "../../sqldb";
 import * as Promise from "bluebird";
 import {ServerError} from "../../models/IError";
 import {NextFunction, Request, Response} from "express";
+import {ProjectAccessRights} from "../../models/team/ITeam";
 
 /**
  * Created by sasha on 7/8/17.
  */
 export let checkProjectAccessRights = (userId: number, projectId: number,
-                                          roles: [string] = ['admin', 'creator']): Promise<void> =>{
-    console.log(db.Team);
+                                          roles: [ProjectAccessRights] = ['admin', 'creator']): Promise<void> =>{
     return db.Team.findAll({
         where: {
             projectId: projectId,
@@ -22,8 +22,4 @@ export let checkProjectAccessRights = (userId: number, projectId: number,
         return team;
     })
 };
-export function checkProject(req: Request, res: Response, next: NextFunction){
-    if(!req.headers.project) res.status(400).send('project id header is required');
-    req['project'] = req.headers.project;
-    next();
-}
+

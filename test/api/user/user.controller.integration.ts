@@ -156,6 +156,8 @@ describe('User API:', function () {
                 .expect('Content-Type', /json/)
                 .end((err, res) => {
                     expect(res.body.token.length).to.be.equal(139);
+                    expect(res.body.email).to.be.equal(config.testEmail);
+                    expect(res.body.name).to.be.equal(config.projectName);
                     db.User.find({
                         where:{
                             email: config.testEmail

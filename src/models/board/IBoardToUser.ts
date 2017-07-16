@@ -8,7 +8,6 @@ import {IColumnAttributes} from "./IColumn";
 export interface IBoardToUserAttributes {
     _id?: number;
     name?: string;
-    creator?: IUserInstance;
     board?: IBoardToUserAttributes
     boardId?: number
     user?:IUserInstance

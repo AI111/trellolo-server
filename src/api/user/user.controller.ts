@@ -45,7 +45,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 const token = jwt.sign({_id: user.getDataValue('_id')}, config.secrets.session, {
                     expiresIn: 60 * 60 * 5,
                 });
-                return {token};
+                return {token, ... User.profile};
             })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));

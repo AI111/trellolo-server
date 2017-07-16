@@ -3,6 +3,7 @@
  */
 import {Instance, Model} from "sequelize";
 import {IProjectAttributes} from "../project/IProject";
+import {IBoardAttributes} from "../board/IBoard";
 
 export interface IUserAttributes {
     _id?: number;
@@ -18,11 +19,12 @@ export interface IUserAttributes {
     google?: string;
     github?: string;
     projects?: [IProjectAttributes]
+    boards?: [IBoardAttributes],
+    profile?: Object,
 }
 
 export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttributes {
     dataValues: IUserAttributes;
-
     /**
      * Authenticate - check if the passwords are the same
      *
@@ -59,7 +61,7 @@ export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttribut
      * @api public
      */
     updatePassword(fn: Error|string);
-    profile(): IUserAttributes;
+    readonly profile: IUserAttributes;
 }
 export interface IUserModel extends Model<IUserInstance, IUserAttributes>{
 

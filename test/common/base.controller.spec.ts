@@ -72,10 +72,10 @@ describe('Base controller class:', function() {
             let cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = new ServerError("my err",502);
             res.status.returns(res);
-            res.send.returns(data.error);
+            res.json.returns(data.error);
             expect(cntrl['handleError'](res as any)(data)).to.be.equal(data.error);
             expect(res.status).to.have.been.calledWith(502);
-            expect(res.send).to.have.been.calledWith(data.error)
+            expect(res.json).to.have.been.calledWith({message:data.error})
         });
         it('It should return express response with status 422 and error message',function () {
             let cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);

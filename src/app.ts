@@ -1,8 +1,4 @@
-import * as bodyParser from "body-parser";
-import * as cors from "cors";
 import * as express from "express";
-import * as logger from "morgan";
-import * as path from "path";
 import {initRouter} from "./routes";
 import {configExpress} from "./config/express";
 // Creates and configures an ExpressJS web server.
@@ -17,6 +13,8 @@ class App {
         this.middleware();
         this.routes();
     }
+
+
 
     // Configure Express middleware.
     private middleware(): void {

@@ -83,9 +83,8 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
 
     protected handleError(res: Response, statusCode: number = 500) {
         return function(err) {
-            console.log('handleError',err);
             if(err instanceof ServerError){
-                return res.status(err.status).send(err.error);
+                return res.status(err.status).json({message:err.error});
             }else if(err instanceof ValidationError){
                 return res.status(422).json((<ValidationError>err).errors||err);
             }

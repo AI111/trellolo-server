@@ -10,7 +10,9 @@ export interface IBoardAttributes {
     name?: string;
     creator?: IUserInstance;
     board?: IBoardInstance
-    columns?:[IColumnAttributes]
+    columns?:[IColumnAttributes];
+    projectId?: number;
+    description?:string
 }
 
 export interface IBoardInstance  extends Instance<IBoardAttributes>, IBoardAttributes {

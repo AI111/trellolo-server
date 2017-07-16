@@ -9,6 +9,7 @@ import {config} from "../../test.config"
 import {Config} from "../../../src/config/environment"
 import {unlink, stat} from "fs";
 import * as path from "path";
+import {ProjectAccessRights} from "../../../src/models/team/ITeam";
 use(require('sinon-chai'));
 use(require('chai-as-promised'));
 use(require('chai-things'));
@@ -42,6 +43,11 @@ describe('Project API:', function() {
                             return t;
                         })
                 })
+                .then(() => db.User.create({
+                    name: 'Fake User2',
+                    email: 'test2@example.com',
+                    password: 'password'
+                }))
         });
 
     });
@@ -167,7 +173,7 @@ describe('Project API:', function() {
         })
     });
     describe('PUT /api/projects', function () {
-        let project, token;
+        let project, token, userToken, icon;
         before(function (done) {
             agent
                 .post('/auth/local')
@@ -179,21 +185,33 @@ describe('Project API:', function() {
                 .expect('Content-Type', /json/)
                 .end((err, res) => {
                     token = res.body.token;
-                     db.Project.create({
-                        title: 'updated test project',
-                        icon: "icon1",
-                        description: 'trollolo test',
-                        active: true
-                    })
-                        .then(p => {
-                            project = p;
-                            return db.Team.create({
-                                projectId: p._id,
-                                userId: user._id,
-                                teamName: 'test'
-                            })
+                    agent
+                        .post('/auth/local')
+                        .send({
+                            email: 'test2@example.com',
+                            password: 'password'
                         })
-                         .then(() => done());
+                        .expect(200)
+                        .expect('Content-Type', /json/)
+                        .end((err, res) => {
+                            userToken = res.body.token;
+                           return db.Project.create({
+                                title: 'updated test project',
+                                icon: "icon1",
+                                description: 'trollolo test',
+                                active: true
+                            })
+                                .then(p => {
+                                    project = p;
+                                    return db.Team.create({
+                                        projectId: p._id,
+                                        userId: user._id,
+                                        teamName: 'testUpdate',
+                                        accessRights: 'creator'
+                                    })
+                                })
+                                .then(() => done());
+                        })
                 })
 
 
@@ -204,25 +222,41 @@ describe('Project API:', function() {
                 .expect(401)
                 .end(done);
         });
-        it('should change only title',function (done) {
+        it('should respond with a 403 when access not allowed',function (done) {
+            agent
+                .put(`/api/projects/${project._id}`)
+                .set('authorization', `Bearer ${userToken}`)
+                .field('title','updated project')
+                .expect('Content-Type', /json/)
+                .expect(403)
+                .end((err,res) => {
+                    expect(res.body).to.be.deep.equal({ message: 'Yo not have access rights for editing this group' });
+                   done()
+                });
+        });
+        it('should change only title and img',function (done) {
             agent
                 .put(`/api/projects/${project._id}`)
                 .set('authorization', `Bearer ${token}`)
                 .field('title','updated project')
+                .attach('icon', config.icon)
+                .expect('Content-Type', /json/)
                 .end((err,res) => {
-                    console.log('++++++++++++++++++',err,res.body);
-                    // return done()
+                    icon = res.body.icon;
                    return db.Project.findById(project._id)
                         .then(pr => {
-                            console.log('**********************',pr.dataValues);
                             expect(pr.dataValues.title).to.be.equal('updated project');
-                            expect(pr.dataValues.icon).to.be.equal('icon1');
+                            expect(pr.dataValues.icon).to.be.equal(res.body.icon);
                             expect(pr.dataValues.description).to.be.equal('trollolo test');
-                          return  done();
+                          return done();
                         })
                 });
+        });
+        after((done) => {
+           if(icon)unlink(icon, (err) => {
+                if (err) console.error(err);
+                return done()
+            })
         })
-
-
     });
 })
