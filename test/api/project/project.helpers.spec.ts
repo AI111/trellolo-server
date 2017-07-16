@@ -25,7 +25,7 @@ describe('Check project.helpers',function () {
         expect(dbSpec.Team.findAll).to.be.calledWith(
         {
             where: {
-                projectId: 2,
+                    projectId: 2,
                     userId: 1,
                     accessRights: {
                     $in: ['admin', 'creator']

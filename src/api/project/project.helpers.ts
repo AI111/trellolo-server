@@ -1,4 +1,4 @@
-import {db} from "../../sqldb/index";
+import {db} from "../../sqldb";
 import * as Promise from "bluebird";
 import {ServerError} from "../../models/IError";
 import {NextFunction, Request, Response} from "express";
