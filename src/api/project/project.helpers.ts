@@ -1,4 +1,4 @@
-import {db} from "../../sqldb";
+import {db} from "../../sqldb/index";
 import * as Promise from "bluebird";
 import {ServerError} from "../../models/IError";
 import {NextFunction, Request, Response} from "express";
@@ -7,7 +7,7 @@ import {ProjectAccessRights} from "../../models/team/ITeam";
 /**
  * Created by sasha on 7/8/17.
  */
-export let checkProjectAccessRights = (userId: number, projectId: number,
+export const checkProjectAccessRights = (userId: number, projectId: number,
                                           roles: [ProjectAccessRights] = ['admin', 'creator']): Promise<void> =>{
     return db.Team.findAll({
         where: {

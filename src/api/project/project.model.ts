@@ -2,9 +2,22 @@
  * Created by sasha on 6/20/17.
  */
 'use strict';
+const Sequilize = require("sequelize");
 
+export class Project extends Sequilize.Model{
+    static associate(models)  {
+        Project.belongsToMany(models.User,{
+            through: {
+                model: models.Team,
+                unique: false,
+            },
+            foreignKey: "projectId",
+            as:"users"
+        })
+    };
+}
 export default function(sequelize, DataTypes) {
-    const Project =  sequelize.define('Project', {
+    Project.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -24,17 +37,8 @@ export default function(sequelize, DataTypes) {
         icon: DataTypes.STRING,
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN
+    },{
+        sequelize
     });
-
-    Project.associate = function(models)  {
-        Project.belongsToMany(models.User,{
-            through: {
-                model: models.Team,
-                unique: false,
-            },
-            foreignKey: "projectId",
-            as:"users"
-        })
-    };
     return Project;
 }

@@ -1,9 +1,15 @@
 /**
  * Created by sasha on 6/21/17.
  */
+const Sequilize = require("sequelize");
 
+export class Team extends Sequilize.Model{
+    static associate(models)  {
+        console.log('Team.associate')
+    };
+}
 export default function(sequelize, DataTypes) {
-    const Team =  sequelize.define('Team', {
+    Team.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -11,8 +17,10 @@ export default function(sequelize, DataTypes) {
         },
         userId: {
             type: DataTypes.INTEGER,
-            modal: 'User',
-            key: '_id',
+            references: {
+                modal: 'User',
+                key: '_id'
+            },
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
@@ -21,8 +29,10 @@ export default function(sequelize, DataTypes) {
         },
         projectId: {
             type: DataTypes.INTEGER,
-            modal: 'Project',
-            key: '_id',
+            references: {
+                modal: 'Project',
+                key: '_id',
+            },
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
@@ -31,9 +41,8 @@ export default function(sequelize, DataTypes) {
             values: ['user', 'admin', 'creator'],
             defaultValue: 'user'
         }
+    },{
+        sequelize
     });
-    Team.associate = function(models)  {
-
-    };
     return Team;
 }

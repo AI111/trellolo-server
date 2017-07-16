@@ -1,8 +1,15 @@
 /**
  * Created by sasha on 6/20/17.
  */
+const Sequilize = require("sequelize");
+
+export class ProjectColumn extends Sequilize.Model{
+    static associate(models)  {
+        ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+    };
+}
 export default function(sequelize, DataTypes) {
-    const ProjectColumn = sequelize.define('ProjectColumn', {
+    ProjectColumn.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -19,9 +26,8 @@ export default function(sequelize, DataTypes) {
             key:  '_id',
             onDelete: 'cascade'
         }
+    },{
+        sequelize
     });
-    ProjectColumn.associate = function(models)  {
-        ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
-    };
     return ProjectColumn;
 }

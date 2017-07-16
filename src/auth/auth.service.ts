@@ -71,13 +71,14 @@ export function hasProjectRoles(roles?:[ProjectAccessRights]): NextFunction{
     return compose()
         .use(isAuthenticated())
         .use((req: Request,res: Response, next: NextFunction) => {
-            console.log('----------------------',req.user._id);
             req.projectId = req.headers['project'] || req.params.projectId;
             if(!req.projectId) return res.status(403).json({"message":"Forbidden"});
             if(!roles) roles = ['user','admin','creator'];
             checkProjectAccessRights(req.user._id, req.projectId, roles)
                 .then(() => next())
-                .catch(err => res.status(403).send({"message":"Forbidden"}))
+                .catch(err => {
+                    res.status(403).send({"message":"Forbidden"})
+                })
         });
 }
 

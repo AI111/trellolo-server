@@ -2,8 +2,15 @@
 /**
  * Created by sasha on 6/20/17.
  */
+const Sequilize = require("sequelize");
+
+export class BoardToUser extends Sequilize.Model{
+    static associate(models)  {
+        console.log('BoardToUser.associate')
+    };
+}
 export default function(sequelize, DataTypes) {
-    const BoardToUser = sequelize.define('BoardToUser', {
+    BoardToUser.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -12,8 +19,10 @@ export default function(sequelize, DataTypes) {
         },
         userId: {
             type: DataTypes.INTEGER,
-            modal: 'User',
-            key: '_id',
+            references: {
+                modal: 'User',
+                key: '_id'
+            },
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
@@ -22,14 +31,15 @@ export default function(sequelize, DataTypes) {
         },
         boardId: {
             type: DataTypes.INTEGER,
-            modal: 'Board',
-            key: '_id',
+            references: {
+                modal: 'Board',
+                key: '_id'
+            },
             onDelete: 'cascade',
             unique: 'compositeIndex'
         },
+    },{
+        sequelize
     });
-    BoardToUser.associate = function(models) {
-
-    };
     return BoardToUser;
 }

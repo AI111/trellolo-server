@@ -48,7 +48,7 @@ export default function(sequelize, DataTypes) {
         info: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
     },{
-        sequelize:sequelize
+        sequelize
     });
 
     return Board;

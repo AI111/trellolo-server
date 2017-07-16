@@ -74,30 +74,29 @@ export function createTestProjectUser() {
                 accessRights:'admin'
             }
         ]))
-        // .then(() => db.Board.bulkCreate([
-        //     {
-        //         projectId:1,
-        //         name:'board 1',
-        //         description: 'description 1'
-        //     },
-        //     {
-        //         projectId:2,
-        //         name:'board 2',
-        //         description: 'description 2'
-        //     }
-        // ]))
-        // .then(() => db.BoardToUser.bulkCreate([
-        //     {
-        //         userId:1,
-        //         boardId:1
-        //     },
-        //     {
-        //         userId:1,
-        //         boardId:2
-        //     }
-        // ]))
+        .then(() => db.Board.bulkCreate([
+            {
+                projectId:1,
+                name:'board 1',
+                description: 'description 1'
+            },
+            {
+                projectId:2,
+                name:'board 2',
+                description: 'description 2'
+            }
+        ]))
+        .then(() => db.BoardToUser.bulkCreate([
+            {
+                userId:1,
+                boardId:1
+            },
+            {
+                userId:1,
+                boardId:2
+            }
+        ]))
 }
-
 export function cleadDBData(){
     return db.Team.destroy({where: {}})
         .then(() => db.Project.destroy({where: {}}))
