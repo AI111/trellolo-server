@@ -111,6 +111,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 "_id",
                 "name",
                 "email",
+                "avatar",
                 "role",
                 "provider",
             ],
