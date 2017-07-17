@@ -10,7 +10,7 @@ export class Team extends Sequilize.Model{
 }
 export default function(sequelize, DataTypes) {
     Team.init({
-        id: {
+        _id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
@@ -21,7 +21,6 @@ export default function(sequelize, DataTypes) {
                 modal: 'User',
                 key: '_id'
             },
-            onDelete: 'cascade',
             unique: 'compositeIndex'
         },
         teamName: {
@@ -33,7 +32,6 @@ export default function(sequelize, DataTypes) {
                 modal: 'Project',
                 key: '_id',
             },
-            onDelete: 'cascade',
             unique: 'compositeIndex'
         },
         accessRights: {

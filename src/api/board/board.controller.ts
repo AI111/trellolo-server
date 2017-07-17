@@ -45,6 +45,10 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
     public create = (req: Request, res: Response) => {
          req.body.projectId = req.projectId;
             return this.entity.create(req.body)
+                .then(board =>{
+                    console.log(board);
+                    return board;
+                })
             .then(setBoardUsers(req.body.users))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res))

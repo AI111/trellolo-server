@@ -13,7 +13,7 @@ const port = normalizePort(process.env.PORT || 3000);
 App.set("port", port);
 
 const server: http.Server = http.createServer(App);
-db.connection.sync()
+db.connection.sync({force:true})
     .then(startServer)
     .catch(function(err) {
         console.log("Server failed to start due to error: %s", err);
@@ -52,4 +52,4 @@ function onListening(): void {
     const bind = (typeof addr === "string") ? `pipe ${addr}` : `port ${addr.port}`;
     console.log(`Listening on ${bind}`);
 }
-export default App;
+export default server;

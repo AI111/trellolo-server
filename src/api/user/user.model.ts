@@ -9,6 +9,8 @@ var validatePresenceOf = function(value) {
 };
 export class User extends Sequilize.Model{
     static  associate (models)  {
+        console.log('User.associate')
+
         User.belongsToMany(models.Project,{
             through:{
                 model: models.Team,

@@ -23,7 +23,7 @@ export default function(sequelize, DataTypes) {
                 modal: 'User',
                 key: '_id'
             },
-            onDelete: 'cascade',
+            constraint: false,
             unique: 'compositeIndex'
         },
         role: {
@@ -35,7 +35,7 @@ export default function(sequelize, DataTypes) {
                 modal: 'Board',
                 key: '_id'
             },
-            onDelete: 'cascade',
+            constraint: false,
             unique: 'compositeIndex'
         },
     },{

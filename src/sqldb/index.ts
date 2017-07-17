@@ -27,8 +27,8 @@ export class DBConnection{
     public ProjectColumn: Sequelize.Model<IColumnInstance,IColumnAttributes> =  connection.import("../api/board/column.model");
     public Card: Sequelize.Model<ICardInstance,ICardAttributes> =  connection.import("../api/board/card.model");
     public Team: Sequelize.Model<ITeamInstance,ITeamAttributes> =  connection.import("../api/team/team.model");
-
     constructor(){
+        console.log('DBConnection constructor');
         for(let pr in this){
            if((<any>this[pr]).associate)(<any>this[pr]).associate(connection.models)
         }

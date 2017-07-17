@@ -28,6 +28,7 @@ export function checkBoardUsers( projectId: number, users: [number] ){
 }
 export function setBoardUsers(users: [number]){
     return (board) => {
+        console.log()
         if(!users || !users.length) return Promise.resolve(board);
         return db.BoardToUser.bulkCreate(users.map(userId => ({
             userId:userId,

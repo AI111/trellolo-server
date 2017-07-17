@@ -6,6 +6,7 @@ const Sequilize = require("sequelize");
 
 export class Project extends Sequilize.Model{
     static associate(models)  {
+        console.log('Project.associate')
         Project.belongsToMany(models.User,{
             through: {
                 model: models.Team,

@@ -40,7 +40,7 @@ export function isAuthenticated() {
             })
                 .then(user => {
                     if(!user) {
-                        return res.status(401).end();
+                        return res.status(401).json({"message":"Forbidden"});
                     }
                     req.user = user;
                     next();
