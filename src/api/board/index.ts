@@ -16,6 +16,6 @@ export default function(): Router {
     // router.get("/me", isAuthenticated(), controller.myProjects);
     // router.put("/:id/password", isAuthenticated(), controller.changePassword);
     // router.get("/:id", isAuthenticated(), controller.show);
-    router.post("/:projectId/boards",hasProjectRoles(['creator','admin']), controller.create);
+    router.post("/:projectId/boards" ,hasProjectRoles(['creator','admin']), validateReauest(controller.createValidator) , controller.create);
     return router;
 }

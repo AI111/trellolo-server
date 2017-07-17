@@ -187,7 +187,7 @@ describe('Project API:', function() {
                     token = res.body.token;
                     agent
                         .post('/auth/local')
-                        .send({
+                            .send({
                             email: 'test2@example.com',
                             password: 'password'
                         })
