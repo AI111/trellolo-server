@@ -100,11 +100,11 @@ export function createTestProjectUser() {
 }
 export function cleadDBData() {
     console.log('DELETE');
-    return  db.User.destroy({where: {},truncate: true})
-        .then(() =>db.Team.destroy({where: {},truncate: true}))
-        .then(() => db.Board.destroy({where: {},truncate: true}))
-        .then(() => db.Project.destroy({where: {},truncate: true}))
-        .then(() => db.BoardToUser.destroy({where: {},truncate: true}))
+    return  db.User.destroy({where: {}})
+        .then(() =>db.Team.destroy({where: {}}))
+        .then(() => db.Board.destroy({where: {}}))
+        .then(() => db.Project.destroy({where: {}}))
+        .then(() => db.BoardToUser.destroy({where: {}}))
 
 
 }
