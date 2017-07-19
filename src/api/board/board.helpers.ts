@@ -5,6 +5,7 @@ import * as Joi from 'joi';
 import {db} from "../../sqldb/index";
 import * as Promise from "bluebird";
 import {ServerError} from "../../models/IError";
+import {BoardAccessRights} from "../../models/board/IBoardToUser";
 
 export const boardValidator = Joi.object().keys({
     name: Joi.string().min(2).max(50).required(),
@@ -28,6 +29,7 @@ export function checkBoardUsers( projectId: number, users: [number] ){
 }
 export function setBoardUsers(users: [number]){
     return (board) => {
+        console.log()
         if(!users || !users.length) return Promise.resolve(board);
         return db.BoardToUser.bulkCreate(users.map(userId => ({
             userId:userId,
@@ -36,3 +38,18 @@ export function setBoardUsers(users: [number]){
             .then(() => board)
     }
 }
+export function  checkBoardAccessRights(userId: number, boardId: number,
+                                          roles: [BoardAccessRights] = ['user', 'admin', 'creator']): Promise<void> {
+    return db.BoardToUser.findAll({
+        where: {
+            boardId,
+            userId,
+            accessRights: {
+                $in: roles
+            }
+        }
+    }).then(team => {
+        if(!team.length) return Promise.reject(new ServerError('Yo not have access rights for using this board',403));
+        return team;
+    })
+};

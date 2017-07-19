@@ -7,6 +7,7 @@ import {db} from '../sqldb/index';
 import {NextFunction, Response} from "express";
 import {Request} from "../models/IExpress";
 import {checkProjectAccessRights} from "../api/project/project.helpers";
+import {checkBoardUsers, checkBoardAccessRights} from "../api/board/board.helpers";
 import {ProjectAccessRights} from "../models/team/ITeam";
 
 const validateJwt = expressJwt({
@@ -40,7 +41,7 @@ export function isAuthenticated() {
             })
                 .then(user => {
                     if(!user) {
-                        return res.status(401).end();
+                        return res.status(401).json({"message":"Forbidden"});
                     }
                     req.user = user;
                     next();
@@ -71,10 +72,24 @@ export function hasProjectRoles(roles?:[ProjectAccessRights]): NextFunction{
     return compose()
         .use(isAuthenticated())
         .use((req: Request,res: Response, next: NextFunction) => {
-            req.projectId = req.headers['project'] || req.params.projectId;
+            req.projectId = req.headers['project'] || req.params.projectId || req.params['project'] || req.body.projectId;
             if(!req.projectId) return res.status(403).json({"message":"Forbidden"});
             if(!roles) roles = ['user','admin','creator'];
             checkProjectAccessRights(req.user._id, req.projectId, roles)
+                .then(() => next())
+                .catch(err => {
+                    res.status(403).send({"message":"Forbidden"})
+                })
+        });
+}
+export function hasBoardRoles(roles?:[ProjectAccessRights]): NextFunction{
+    return compose()
+        .use(isAuthenticated())
+        .use((req: Request,res: Response, next: NextFunction) => {
+            const boardId = req.headers['board'] || req.params.boardId || req.params['id'] || req.body.projectId;
+            if(!boardId) return res.status(403).json({"message":"Forbidden"});
+            if(!roles) roles = ['user','admin','creator'];
+            checkBoardAccessRights(req.user._id, boardId, roles)
                 .then(() => next())
                 .catch(err => {
                     res.status(403).send({"message":"Forbidden"})

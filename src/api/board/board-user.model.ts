@@ -23,11 +23,13 @@ export default function(sequelize, DataTypes) {
                 modal: 'User',
                 key: '_id'
             },
-            onDelete: 'cascade',
+            constraint: false,
             unique: 'compositeIndex'
         },
-        role: {
-            type: DataTypes.STRING
+        accessRights: {
+            type: DataTypes.ENUM,
+            values: ['user', 'admin', 'creator'],
+            defaultValue: 'user'
         },
         boardId: {
             type: DataTypes.INTEGER,
@@ -35,7 +37,7 @@ export default function(sequelize, DataTypes) {
                 modal: 'Board',
                 key: '_id'
             },
-            onDelete: 'cascade',
+            constraint: false,
             unique: 'compositeIndex'
         },
     },{

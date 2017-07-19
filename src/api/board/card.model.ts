@@ -2,8 +2,17 @@
 /**
  * Created by sasha on 6/20/17.
  */
+const Sequilize = require("sequelize");
+
+export class Card extends Sequilize.Model{
+    static associate(models)  {
+        console.log('Card.associate')
+        Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+        Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
+    };
+}
 export default function(sequelize, DataTypes) {
-    const Card = sequelize.define('Card', {
+    Card.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -14,11 +23,8 @@ export default function(sequelize, DataTypes) {
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
         order: DataTypes.INTEGER,
-
+    },{
+        sequelize
     });
-    Card.associate = function(models)  {
-        Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
-        Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
-    };
     return Card;
 }

@@ -5,7 +5,9 @@ import {db} from "../../sqldb/index";
 import {Response} from "express";
 import {checkProjectAccessRights} from "../project/project.helpers";
 import {Request} from "../../models/IExpress";
-import {checkBoardUsers, setBoardUsers} from "./board.helpers";
+import {setBoardUsers} from "./board.helpers";
+import * as Joi from 'joi';
+
 /**
  * Created by sasha on 6/22/17.
  */
@@ -27,6 +29,10 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
             .then(this.respondWithResult(res))
             .catch(this.handleError(res))
     };
+    public createValidator = Joi.object().keys({
+        name: Joi.string().min(2).max(30).required(),
+        description: Joi.string().min(4).max(200).optional()
+    });
     // public myProjects = (req: Request, res: Response) => {
     //    return db.Team.findAll({
     //        where:{

@@ -6,7 +6,7 @@ const Sequilize = require("sequelize");
 export class Board extends Sequilize.Model{
     static associate (models)  {
         Board.belongsTo(models.Project,{
-            foreignKey: "boardId",
+            foreignKey: "projectId",
             as:"boards"
         });
         Board.belongsToMany(models.User,{
@@ -29,18 +29,19 @@ export default function(sequelize, DataTypes) {
         },
         name: {
             type: DataTypes.STRING,
-            validate:{
+            validate: {
                 isLength: {min:2, max: 50},
-                notEmpty: true
+                notEmpty: {
+                    msg: 'Title is a required field'
+                }
             }
         },
         projectId:{
-          type: DataTypes.INTEGER,
-            validate:{
-                notEmpty: {
-                    msg: 'project id is required field'
-                }
-            }
+            type: DataTypes.INTEGER,
+            references: {
+                modal: 'Project',
+                key: '_id',
+            },
         },
         description: {
             type: DataTypes.STRING

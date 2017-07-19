@@ -7,8 +7,8 @@ import {ProjectAccessRights} from "../../models/team/ITeam";
 /**
  * Created by sasha on 7/8/17.
  */
-export const checkProjectAccessRights = (userId: number, projectId: number,
-                                          roles: [ProjectAccessRights] = ['admin', 'creator']): Promise<void> =>{
+export function  checkProjectAccessRights(userId: number, projectId: number,
+                                          roles: [ProjectAccessRights] = ['admin', 'creator']): Promise<void> {
     return db.Team.findAll({
         where: {
             projectId: projectId,
@@ -18,7 +18,7 @@ export const checkProjectAccessRights = (userId: number, projectId: number,
             }
         }
     }).then(team => {
-        if(!team.length) return Promise.reject(new ServerError('Yo not have access rights for editing this group',403));
+        if(!team.length) return Promise.reject(new ServerError('Yo not have access rights for editing this project',403));
         return team;
     })
 };

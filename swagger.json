@@ -17,6 +17,9 @@
   "basePath": "/api",
   "tags": [
     {
+      "name":"User"
+    },
+    {
       "name": "Project"
     },
     {
@@ -48,25 +51,24 @@
     "http"
   ],
   "paths": {
-    "/pet": {
+    "/projects": {
       "post": {
         "tags": [
           "Project"
         ],
         "summary": "Create a new Project",
         "description": "",
-        "operationId": "addPet",
         "consumes": [
-          "application/json"
+          "multipart/form-data"
         ],
         "produces": [
-          "application/json"
+          "multipart/form-data"
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "Pet object that needs to be added to the store",
+            "description": "Project object that needs to be added to the store",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Project"
@@ -74,8 +76,11 @@
           }
         ],
         "responses": {
-          "405": {
-            "description": "Invalid input"
+          "401": {
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error"
           }
         },
         "security": [
@@ -89,16 +94,16 @@
       },
       "put": {
         "tags": [
-          "pet"
+          "Project"
         ],
         "summary": "Update an existing Project",
         "description": "",
         "operationId": "updateProject",
         "consumes": [
-          "application/json"
+          "multipart/form-data"
         ],
         "produces": [
-          "application/json"
+          "multipart/form-data"
         ],
         "parameters": [
           {
@@ -107,19 +112,19 @@
             "description": "Pet object that needs to be added to the store",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Pet"
+              "$ref": "#/definitions/Project"
             }
           }
         ],
         "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
+          "401": {
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error"
           },
           "404": {
             "description": "Project not found"
-          },
-          "405": {
-            "description": "Validation exception"
           }
         },
         "security": [
@@ -130,16 +135,13 @@
             ]
           }
         ]
-      }
-    },
-    "/pet/findByStatus": {
+      },
       "get": {
         "tags": [
-          "pet"
+          "Project"
         ],
-        "summary": "Finds Pets by status",
+        "summary": "Get User Project list",
         "description": "Multiple status values can be provided with comma separated strings",
-        "operationId": "findPetsByStatus",
         "produces": [
           "application/xml",
           "application/json"
@@ -183,6 +185,128 @@
               "write:pets",
               "read:pets"
             ]
+          }
+        ]
+      }
+    },
+    "/projects/{projectId}": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Finds Project by id",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findPetsByStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "ID of project that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/Project"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+    "/boards": {
+      "post": {
+        "tags": [
+          "Board"
+        ],
+        "summary": "Create a new Board",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Board object that needs to be added to the store",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Board"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Forbidden"
+          },
+          "403": {
+            "description": "Access to this project Forbidden"
+          },
+          "422": {
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Board"
+        ],
+        "summary": "Get User Board list",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Board"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "security": [
+          {
+
           }
         ]
       }
@@ -573,7 +697,7 @@
     "/users": {
       "post": {
         "tags": [
-          "user"
+          "User"
         ],
         "summary": "Create user",
         "description": "This can only be done by the logged in user.",
@@ -860,6 +984,7 @@
         }
       }
     }
+
   },
   "securityDefinitions": {
     "petstore_auth": {
@@ -881,6 +1006,7 @@
     }
   },
   "definitions": {
+
     "Order": {
       "type": "object",
       "properties": {
@@ -934,9 +1060,32 @@
       }
     },
     "Project":{
+      "required": [
+        "title"
+      ],
       "type": "object",
       "properties": {
         "title":{
+          "type": "string"
+        },
+        "description":{
+          "type": "string"
+        },
+        "icon":{
+          "type": "string"
+        },
+        "users":{
+          "$ref": "#/definitions/Category"
+        }
+      }
+    },
+    "Board":{
+      "required": [
+        "name"
+      ],
+      "type": "object",
+      "properties": {
+        "name":{
           "type": "string"
         },
         "description":{
