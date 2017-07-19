@@ -161,7 +161,7 @@ describe('Project API:', function() {
                 .expect('Content-Type', /json/)
                 .expect(403)
                 .end((err,res) => {
-                    expect(res.body).to.be.deep.equal({ message: 'Yo not have access rights for editing this group' });
+                    expect(res.body).to.be.deep.equal({ message: 'Yo not have access rights for editing this project' });
                     done()
                 });
         });

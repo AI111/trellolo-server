@@ -26,8 +26,10 @@ export default function(sequelize, DataTypes) {
             constraint: false,
             unique: 'compositeIndex'
         },
-        role: {
-            type: DataTypes.STRING
+        accessRights: {
+            type: DataTypes.ENUM,
+            values: ['user', 'admin', 'creator'],
+            defaultValue: 'user'
         },
         boardId: {
             type: DataTypes.INTEGER,

@@ -4,6 +4,7 @@
 import {Instance, Model} from "sequelize";
 import {IUserInstance} from "../user/IUser";
 import {IColumnAttributes} from "./IColumn";
+export type  BoardAccessRights = 'user'| 'admin' | 'creator';
 
 export interface IBoardToUserAttributes {
     _id?: number;
@@ -12,6 +13,7 @@ export interface IBoardToUserAttributes {
     boardId?: number
     user?:IUserInstance
     userId?:number
+    accessRights?: BoardAccessRights;
 
 }
 

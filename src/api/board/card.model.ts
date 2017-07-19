@@ -23,7 +23,6 @@ export default function(sequelize, DataTypes) {
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
         order: DataTypes.INTEGER,
-
     },{
         sequelize
     });

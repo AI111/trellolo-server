@@ -5,7 +5,7 @@ import {db} from "../../sqldb/index";
 import {Response} from "express";
 import {checkProjectAccessRights} from "../project/project.helpers";
 import {Request} from "../../models/IExpress";
-import {checkBoardUsers, setBoardUsers} from "./board.helpers";
+import {setBoardUsers} from "./board.helpers";
 import * as Joi from 'joi';
 
 /**

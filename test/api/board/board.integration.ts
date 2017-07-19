@@ -74,6 +74,53 @@ describe('Board API:', function() {
                 });
         });
     });
+    describe('GET /api/projects/boards/{boardId}',function () {
+        let tokenValid:string;
+        let tokenInvalid: string;
+        before(function () {
+          return createTestProjectUser()
+                .then(() => getToken(httpAgent,'test@example.com','password'))
+                .then(token => tokenValid = token)
+                .then(() => getToken(httpAgent,'test2@example.com','password'))
+                .then(token => (tokenInvalid = token))
+        });
+        after(function () {
+            return cleadDBData()
+        });
+        it('should respond with a 401 when not authenticated', function (done) {
+            httpAgent
+                .get(`/api/boards/1`)
+                .expect(401)
+                .end(done);
+        });
+        it('should respond with a 403 when user not have access to edit project', function (done) {
+            httpAgent
+                .get(`/api/boards/1`)
+                .set('authorization', `Bearer ${tokenInvalid}`)
+                .expect(403)
+                .end((err,res)=>{
+                    expect(res.body).to.be.deep.equal({"message":"Forbidden"});
+                    done()
+                });
+        });
+        it('should return one board', function (done) {
+            httpAgent
+                .get(`/api/boards/1`)
+
+                .set('authorization', `Bearer ${tokenValid}`)
+                .expect(200)
+                .end((err,res)=>{
+                    expect(res.body).to.containSubset(
+                        {
+                            _id: 1,
+                            name: 'board 1',
+                            projectId: 1,
+                            description: 'description 1'
+                        });
+                    done()
+                });
+        });
+    });
     describe('POST /api/projects/{projectId}/boards', function () {
         let tokenValid:string;
         let tokenInvalid: string;
