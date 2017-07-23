@@ -8,13 +8,15 @@ import {IBoardInstance} from "./IBoard";
 
 export interface IColumnAttributes {
     _id?: number;
-    name?: string;
-    creator: IUserInstance;
-    board: IBoardInstance
-    order: number;
-    cards: [ICardAttributes]
+    title?: string;
+    board?: IBoardInstance
+    boardId?: number
+    position?: number;
+    cards?: [ICardAttributes]
 }
 
 export interface IColumnInstance  extends Instance<IColumnAttributes>, IColumnAttributes {
     dataValues: IColumnAttributes;
+    getMaxBoardPosition(boardId: number): Promise<number>
+    moveToPosition(position: number): Promise<void>
 }

@@ -16,8 +16,8 @@ use(require('chai-subset'));
 
 const agent = request.agent(app.default);
 describe('Project API:', function() {
-    // this.timeout(5000)
-    //
+    this.timeout(5000)
+
     // before((done)=>{
     //     app.default.on("listening",() =>{
     //         console.log('listening')
@@ -46,7 +46,7 @@ describe('Project API:', function() {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .end((err, res) => {
-
+                    console.log(res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,
@@ -190,4 +190,48 @@ describe('Project API:', function() {
             })
         })
     });
+    describe('GET /api/projects/latest', function () {
+        let tokenValid:string;
+        let tokenInvalid: string;
+        before(function () {
+            return createTestProjectUser()
+                .then(() => getToken(agent,'test@example.com','password'))
+                .then(token => tokenValid = token)
+                .then(() => getToken(agent,'test2@example.com','password'))
+                .then(token => (tokenInvalid = token))
+                .then(()=>{
+                db.Project.findById(1)
+                    .then(project => project.updateAttributes({'title':'new title'}))
+                })
+        });
+        after(function () {
+            return cleadDBData()
+        });
+        it('should return user user project list', function (done) {
+            agent
+                .get('/api/projects/latest')
+                .set('authorization', `Bearer ${tokenValid}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .end((err, res) => {
+
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 1,
+                            title: "new title",
+                            description: "description 1"
+                        }
+                    ]);
+                    done();
+                });
+        });
+
+        it('should respond with a 401 when not authenticated', function (done) {
+            agent
+                .get('/api/projects/latest')
+                .expect(401)
+                .end(done);
+        });
+    });
+
 });

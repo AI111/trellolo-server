@@ -97,6 +97,39 @@ export function createTestProjectUser() {
                 boardId: 2
             }
         ]))
+        .then(() => db.ProjectColumn.bulkCreate([
+            {
+                _id:1,
+                boardId: 1,
+                title:"Column 1",
+                position:1
+            },
+            {
+                _id:2,
+                title: "Title 2",
+                boardId: 1,
+                position:2
+            },
+            {
+                _id:3,
+                title: "Title 3",
+                boardId: 1,
+                position:3
+            },
+            {
+                _id:4,
+                title: "Title 4",
+                boardId: 1,
+                position:4
+            },
+            {
+                _id:5,
+                title: "Title 5",
+                boardId: 1,
+                position:5
+            }
+        ]))
+
 }
 export function cleadDBData() {
     console.log('DELETE');

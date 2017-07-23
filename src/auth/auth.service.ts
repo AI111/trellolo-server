@@ -68,31 +68,29 @@ export function hasRole(roleRequired) {
             }
         });
 }
-export function hasProjectRoles(roles?:[ProjectAccessRights]): NextFunction{
+export function hasProjectRoles(roles:[ProjectAccessRights] = ['user','admin','creator']): NextFunction{
     return compose()
         .use(isAuthenticated())
         .use((req: Request,res: Response, next: NextFunction) => {
             req.projectId = req.headers['project'] || req.params.projectId || req.params['project'] || req.body.projectId;
             if(!req.projectId) return res.status(403).json({"message":"Forbidden"});
-            if(!roles) roles = ['user','admin','creator'];
             checkProjectAccessRights(req.user._id, req.projectId, roles)
                 .then(() => next())
                 .catch(err => {
-                    res.status(403).send({"message":"Forbidden"})
+                    return res.status(err.status||403).send({"message":(err.error||"Forbidden")})
                 })
         });
 }
-export function hasBoardRoles(roles?:[ProjectAccessRights]): NextFunction{
+export function hasBoardRoles(roles:[ProjectAccessRights] = ['user','admin','creator']): NextFunction{
     return compose()
         .use(isAuthenticated())
         .use((req: Request,res: Response, next: NextFunction) => {
-            const boardId = req.headers['board'] || req.params.boardId || req.params['id'] || req.body.projectId;
-            if(!boardId) return res.status(403).json({"message":"Forbidden"});
-            if(!roles) roles = ['user','admin','creator'];
+            const boardId = req.headers['board'] || req.params.boardId || req.params['id'] || req.body.boardId;
+            if(!boardId) return res.status(403).json({"message":"boardId is required field"});
             checkBoardAccessRights(req.user._id, boardId, roles)
                 .then(() => next())
                 .catch(err => {
-                    res.status(403).send({"message":"Forbidden"})
+                    return res.status(err.status||403).send({"message":(err.error||"Forbidden")})
                 })
         });
 }
