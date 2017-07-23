@@ -6,16 +6,16 @@
 
 import {Router} from "express";
 import {hasProjectRoles, hasRole, isAuthenticated} from "../../auth/auth.service";
-import {projectUpload, userCreate} from "../../config/multer.config";
 import {controller} from "./project.controller";
+import {projectUpload} from "../../config/multer.config"
 // import {validateReauest} from "../../common/validation.service";
 
 export default function(): Router {
     const router =  Router();
     router.get("/", isAuthenticated(), controller.show);
     router.get("/latest", isAuthenticated(), controller.latest);
-    router.delete("/:id", hasProjectRoles(["admin", "creator"]), controller.destroy);
-    router.put("/:projectId", hasProjectRoles(["admin", "creator"]), userCreate, controller.update);
-    router.post("/", isAuthenticated(), userCreate, controller.create);
+    router.delete("/:id", hasProjectRoles(["admin","creator"]), controller.destroy);
+    router.put("/:projectId", hasProjectRoles(["admin","creator"]), projectUpload, controller.update);
+    router.post("/",isAuthenticated(), projectUpload, controller.create);
     return router;
 }
