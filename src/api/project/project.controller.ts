@@ -55,27 +55,23 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .catch(this.handleError(res));
     };
     public latest = (req: Request, res: Response) => {
-        return db.User.findOne({
-            where: {
-                _id: req.user._id,
-            },
+        return db.Project.findOne({
+            where: {},
             include: [
                 {
-                    model: db.Project,
-                    as: "projects",
-                    attributes: {
-                        exclude: [
-                            "Team",
-                        ],
+                    model: db.User,
+                    as: "users",
+                    attributes: [],
+                    where: {
+                        _id: req.user._id,
                     },
                 },
             ],
             order: [
-                [{model: db.Project, as: "projects"}, "updatedAt", "DESC"],
+                [ "updatedAt", "DESC"],
             ],
         })
             .then(this.handleEntityNotFound(res))
-            .then((user) => user.projects)
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

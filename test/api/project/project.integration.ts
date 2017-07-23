@@ -15,30 +15,30 @@ use(require("chai-things"));
 use(require("chai-subset"));
 
 const agent = request.agent(app.default);
-describe("Project API:", function() {
+describe("Project API:", function () {
     this.timeout(5000);
 
-    // before((done)=>{
-    //     app.default.on("listening",() =>{
-    //         console.log('listening')
-    //         done()
-    //     })
-    // })
+    before((done) => {
+        app.default.on("listening", () => {
+            console.log("listening");
+            done();
+        });
+    });
 
-    describe("GET /api/projects", function() {
+    describe("GET /api/projects", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(function() {
+        before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
                 .then((token) => tokenValid = token)
                 .then(() => getToken(agent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token));
         });
-        after(function() {
+        after(() =>  {
             return cleadDBData();
         });
-        it("should return user user project list", function(done) {
+        it("should return user user project list", (done) =>  {
             agent
                 .get("/api/projects")
                 .set("authorization", `Bearer ${tokenValid}`)
@@ -57,18 +57,18 @@ describe("Project API:", function() {
                 });
         });
 
-        it("should respond with a 401 when not authenticated", function(done) {
+        it("should respond with a 401 when not authenticated", (done) =>  {
             agent
                 .get("/api/projects")
                 .expect(401)
                 .end(done);
         });
     });
-    describe("POST /api/projects", function() {
+    describe("POST /api/projects", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
         let testProject;
-        before(function() {
+        before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
                 .then((token) => tokenValid = token)
@@ -76,7 +76,7 @@ describe("Project API:", function() {
                 .then((token) => (tokenInvalid = token));
 
         });
-        after(function() {
+        after(() =>  {
             return cleadDBData();
         });
         it("Check new Project in DB", (done) => {
@@ -119,7 +119,7 @@ describe("Project API:", function() {
                     done();
                 });
         });
-        it("should respond with a 401 when not authenticated", function(done) {
+        it("should respond with a 401 when not authenticated", (done) =>  {
             agent
                 .get("/api/projects")
                 .expect(401)
@@ -132,27 +132,27 @@ describe("Project API:", function() {
             });
         });
     });
-    describe("PUT /api/projects", function() {
+    describe("PUT /api/projects", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
         let icon: string;
-        before(function() {
+        before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
                 .then((token) => tokenValid = token)
                 .then(() => getToken(agent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token));
         });
-        after(function() {
+        after(() =>  {
             return cleadDBData();
         });
-        it("should respond with a 401 when not authenticated", function(done) {
+        it("should respond with a 401 when not authenticated", (done) =>  {
             agent
                 .put("/api/projects/1")
                 .expect(401)
                 .end(done);
         });
-        it("should respond with a 403 when access not allowed", function(done) {
+        it("should respond with a 403 when access not allowed", (done) =>  {
             agent
                 .put(`/api/projects/${1}`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
@@ -164,7 +164,7 @@ describe("Project API:", function() {
                     done();
                 });
         });
-        it("should change only title and img", function(done) {
+        it("should change only title and img", (done) =>  {
             agent
                 .put(`/api/projects/${1}`)
                 .set("authorization", `Bearer ${tokenValid}`)
@@ -189,10 +189,10 @@ describe("Project API:", function() {
             });
         });
     });
-    describe("GET /api/projects/latest", function() {
+    describe("GET /api/projects/latest", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(function() {
+        before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
                 .then((token) => tokenValid = token)
@@ -203,29 +203,29 @@ describe("Project API:", function() {
                     .then((project) => project.updateAttributes({title: "new title"}));
                 });
         });
-        after(function() {
+        after(() =>  {
             return cleadDBData();
         });
-        it("should return user user project list", function(done) {
+        it("should return user user project list", (done) =>  {
             agent
                 .get("/api/projects/latest")
                 .set("authorization", `Bearer ${tokenValid}`)
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
-
-                    expect(res.body).to.containSubset([
+                    expect(res.body).not.to.be.an("array");
+                    expect(res.body).to.containSubset(
                         {
                             _id: 1,
                             title: "new title",
                             description: "description 1",
                         },
-                    ]);
+                    );
                     done();
                 });
         });
 
-        it("should respond with a 401 when not authenticated", function(done) {
+        it("should respond with a 401 when not authenticated", (done) =>  {
             agent
                 .get("/api/projects/latest")
                 .expect(401)
