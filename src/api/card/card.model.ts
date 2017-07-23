@@ -1,15 +1,18 @@
+
 /**
  * Created by sasha on 6/20/17.
  */
 const Sequilize = require("sequelize");
 
-export class ProjectColumn extends Sequilize.Model{
+export class Card extends Sequilize.Model{
     static associate(models)  {
-        ProjectColumn.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+        console.log('Card.associate')
+        Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
+        Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
     };
 }
 export default function(sequelize, DataTypes) {
-    ProjectColumn.init({
+    Card.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -17,19 +20,14 @@ export default function(sequelize, DataTypes) {
             autoIncrement: true
         },
         name: DataTypes.STRING,
-        info: DataTypes.STRING,
+        description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
-        order: DataTypes.INTEGER,
-        boardId: {
+        order:{
             type: DataTypes.INTEGER,
-            references: {
-                modal: 'Board',
-                key: '_id'
-            },
-            onDelete: 'cascade'
+            notNull: true,
         }
     },{
         sequelize
     });
-    return ProjectColumn;
+    return Card;
 }

@@ -131,7 +131,6 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
             } catch (err) {
                 return Promise.reject(err);
             }
-
             return entity.save();
         };
     }

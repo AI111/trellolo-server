@@ -46,7 +46,7 @@ describe('Board API:', function() {
                 .set('authorization', `Bearer ${tokenInvalid}`)
                 .expect(403)
                 .end((err,res)=>{
-                    expect(res.body).to.be.deep.equal({"message":"Forbidden"});
+                    expect(res.body).to.be.deep.equal({"message": "Yo not have access rights for editing this project"});
                     done()
                 });
         });
@@ -99,7 +99,7 @@ describe('Board API:', function() {
                 .set('authorization', `Bearer ${tokenInvalid}`)
                 .expect(403)
                 .end((err,res)=>{
-                    expect(res.body).to.be.deep.equal({"message":"Forbidden"});
+                    expect(res.body).to.be.deep.equal({"message": "Yo not have access rights for using this board"});
                     done()
                 });
         });
@@ -150,7 +150,7 @@ describe('Board API:', function() {
                 .set('authorization', `Bearer ${tokenInvalid}`)
                 .expect(403)
                 .end((err,res)=>{
-                    expect(res.body).to.be.deep.equal({"message":"Forbidden"});
+                    expect(res.body).to.be.deep.equal({"message": "Yo not have access rights for editing this project"});
                     done()
                 });
         });

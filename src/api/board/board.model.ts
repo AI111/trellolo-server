@@ -33,7 +33,7 @@ export default function(sequelize, DataTypes) {
                 isLength: {min:2, max: 50},
                 notEmpty: {
                     msg: 'Title is a required field'
-                }
+                },
             }
         },
         projectId:{

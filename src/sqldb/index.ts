@@ -24,8 +24,8 @@ export class DBConnection{
     public Project: Sequelize.Model<IProjectInstance,IProjectAttributes> =  connection.import("../api/project/project.model");
     public Board: Sequelize.Model<IBoardInstance,IBoardAttributes> =  connection.import("../api/board/board.model");
     public BoardToUser: Sequelize.Model<IBoardToUserInstance,IBoardToUserAttributes> =  connection.import("../api/board/board-user.model");
-    public ProjectColumn: Sequelize.Model<IColumnInstance,IColumnAttributes> =  connection.import("../api/board/column.model");
-    public Card: Sequelize.Model<ICardInstance,ICardAttributes> =  connection.import("../api/board/card.model");
+    public ProjectColumn: Sequelize.Model<IColumnInstance,IColumnAttributes> =  connection.import("../api/column/column.model");
+    public Card: Sequelize.Model<ICardInstance,ICardAttributes> =  connection.import("../api/card/card.model");
     public Team: Sequelize.Model<ITeamInstance,ITeamAttributes> =  connection.import("../api/team/team.model");
     constructor(){
         console.log('DBConnection constructor');
