@@ -5,6 +5,7 @@ import * as debug from "debug";
 import * as http from "http";
 import App from "./app";
 import {db} from "./sqldb";
+import {seedDatabase} from "./sqldb/seed";
 // global.Promise = require("sequelize").Promise;
 
 debug("ts-express:server");
@@ -15,6 +16,7 @@ App.set("port", port);
 const server: http.Server = http.createServer(App);
 db.connection.sync({force:true})
     .then(startServer)
+    .then(seedDatabase)
     .catch(function(err) {
         console.log("Server failed to start due to error: %s", err);
     });

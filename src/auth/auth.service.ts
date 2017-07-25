@@ -1,17 +1,17 @@
-'use strict';
-import {Config as config} from '../config/environment';
-import {sign} from 'jsonwebtoken';
-import * as expressJwt from 'express-jwt';
-const  compose  = require('composable-middleware');
-import {db} from '../sqldb/index';
+"use strict";
+import * as expressJwt from "express-jwt";
+import {sign} from "jsonwebtoken";
+import {Config as config} from "../config/environment";
+const  compose  = require("composable-middleware");
 import {NextFunction, Response} from "express";
-import {Request} from "../models/IExpress";
+import {checkBoardAccessRights, checkBoardUsers} from "../api/board/board.helpers";
 import {checkProjectAccessRights} from "../api/project/project.helpers";
-import {checkBoardUsers, checkBoardAccessRights} from "../api/board/board.helpers";
+import {Request} from "../models/IExpress";
 import {ProjectAccessRights} from "../models/team/ITeam";
+import {db} from "../sqldb/index";
 
 const validateJwt = expressJwt({
-    secret: config.secrets.session
+    secret: config.secrets.session,
 });
 
 /**
@@ -23,11 +23,11 @@ export function isAuthenticated() {
     // Validate jwt
         .use((req, res, next) => {
             // allow access_token to be passed through query parameter as well
-            if(req.query && req.query.hasOwnProperty('access_token')) {
+            if (req.query && req.query.hasOwnProperty("access_token")) {
                 req.headers.authorization = `Bearer ${req.query.access_token}`;
             }
             // IE11 forgets to set Authorization header sometimes. Pull from cookie instead.
-            if(req.query && typeof req.headers.authorization === 'undefined') {
+            if (req.query && typeof req.headers.authorization === "undefined") {
                 req.headers.authorization = `Bearer ${req.cookies.token}`;
             }
             validateJwt(req, res, next);
@@ -36,17 +36,17 @@ export function isAuthenticated() {
         .use((req, res, next) => {
             db.User.find({
                 where: {
-                    _id: req.user._id
-                }
+                    _id: req.user._id,
+                },
             })
-                .then(user => {
-                    if(!user) {
-                        return res.status(401).json({"message":"Forbidden"});
+                .then((user) => {
+                    if (!user) {
+                        return res.status(401).json({message: "Forbidden"});
                     }
                     req.user = user;
                     next();
                 })
-                .catch(err => next(err));
+                .catch((err) => next(err));
         });
 }
 
@@ -54,44 +54,43 @@ export function isAuthenticated() {
  * Checks if the user role meets the minimum requirements of the route
  */
 export function hasRole(roleRequired) {
-    if(!roleRequired) {
-        throw new Error('Required role needs to be set');
+    if (!roleRequired) {
+        throw new Error("Required role needs to be set");
     }
     return compose()
         .use(isAuthenticated())
         .use(function meetsRequirements(req, res, next) {
-            console.log('has role',req);
-            if(config.userRoles.indexOf(req.user.role) >= config.userRoles.indexOf(roleRequired)) {
+            if (config.userRoles.indexOf(req.user.role) >= config.userRoles.indexOf(roleRequired)) {
                 return next();
             } else {
-                return res.status(403).json({"message":"Forbidden"});
+                return res.status(403).json({message: "Forbidden"});
             }
         });
 }
-export function hasProjectRoles(roles:[ProjectAccessRights] = ['user','admin','creator']): NextFunction{
+export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"]): NextFunction{
     return compose()
         .use(isAuthenticated())
-        .use((req: Request,res: Response, next: NextFunction) => {
-            req.projectId = req.headers['project'] || req.params.projectId || req.params['project'] || req.body.projectId;
-            if(!req.projectId) return res.status(403).json({"message":"Forbidden"});
+        .use((req: Request, res: Response, next: NextFunction) => {
+            req.projectId = req.headers.project || req.params.projectId || req.params.project || req.body.projectId;
+            if (!req.projectId) return res.status(403).json({message: "Forbidden"});
             checkProjectAccessRights(req.user._id, req.projectId, roles)
                 .then(() => next())
-                .catch(err => {
-                    return res.status(err.status||403).send({"message":(err.error||"Forbidden")})
-                })
+                .catch((err) => {
+                    return res.status(err.status || 403).send({message: (err.error || "Forbidden")});
+                });
         });
 }
-export function hasBoardRoles(roles:[ProjectAccessRights] = ['user','admin','creator']): NextFunction{
+export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"]): NextFunction{
     return compose()
         .use(isAuthenticated())
-        .use((req: Request,res: Response, next: NextFunction) => {
-            const boardId = req.headers['board'] || req.params.boardId || req.params['id'] || req.body.boardId;
-            if(!boardId) return res.status(403).json({"message":"boardId is required field"});
+        .use((req: Request, res: Response, next: NextFunction) => {
+            const boardId = req.headers.board || req.params.boardId || req.params.id || req.body.boardId;
+            if (!boardId) return res.status(403).json({message: "boardId is required field"});
             checkBoardAccessRights(req.user._id, boardId, roles)
                 .then(() => next())
-                .catch(err => {
-                    return res.status(err.status||403).send({"message":(err.error||"Forbidden")})
-                })
+                .catch((err) => {
+                    return res.status(err.status || 403).send({message: (err.error || "Forbidden")});
+                });
         });
 }
 
@@ -100,7 +99,7 @@ export function hasBoardRoles(roles:[ProjectAccessRights] = ['user','admin','cre
  */
 export function signToken(id, role) {
     return sign({ _id: id, role } as object, config.secrets.session, {
-        expiresIn: 60 * 60 * 5
+        expiresIn: 60 * 60 * 5,
     });
 }
 
@@ -108,10 +107,10 @@ export function signToken(id, role) {
  * Set token cookie directly for oAuth strategies
  */
 export function setTokenCookie(req, res) {
-    if(!req.user) {
-        return res.status(404).send('It looks like you aren\'t logged in, please try again.');
+    if (!req.user) {
+        return res.status(404).send("It looks like you aren't logged in, please try again.");
     }
-    var token = signToken(req.user._id, req.user.role);
-    res.cookie('token', token);
-    res.redirect('/');
+    let token = signToken(req.user._id, req.user.role);
+    res.cookie("token", token);
+    res.redirect("/");
 }

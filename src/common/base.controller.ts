@@ -54,7 +54,6 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
 
 // Updates an existing Thing in the DB
     public patch = (req: Request, res: Response) => {
-        console.log('    public patch = (req: Request, res: Response) => {');
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
@@ -82,7 +81,7 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
     };
 
     protected handleError(res: Response, statusCode: number = 500) {
-        return function(err) {
+        return (err) => {
             if(err instanceof ServerError){
                 return res.status(err.status).json({message:err.error});
             }else if(err instanceof ValidationError){
@@ -92,7 +91,7 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
         };
     }
     protected respondWithResult(res: Response, statusCode: number= 200) {
-        return function(entity) {
+        return (entity) => {
             if (entity) {
                 return res.status(statusCode).json(entity);
             }
@@ -100,7 +99,7 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
         };
     }
     protected handleEntityNotFound(res: Response) {
-        return function(entity) {
+        return (entity) => {
             if (!entity) {
                 res.status(404).end();
                 return null;
@@ -109,12 +108,12 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
         };
     }
     protected validationError(res: Response, statusCode: number= 422) {
-        return function(err) {
+        return (err) => {
             return res.status(statusCode).json(err);
         };
     }
     protected removeEntity(res: Response) {
-        return function(entity) {
+        return (entity) => {
             if (entity) {
                 return entity.destroy()
                     .then(() => {
@@ -124,7 +123,7 @@ export class BaseController<Entity extends Sequelize.Model <any, any>>{
         };
     }
     protected patchUpdates(patches) {
-        return function(entity) {
+        return (entity) => {
             try {
                 // eslint-disable-next-line prefer-reflect
                 jsonpatch.default.apply(entity, patches, /*validate*/ true);

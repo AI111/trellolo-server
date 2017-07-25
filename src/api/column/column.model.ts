@@ -4,11 +4,11 @@
 const Sequilize = require("sequelize");
 
 export class ProjectColumn extends Sequilize.Model {
-    static associate(models) {
+    public static associate(models) {
         ProjectColumn.belongsTo(models.Board, {foreignKey: "boardId", as: "board"});
     }
 
-    getMaxBoardPosition(boardId: number): Promise<number> {
+    public getMaxBoardPosition(boardId: number): Promise<number> {
         return ProjectColumn.max("position", {
             where: {
                 boardId,
@@ -16,7 +16,7 @@ export class ProjectColumn extends Sequilize.Model {
         });
     }
 
-    moveToPosition(position: number): Promise<this> {
+    public moveToPosition(position: number): Promise<this> {
         if (this.position === position || !position) return Sequilize.Promise.resolve(this);
         const inc: boolean = this.position > position;
         const between = [position, this.position].sort();
@@ -30,7 +30,7 @@ export class ProjectColumn extends Sequilize.Model {
                         $between: between,
                     },
                 },
-                order: ["position"],
+                order: ["position", "DESC"],
             },
         )
             .then(() => {
@@ -78,16 +78,6 @@ export default function(sequelize, DataTypes) {
             beforeCreate(column, fields, fn) {
                return column.getMaxBoardPosition(column.boardId)
                     .then((position) => (column.position = position + 1));
-            },
-            beforeUpdate(user, fields, fn) {
-                // if (user.changed('password')) return user.updatePassword();
-                // return sequelize.Promise.resolve();
-            },
-            afterUpdate(column, fields){
-                console.log("AFTERUPDATE", column);
-            },
-            afterBulkUpdate(column, fields){
-                console.log("AFTERBULKUPDATE");
             },
         },
 

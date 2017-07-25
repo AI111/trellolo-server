@@ -1,18 +1,23 @@
 "use strict";
-import {captureServiceInstance} from "../../common/captcha.service";
 import {NextFunction, Request, Response} from "express";
+import * as Joi from "joi";
 import * as jwt from "jsonwebtoken";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
+import {captureServiceInstance} from "../../common/captcha.service";
 import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
-import * as Joi from 'joi';
 export class UserController extends BaseController<Sequelize.Model<IUserInstance, IUserAttributes>> {
     constructor() {
         super(db.User);
     }
-
+    /**
+     * Authentication callback
+     */
+    public authCallback(req: Request, res: Response) {
+        res.redirect("/");
+    }
     public index = (req: Request, res: Response) => {
         return db.User.findAll({
             attributes: [
@@ -25,31 +30,31 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
         })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    };
+    }
     public createValidator = Joi.object().keys({
         name: Joi.string().optional(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).max(30).required(),
-        token: Joi.string().required()
+        token: Joi.string().required(),
     });
     /**
      * Creates a new user
      */
     public create = (req: Request, res: Response) => {
-        let User = this.entity.build(req.body);
+        const User = this.entity.build(req.body);
         if (req.file) User.setDataValue("avatar", req.file.path);
         User.setDataValue("provider", "local");
         User.setDataValue("role", "user");
         return User.save()
             .then((user) => {
-                const token = jwt.sign({_id: user.getDataValue('_id')}, config.secrets.session, {
+                const token = jwt.sign({_id: user.getDataValue("_id")}, config.secrets.session, {
                     expiresIn: 60 * 60 * 5,
                 });
                 return {token, ... User.profile};
             })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    };
+    }
 
     /**
      * Get a single user
@@ -69,7 +74,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 res.json(user.profile);
             })
             .catch((err) => next(err));
-    };
+    }
 
     /**
      * Change a users password
@@ -96,7 +101,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                     return res.status(403).end();
                 }
             });
-    };
+    }
 
     /**
      * Get my info
@@ -123,14 +128,9 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 res.json(user);
             })
             .catch((err) => next(err));
-    };
-
-    /**
-     * Authentication callback
-     */
-    public authCallback(req: Request, res: Response) {
-        res.redirect("/");
     }
+
+
 
 }
 export const controller = new UserController();

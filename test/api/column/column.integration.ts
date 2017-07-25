@@ -74,7 +74,6 @@ describe("Column API:", () =>  {
                 })
                 .expect(422)
                 .end((err, res) => {
-                    console.log(res.body);
                     expect(res.body).to.be.deep.equal([
                         {
                             message: "title cannot be null",
@@ -115,7 +114,7 @@ describe("Column API:", () =>  {
                 .then(() => getToken(httpAgent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
                 .catch((err) => {
-                    console.error(err);
+                    // console.error(err);
                     return err;
                 });
         });
@@ -151,11 +150,11 @@ describe("Column API:", () =>  {
         });
         // it("should respond with a 200 when move 1 column to middle position", (done) =>  {
         //     httpAgent
-        //         .put(`/api/board/columns/1`)
+        //         .put(`/api/board/columns/4`)
         //         .set("authorization", `Bearer ${tokenValid}`)
         //         .send({
         //             title: "New Title 5",
-        //             position: 4,
+        //             position: 2,
         //         })
         //         .expect(200)
         //         .end((err, res) => {

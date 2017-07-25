@@ -5,5 +5,6 @@ import {IUserInstance} from "./user/IUser";
  */
 export interface Request extends Request{
     projectId?:number;
-    user?: IUserInstance
+    user?: IUserInstance;
+    filePath: string;
 }
