@@ -1,7 +1,7 @@
 /**
  * Created by sasha on 6/22/17.
  */
-import {expect, use}  from "chai";
+import {expect, use} from "chai";
 import {stat, unlink} from "fs";
 import * as path from "path";
 import * as request from "supertest";
@@ -15,15 +15,15 @@ use(require("chai-things"));
 use(require("chai-subset"));
 
 const agent = request.agent(app.default);
-describe("Project API:", function () {
+describe("Project API:", function() {
     this.timeout(5000);
-
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening");
-            done();
-        });
-    });
+    //
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening");
+    //         done();
+    //     });
+    // });
 
     describe("GET /api/projects", () =>  {
         let tokenValid: string;
@@ -45,7 +45,6 @@ describe("Project API:", function () {
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
-                    console.log(res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,
@@ -67,7 +66,8 @@ describe("Project API:", function () {
     describe("POST /api/projects", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
-        let testProject;
+        let iconGenerated: string;
+        let iconSaved: string;
         before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
@@ -78,29 +78,6 @@ describe("Project API:", function () {
         });
         after(() =>  {
             return cleadDBData();
-        });
-        it("Check new Project in DB", (done) => {
-            agent.post("/api/projects")
-                .field("title", config.projectName)
-                .attach("icon", config.icon)
-                .set("authorization", `Bearer ${tokenValid}`)
-                .expect(200)
-                .expect("Content-Type", /json/)
-                .end((err, res) => {
-                    testProject = res.body;
-                    db.Project.findOne({where: {title: config.projectName}})
-                        .then((project) => {
-                            expect(project.dataValues).to.containSubset({
-                                title: config.projectName,
-                                icon: res.body.icon,
-                            });
-                            stat(path.join(Config.root, res.body.icon), (err) => {
-                                expect(err).is.null;
-                                return done();
-                            });
-                        });
-                });
-
         });
         it("Should return error without required field name", (done) => {
             agent.post("/api/projects")
@@ -119,6 +96,33 @@ describe("Project API:", function () {
                     done();
                 });
         });
+        it("Should saved project and generate icon", (done) => {
+            agent.post("/api/projects")
+                .set("authorization", `Bearer ${tokenValid}`)
+                .field("title", "test project title")
+                .expect(200)
+                .expect("Content-Type", /json/)
+                .end((err, res) => {
+                    iconGenerated = res.body.icon;
+                    expect(res.body.title).to.be.equal("test project title");
+                    expect(res.body.icon).to.be.a("string");
+                    done();
+                });
+        });
+        it("Should saved project with icon generate icon", (done) => {
+            agent.post("/api/projects")
+                .set("authorization", `Bearer ${tokenValid}`)
+                .field("title", "test project title")
+                .attach("icon", config.icon)
+                .expect(200)
+                .expect("Content-Type", /json/)
+                .end((err, res) => {
+                    iconSaved = res.body.icon;
+                    expect(res.body.title).to.be.equal("test project title");
+                    expect(res.body.icon).to.be.a("string");
+                    done();
+                });
+        });
         it("should respond with a 401 when not authenticated", (done) =>  {
             agent
                 .get("/api/projects")
@@ -126,9 +130,12 @@ describe("Project API:", function () {
                 .end(done);
         });
         after((done) => {
-            unlink(testProject.icon, (err) => {
+            unlink(iconGenerated, (err) => {
                 if (err) console.error(err);
-                return done();
+                unlink(iconSaved, (err) => {
+                    if (err) console.error(err);
+                    return done();
+                });
             });
         });
     });
@@ -160,7 +167,8 @@ describe("Project API:", function () {
                 .expect("Content-Type", /json/)
                 .expect(403)
                 .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({ message: "Yo not have access rights for editing this project" });
+                    expect(res.body)
+                        .to.be.deep.equal({ message: "Yo not have access rights for editing this project" });
                     done();
                 });
         });
@@ -199,8 +207,8 @@ describe("Project API:", function () {
                 .then(() => getToken(agent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
                 .then(() => {
-                db.Project.findById(1)
-                    .then((project) => project.updateAttributes({title: "new title"}));
+                    db.Project.findById(1)
+                        .then((project) => project.updateAttributes({title: "new title"}));
                 });
         });
         after(() =>  {
