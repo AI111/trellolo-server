@@ -41,8 +41,8 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
      * Creates a new user
      */
     public create = (req: Request, res: Response) => {
+        req.body.avatar = (req.file && req.file.path) || req.filePath;
         const User = this.entity.build(req.body);
-        if (req.file) User.setDataValue("avatar", req.file.path);
         User.setDataValue("provider", "local");
         User.setDataValue("role", "user");
         return User.save()
