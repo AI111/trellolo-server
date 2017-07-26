@@ -1,5 +1,6 @@
 "use strict";
-import {NextFunction, Request, Response} from "express";
+import {NextFunction, Response} from "express";
+import {Request} from "../../models/IExpress";
 import * as Joi from "joi";
 import * as jwt from "jsonwebtoken";
 import * as Sequelize from "sequelize";
@@ -30,7 +31,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
         })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    }
+    };
     public createValidator = Joi.object().keys({
         name: Joi.string().optional(),
         email: Joi.string().email().required(),
