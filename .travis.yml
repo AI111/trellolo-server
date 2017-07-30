@@ -19,6 +19,6 @@ install:
     - npm install
 script:
     - npm build
-    - npm run test:integration
     - npm run test
+    - npm run test:integration
 after_success: npm run coverage

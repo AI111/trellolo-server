@@ -2,13 +2,11 @@
  * Created by sasha on 6/22/17.
  */
 import {expect, use} from "chai";
-import {stat, unlink} from "fs";
-import * as path from "path";
 import * as request from "supertest";
-import {Config} from "../../../src/config/environment";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {deleteFiles} from "../../test.helper";
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -154,14 +152,8 @@ describe("Project API:", function() {
                 .expect(401)
                 .end(done);
         });
-        after((done) => {
-            unlink(iconGenerated, (err) => {
-                if (err) console.error(err);
-                unlink(iconSaved, (err) => {
-                    if (err) console.error(err);
-                    return done();
-                });
-            });
+        after(() => {
+           return deleteFiles([iconGenerated, iconSaved]);
         });
     });
     describe("PUT /api/projects", () => {
@@ -215,11 +207,8 @@ describe("Project API:", function() {
                         });
                 });
         });
-        after((done) => {
-            if (icon) unlink(icon, (err) => {
-                if (err) console.error(err);
-                return done();
-            });
+        after(() => {
+            return deleteFiles([icon]);
         });
     });
     describe("GET /api/projects/latest", () => {
