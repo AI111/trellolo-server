@@ -37,12 +37,15 @@ export function createTestProjectUser() {
             name: "Fake User",
             email: "test@example.com",
             password: "password",
+            avatar: "uploads/pop.jpg",
         },
         {
             _id: 2,
             name: "Fake User 2",
             email: "test2@example.com",
             password: "password",
+            avatar: "uploads/pop.jpg",
+
         },
     ])
         .then(() => db.Project.bulkCreate([
@@ -77,8 +80,8 @@ export function createTestProjectUser() {
             },{
                 _id: 3,
                 userId: 1,
-                projectId: 3,
-                accessRights: "creator",
+                projectId: 2,
+                accessRights: "user",
             },
         ]))
         .then(() => db.Board.bulkCreate([

@@ -34,11 +34,11 @@ describe("Base controller class:", function() {
     });
     describe("Check respondWithResult", function() {
         it("It should return null if entity empty", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             expect(cntrl.respondWithResult(res as any)(null)).to.be.null;
         });
         it("It should return express response if entity not empty", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {data: "test"};
             res.status.returns(res);
             res.json.returns(data);
@@ -49,7 +49,7 @@ describe("Base controller class:", function() {
     });
     describe("Check validationError", function() {
         it("It should return express response with status 422 and error message", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {error: "test"};
             res.status.returns(res);
             res.json.returns(data);
@@ -58,7 +58,7 @@ describe("Base controller class:", function() {
             expect(res.json).to.have.been.calledWith(data);
         })    ;
         it("It should return express response with selected status and error message", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {error: "test"};
             res.status.returns(res);
             res.json.returns(data);
@@ -69,7 +69,7 @@ describe("Base controller class:", function() {
     });
     describe("Check handleError", function() {
         it("It should return express response with status 502 and error message", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = new ServerError("my err", 502);
             res.status.returns(res);
             res.json.returns(data.error);
@@ -78,7 +78,7 @@ describe("Base controller class:", function() {
             expect(res.json).to.have.been.calledWith({message: data.error});
         });
         it("It should return express response with status 422 and error message", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {error: "test"};
             res.status.returns(res);
             res.send.returns(data);
@@ -87,7 +87,7 @@ describe("Base controller class:", function() {
             expect(res.send).to.have.been.calledWith(data);
         });
         it("It should return express response with selected status and error message", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl:any  = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {error: "test"};
             res.status.returns(res);
             res.send.returns(data);
@@ -98,14 +98,14 @@ describe("Base controller class:", function() {
     });
     describe("Check handleEntityNotFound", function() {
         it("It should return express response status 404 if entity empty", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             res.status.returns(res);
             cntrl.handleEntityNotFound(res as any)(null);
             expect(res.status).to.have.been.calledWith(404);
             expect(res.end).to.have.been.calledOnce;
         });
         it("It should return entity if it not empty", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             const data = {data: "test"};
             expect(cntrl.handleEntityNotFound(res as any)(data)).to.be.equal(data);
         });
@@ -113,7 +113,7 @@ describe("Base controller class:", function() {
     });
     describe("Check removeEntity", function() {
         it("It should return destroy of model", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);
             // res.status.restore;
             res.status.returns(res);
             modelStub.destroy.returns(Sequelize.Promise.resolve());
@@ -143,7 +143,7 @@ describe("Base controller class:", function() {
     });
     describe("Check index", function() {
         it("It should excec findAll", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
             const data = {data: "test"};
             modelStub.findAll.returns(Sequelize.Promise.resolve());
             const respStub = stub(cntrl, "respondWithResult");
@@ -155,7 +155,7 @@ describe("Base controller class:", function() {
     });
     describe("Check create", function() {
         it("It should exec findAll", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
             const data = {data: "test"};
             modelStub.create.returns(Sequelize.Promise.resolve());
             const respStub = stub(cntrl, "respondWithResult");
@@ -165,7 +165,7 @@ describe("Base controller class:", function() {
             expect(respStub).to.be.calledOnce;
         });
         it("It should handler validation error", function() {
-            const cntrl = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
+            const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub);
             modelStub.create.callsFake(() => Sequelize.Promise.reject(new Error("Validation Error")));
             const clb = spy();
             stub(cntrl, "handleError").callsFake((e) => e);

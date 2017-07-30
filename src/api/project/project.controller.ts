@@ -5,6 +5,7 @@ import {BaseController} from "../../common/base.controller";
 import {Request} from "../../models/IExpress";
 import {IProjectAttributes, IProjectInstance} from "../../models/project/IProject";
 import {db} from "../../sqldb/index";
+
 /**
  * Created by sasha on 6/22/17.
  */
@@ -14,14 +15,30 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
     constructor() {
         super(db.Project);
     }
+
     public show = (req: Request, res: Response) => {
         return db.User.findOne({
             where: {
                 _id: req.user._id,
             },
             include: [
-                {model: db.Project, as: "projects"},
+                {
+                    model: db.Project,
+                    as: "projects",
+                    include: [
+                        {
+                            model: db.User,
+                            as: "users",
+                            attributes: [
+                                "email",
+                                "avatar",
+                                "_id",
+                            ],
+                        },
+                    ],
+                },
             ],
+
         })
             .then((user) => user.projects)
             .then(this.handleEntityNotFound(res))
@@ -33,13 +50,14 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
         if (req.file) req.body.icon = req.file.path;
         if (req.body._id) Reflect.deleteProperty(req.body, "_id");
         return this.entity.find({
-                where: {
-                    _id: req.params.projectId,
-                }})
-                .then(this.handleEntityNotFound(res))
-                .then((project) => project.updateAttributes(req.body, {validate: true}))
-                .then(this.respondWithResult(res))
-                .catch(this.handleError(res));
+            where: {
+                _id: req.params.projectId,
+            }
+        })
+            .then(this.handleEntityNotFound(res))
+            .then((project) => project.updateAttributes(req.body, {validate: true}))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
     }
 
     public create = (req: Request, res: Response) => {
@@ -67,7 +85,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                 },
             ],
             order: [
-                [ "updatedAt", "DESC"],
+                ["updatedAt", "DESC"],
             ],
         })
             .then(this.handleEntityNotFound(res))
@@ -76,4 +94,5 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
     }
 
 }
+
 export const controller = new ProjectController();
