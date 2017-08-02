@@ -24,7 +24,7 @@ const swaggerDocument = require(path.join(Config.root,'swagger.json'));
 export function configExpress(app: Application) {
     let env = app.get("env");
     app.use(cors());
-    app.use(morgan("dev"));
+    if(env !== "test") app.use(morgan("dev"));
     app.use(shrinkRay());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());

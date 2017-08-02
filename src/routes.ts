@@ -15,5 +15,6 @@ export function initRouter(app: Application) {
     // All undefined asset or api routes should return a 404
     app.use("/api", require("./api/board").default());
     app.use("/api/board", require("./api/column").default());
+    app.use("/api/invites", require("./api/invite").default());
 
 }

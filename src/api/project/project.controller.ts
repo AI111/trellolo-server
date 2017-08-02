@@ -31,6 +31,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                             as: "users",
                             attributes: [
                                 "email",
+                                "name",
                                 "avatar",
                                 "_id",
                             ],

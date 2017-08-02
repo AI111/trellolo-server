@@ -30,7 +30,6 @@ export let res: any = {
     end: spy(),
 };
 export function createTestProjectUser() {
-    console.log("CREATE");
     return db.User.bulkCreate([
         {
             _id: 1,
@@ -46,6 +45,13 @@ export function createTestProjectUser() {
             password: "password",
             avatar: "uploads/pop.jpg",
 
+        },
+        {
+            _id: 3,
+            name: "Fake User 3",
+            email: "test3@example.com",
+            password: "password",
+            avatar: "uploads/pop.jpg",
         },
     ])
         .then(() => db.Project.bulkCreate([
@@ -140,16 +146,37 @@ export function createTestProjectUser() {
                 boardId: 1,
                 position: 5,
             },
+        ]))
+        .then(() => db.Invite.bulkCreate([
+            {
+                _id: 1,
+                projectId: 1,
+                userFromId: 1,
+                userToId: 3,
+                message: "team invite",
+            }, {
+                _id: 2,
+                projectId: 1,
+                userFromId: 1,
+                userToId: 3,
+                message: "team invite",
+            }, {
+                _id: 3,
+                projectId: 2,
+                userFromId: 2,
+                userToId: 3,
+                message: "team invite",
+            },
         ]));
 
 }
 export function cleadDBData() {
-    console.log("DELETE");
     return  db.User.destroy({where: {}})
+        .then(() => db.Invite.destroy({where: {}}))
         .then(() => db.Team.destroy({where: {}}))
         .then(() => db.Board.destroy({where: {}}))
         .then(() => db.Project.destroy({where: {}}))
-        .then(() => db.BoardToUser.destroy({where: {}}));
+        .then(() => db.BoardToUser.destroy({where: {}}))
 
 }
 export function getToken(agent: SuperTest<Test>, email: string, password: string): Promise<string> {
@@ -164,7 +191,6 @@ export function getToken(agent: SuperTest<Test>, email: string, password: string
             .expect("Content-Type", /json/)
             .end((err, res) => {
                 const token: string = res.body.token;
-                console.log(token);
                 if (!token) return reject(err);
                 return resolve(token);
             });

@@ -5,7 +5,7 @@
 const Sequilize = require("sequelize");
 
 export class Project extends Sequilize.Model{
-    static associate(models)  {
+    public static associate(models)  {
         console.log("Project.associate");
         Project.belongsToMany(models.User, {
             through: {

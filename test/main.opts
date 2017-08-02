@@ -1,0 +1,8 @@
+--compilers ts-node/register
+--ui bdd
+--recursive
+--require source-map-support/register
+--full-trace
+--bail
+test/**/*.integration.ts
+test/**/*.spec.ts

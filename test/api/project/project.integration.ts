@@ -7,6 +7,7 @@ import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
 import {deleteFiles} from "../../test.helper";
+const debug = require("debug")("test.project");
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -44,6 +45,7 @@ describe("Project API:", function() {
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
+                    debug(res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,

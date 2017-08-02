@@ -1,47 +1,51 @@
 /**
- * Created by sasha on 6/20/17.
+ * Created by sasha on 6/21/17.
  */
 "use strict";
 const Sequilize = require("sequelize");
 
-export class Team extends Sequilize.Model{
+export class Invite extends Sequilize.Model {
     public static associate(models)  {
-        console.log("Team.associate");
+        console.log("Invite.associate");
     }
 }
 export default function(sequelize, DataTypes) {
-    Team.init({
+    Invite.init({
         _id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        userId: {
+        userFromId: {
             type: DataTypes.INTEGER,
             references: {
                 model: "Users",
                 key: "_id",
             },
-            unique: "compositeIndex",
+            onDelete: "cascade",
         },
-        teamName: {
-            type: DataTypes.STRING,
-        },
-        projectId: {
+        userToId: {
             type: DataTypes.INTEGER,
             references: {
-                model: "Projects",
+                model: "Users",
                 key: "_id",
             },
-            unique: "compositeIndex",
+            onDelete: "cascade",
         },
-        accessRights: {
-            type: DataTypes.ENUM,
-            values: ["user", "admin", "creator"],
-            defaultValue: "user",
+        projectId: {
+          type: DataTypes.INTEGER,
+          references: {
+              model: "Projects",
+              key: "_id",
+          },
+            onDelete: "cascade",
+        },
+        message: {
+            type: DataTypes.STRING,
+            isLength: {min: 2, max: 500},
         },
     }, {
         sequelize,
     });
-    return Team;
+    return Invite;
 }

@@ -3,9 +3,9 @@
  */
 export interface IServerError{
     status: number;
-    error: string | object
+    error: string | object,
 }
 export class ServerError implements IServerError{
-    constructor(public error: string | Object, public status: number=500 ) {
+    constructor(public error: string | object, public status: number = 500 ) {
     }
 }

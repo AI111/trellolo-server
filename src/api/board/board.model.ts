@@ -4,19 +4,19 @@
 const Sequilize = require("sequelize");
 
 export class Board extends Sequilize.Model{
-    static associate (models)  {
-        Board.belongsTo(models.Project,{
+    static associate(models)  {
+        Board.belongsTo(models.Project, {
             foreignKey: "projectId",
-            as:"boards"
+            as: "boards",
         });
-        Board.belongsToMany(models.User,{
-            through:{
+        Board.belongsToMany(models.User, {
+            through: {
                 model: models.BoardToUser,
                 unique: false,
             },
             foreignKey: "boardId",
-            as:"users"
-        })
+            as: "users",
+        });
     }
 }
 export default function(sequelize, DataTypes) {
@@ -25,31 +25,31 @@ export default function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
         },
         name: {
             type: DataTypes.STRING,
             validate: {
-                isLength: {min:2, max: 50},
+                isLength: {min: 2, max: 50},
                 notEmpty: {
-                    msg: 'Title is a required field'
+                    msg: "Title is a required field",
                 },
-            }
+            },
         },
-        projectId:{
+        projectId: {
             type: DataTypes.INTEGER,
             references: {
-                modal: 'Project',
-                key: '_id',
+                modal: "Projects",
+                key: "_id",
             },
         },
         description: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
         },
         info: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
-    },{
-        sequelize
+    }, {
+        sequelize,
     });
 
     return Board;

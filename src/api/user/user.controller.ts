@@ -10,6 +10,12 @@ import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
 export class UserController extends BaseController<Sequelize.Model<IUserInstance, IUserAttributes>> {
+    public createValidator = Joi.object().keys({
+        name: Joi.string().optional(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).max(30).required(),
+        token: Joi.string().required(),
+    });
     constructor() {
         super(db.User);
     }
@@ -23,21 +29,14 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
         return db.User.findAll({
             attributes: [
                 "_id",
-                "name",
                 "email",
-                "role",
-                "provider",
+                "avatar",
             ],
         })
+            .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     };
-    public createValidator = Joi.object().keys({
-        name: Joi.string().optional(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(30).required(),
-        token: Joi.string().required(),
-    });
     /**
      * Creates a new user
      */
@@ -51,7 +50,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 const token = jwt.sign({_id: user.getDataValue("_id")}, config.secrets.session, {
                     expiresIn: 60 * 60 * 5,
                 });
-                return {token, ... User.profile};
+                return {token, ...User.profile};
             })
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
@@ -130,8 +129,5 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
             })
             .catch((err) => next(err));
     }
-
-
-
 }
 export const controller = new UserController();

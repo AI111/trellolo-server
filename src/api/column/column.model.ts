@@ -66,7 +66,7 @@ export default function(sequelize, DataTypes) {
         boardId: {
             type: DataTypes.INTEGER,
             references: {
-                modal: "Board",
+                modal: "Boards",
                 key: "_id",
             },
             onDelete: "cascade",
