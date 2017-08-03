@@ -9,12 +9,12 @@ export interface IBoardAttributes {
     _id?: number;
     name?: string;
     creator?: IUserInstance;
-    board?: IBoardInstance
-    columns?:[IColumnAttributes];
+    board?: IBoardInstance;
+    columns?: [IColumnAttributes];
     projectId?: number;
-    description?:string
+    description?: string;
 }
 
 export interface IBoardInstance  extends Instance<IBoardAttributes>, IBoardAttributes {
-    dataValues: IBoardAttributes
+    dataValues: IBoardAttributes;
 }
