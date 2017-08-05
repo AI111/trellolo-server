@@ -818,7 +818,8 @@
     },
     "Board":{
       "required": [
-        "name"
+        "name",
+        "projectId"
       ],
       "type": "object",
       "properties": {
@@ -828,8 +829,8 @@
         "description":{
           "type": "string"
         },
-        "icon":{
-          "type": "string"
+        "projectId": {
+          "type": "integer"
         }
       }
     },
