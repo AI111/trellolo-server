@@ -12,12 +12,14 @@ import {controller} from "./board.controller";
 
 export default function(): Router {
     const router =  Router();
-    router.get("/projects/:projectId/boards", hasProjectRoles(),  controller.index);
+    // router.get("/projects/:projectId/boards", hasProjectRoles(),  controller.index);
     // router.delete("/:id", hasRole("admin"), controller.destroy);
     // router.get("/me", hasProjectRoles(), controller.show);
-    router.put("/boards/:id", hasBoardRoles(), controller.patch);
-    router.get("/boards/:id", hasBoardRoles(), controller.show);
-    router.post("/projects/:projectId/boards" , hasProjectRoles(["creator", "admin"]),
+    router.get("/:id", hasBoardRoles(), controller.show);
+    router.put("/:id", hasBoardRoles(), controller.patch);
+    router.post("/" , hasProjectRoles(["creator", "admin"]),
         validateReauest(controller.createValidator) , controller.create);
+    router.get("/:boardId/columns", hasBoardRoles(),  controller.getColumns);
+
     return router;
 }

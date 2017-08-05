@@ -6,31 +6,30 @@
 
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
+import * as cors from "cors";
 import * as errorHandler from "errorhandler";
 import {Application} from "express";
-import * as cors from "cors";
 import * as session from "express-session";
 import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
-import * as shrinkRay from "shrink-ray";
-import {Config} from './environment'
-import * as swaggerUi from 'swagger-ui-express';
 import * as path from "path";
-const swaggerDocument = require(path.join(Config.root,'swagger.json'));
-
-
+import * as shrinkRay from "shrink-ray";
+import * as swaggerUi from "swagger-ui-express";
+import {Config} from "./environment";
+const swaggerDocument = require(path.join(Config.root, "swagger.json"));
 
 export function configExpress(app: Application) {
-    let env = app.get("env");
+    const env = app.get("env");
     app.use(cors());
-    if(env !== "test") app.use(morgan("dev"));
+    // if(env !== "test")
+    app.use(morgan("dev"));
     app.use(shrinkRay());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
     app.use(methodOverride());
     app.use(cookieParser());
-    app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(initialize());
 

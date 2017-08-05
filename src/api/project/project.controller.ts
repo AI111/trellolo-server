@@ -15,7 +15,20 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
     constructor() {
         super(db.Project);
     }
-
+    public index = (req: Request, res: Response) => {
+        return db.User.findOne({
+            where: {
+                _id: req.user._id,
+            },
+            include: [
+                {model: db.Board, as: "boards"},
+            ],
+        })
+            .then((user) => user.boards)
+            .then(this.handleEntityNotFound(res))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
     public show = (req: Request, res: Response) => {
         return db.User.findOne({
             where: {

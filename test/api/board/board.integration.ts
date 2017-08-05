@@ -15,65 +15,14 @@ use(require("chai-subset"));
 describe("Board API:", function() {
     before((done) => {
         app.default.on("listening", () => {
+            console.log("listening//////////////");
+
             done();
         });
     });
 
     this.timeout(5000);
-    describe("GET /api/projects/{projectId}/boards", () => {
-        let tokenValid: string;
-        let tokenInvalid: string;
-        before(() => {
-          return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => tokenValid = token)
-                .then(() => getToken(httpAgent, "test2@example.com", "password"))
-                .then((token) => (tokenInvalid = token));
-        });
-        after(function() {
-            return cleadDBData();
-        });
-        it("should respond with a 401 when not authenticated", function(done) {
-            httpAgent
-                .get(`/api/projects/${1}/boards`)
-                .expect(401)
-                .end(done);
-        });
-        it("should respond with a 403 when user not have access to edit project", function(done) {
-            httpAgent
-                .get(`/api/projects/${1}/boards`)
-                .set("authorization", `Bearer ${tokenInvalid}`)
-                .expect(403)
-                .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
-                    done();
-                });
-        });
-        it("should return list of user projects", function(done) {
-            httpAgent
-                .get(`/api/projects/${1}/boards`)
-                .set("authorization", `Bearer ${tokenValid}`)
-                .expect(200)
-                .end((err, res) => {
-                    expect(res.body).to.containSubset([
-                        {
-                            _id: 1,
-                            name: "board 1",
-                            projectId: 1,
-                            description: "description 1",
-                        }, {
-                            name: "board 2",
-                            projectId: 2,
-                            description: "description 2",
-                            info: null,
-                            active: null,
-                        },
-                    ]);
-                    done();
-                });
-        });
-    });
-    describe("GET /api/projects/boards/{boardId}", function() {
+    describe("GET /api/boards/{boardId}", function() {
         let tokenValid: string;
         let tokenInvalid: string;
         before(function() {
@@ -120,7 +69,7 @@ describe("Board API:", function() {
                 });
         });
     });
-    describe("POST /api/projects/{projectId}/boards", function() {
+    describe("POST /api/boards", function() {
         let tokenValid: string;
         let tokenInvalid: string;
         before(function() {
@@ -139,25 +88,27 @@ describe("Board API:", function() {
         });
         it("should respond with a 401 when not authenticated", function(done) {
             httpAgent
-                .post(`/api/projects/${1}/boards`)
+                .post("/api/boards")
                 .expect(401)
                 .end(done);
         });
         it("should respond with a 403 when user not have access to edit project", function(done) {
             httpAgent
-                .post(`/api/projects/${1}/boards`)
+                .post("/api/boards")
                 .set("authorization", `Bearer ${tokenInvalid}`)
                 .expect(403)
                 .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
+                    expect(res.body).to.be.deep.equal({message: "Forbidden"});
                     done();
                 });
         });
         it("should respond with a 422 if board validation failed", function(done) {
             httpAgent
-                .post(`/api/projects/${1}/boards`)
+                .post("/api/boards")
                 .set("authorization", `Bearer ${tokenValid}`)
-                .send({})
+                .send({
+                    projectId: 1,
+                })
                 .expect(422)
                 .end((err, res) => {
                     // console.log(res.body);
@@ -176,14 +127,17 @@ describe("Board API:", function() {
         });
         it("should respond with a 200 if new board was created", function(done) {
             httpAgent
-                .post(`/api/projects/${1}/boards`)
+                .post(`/api/boards`)
                 .set("authorization", `Bearer ${tokenValid}`)
-                .send({name: "test board"})
+                .send({
+                    name: "test board",
+                    projectId: 1,
+                })
                 .expect(200)
                 .end((err, res) => {
                     expect(res.body).to.containSubset({
                         name: "test board",
-                        projectId: "1",
+                        projectId: 1,
                     });
                     done();
                 });

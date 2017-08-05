@@ -15,23 +15,10 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
     constructor() {
         super(db.Board);
     }
-    public index = (req: Request, res: Response) => {
-        return db.User.findOne({
-            where: {
-                _id: req.user._id,
-            },
-            include: [
-                {model: db.Board, as: "boards"},
-            ],
-        })
-            .then((user) => user.boards)
-            .then(this.handleEntityNotFound(res))
-            .then(this.respondWithResult(res))
-            .catch(this.handleError(res));
-    }
     public createValidator = Joi.object().keys({
         name: Joi.string().min(2).max(30).required(),
         description: Joi.string().min(4).max(200).optional(),
+        projectId: Joi.number().integer().required(),
     });
     // public myProjects = (req: Request, res: Response) => {
     //    return db.Team.findAll({
@@ -49,9 +36,20 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
     // };
     // addUsersToBoard()
     public create = (req: Request, res: Response) => {
-         req.body.projectId = req.projectId;
          return this.entity.create(req.body)
             .then(setBoardUsers(req.body.users))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
+    public getColumns = (req: Request, res: Response) => {
+        return db.ProjectColumn.findAll({
+            where: {
+                boardId: req.params.boardId,
+            },
+            raw: true,
+            order: ["position"],
+        })
+            .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

@@ -15,6 +15,8 @@ export default function(): Router {
     const router =  Router();
     router.get("/", isAuthenticated(), controller.show);
     router.get("/latest", isAuthenticated(), controller.latest);
+    router.get("/:projectId/boards", hasProjectRoles(),  controller.index);
+
     router.delete("/:id", hasProjectRoles(["admin", "creator"]), controller.destroy);
     router.put("/:projectId", hasProjectRoles(["admin", "creator"]), iconParse("icon"), controller.update);
     router.post("/", isAuthenticated(), iconParse("icon"), controller.create);

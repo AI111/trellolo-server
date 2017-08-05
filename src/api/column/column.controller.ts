@@ -19,18 +19,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
         title: Joi.string().min(2).max(30).required(),
         position: Joi.string().min(4).max(200).optional(),
     });
-    public index = (req: Request, res: Response) => {
-        return this.entity.findAll({
-            where: {
-                boardId: req.params.boardId,
-            },
-            raw: true,
-            order: ["position"],
-        })
-            .then(this.handleEntityNotFound(res))
-            .then(this.respondWithResult(res))
-            .catch(this.handleError(res));
-    }
+    // public index
     public patch = (req: Request, res: Response) => {
         return this.entity.findById(req.params.columnId)
             .then(this.handleEntityNotFound(res))

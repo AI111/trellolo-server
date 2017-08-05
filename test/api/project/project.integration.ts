@@ -256,5 +256,58 @@ describe("Project API:", function() {
                 .end(done);
         });
     });
+    describe("GET /api/projects/{projectId}/boards", () => {
+        let tokenValid: string;
+        let tokenInvalid: string;
+        before(() => {
+            return createTestProjectUser()
+                .then(() => getToken(agent, "test@example.com", "password"))
+                .then((token) => tokenValid = token)
+                .then(() => getToken(agent, "test2@example.com", "password"))
+                .then((token) => (tokenInvalid = token));
+        });
+        after(function() {
+            return cleadDBData();
+        });
+        it("should respond with a 401 when not authenticated", function(done) {
+            agent
+                .get(`/api/projects/${1}/boards`)
+                .expect(401)
+                .end(done);
+        });
+        it("should respond with a 403 when user not have access to edit project", function(done) {
+            agent
+                .get(`/api/projects/${1}/boards`)
+                .set("authorization", `Bearer ${tokenInvalid}`)
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
+                    done();
+                });
+        });
+        it("should return list of user projects", function(done) {
+            agent
+                .get(`/api/projects/${1}/boards`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(200)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 1,
+                            name: "board 1",
+                            projectId: 1,
+                            description: "description 1",
+                        }, {
+                            name: "board 2",
+                            projectId: 2,
+                            description: "description 2",
+                            info: null,
+                            active: null,
+                        },
+                    ]);
+                    done();
+                });
+        });
+    });
 
 });

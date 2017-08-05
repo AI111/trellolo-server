@@ -21,7 +21,7 @@ export class ProjectColumn extends Sequilize.Model {
         const inc: boolean = this.position > position;
         const between = [position, this.position].sort();
         return ProjectColumn.update({
-                position: Sequilize.literal(`IF(_id=${this._id}, ${1000}, position ${inc ? "+" : "-"}1)`),
+                position: Sequilize.literal(`position ${inc ? "+" : "-"}1`),
             },
             {
                 where: {
@@ -57,11 +57,9 @@ export default function(sequelize, DataTypes) {
             },
             allowNull: false,
         },
-        info: DataTypes.STRING,
-        active: DataTypes.BOOLEAN,
         position: {
             type: DataTypes.INTEGER,
-            unique: "compositeIndex",
+            // unique: "compositeIndex",
         },
         boardId: {
             type: DataTypes.INTEGER,
@@ -70,7 +68,7 @@ export default function(sequelize, DataTypes) {
                 key: "_id",
             },
             onDelete: "cascade",
-            unique: "compositeIndex",
+            // unique: "compositeIndex",
         },
     }, {
         sequelize,
