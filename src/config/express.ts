@@ -22,14 +22,15 @@ const swaggerDocument = require(path.join(Config.root, "swagger.json"));
 export function configExpress(app: Application) {
     const env = app.get("env");
     app.use(cors());
-    if(env !== "test") app.use(morgan("dev"));
+    if (env !== "test") {
+        app.use(morgan("dev"));
+        app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    }
     app.use(shrinkRay());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
     app.use(methodOverride());
     app.use(cookieParser());
-    app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
     app.use(initialize());
 
     /**

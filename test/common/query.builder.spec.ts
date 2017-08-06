@@ -8,9 +8,9 @@ use(require("chai-things"));
 
 describe("Query builder service", function() {
     it("typeParser should parse query value", () => {
-        expect(builder.typeParser("%like%", "sasha")).to.be.deep.equal({$like: "%sasha%"});
-        expect(builder.typeParser("%like", "sasha")).to.be.deep.equal({$like: "%sasha"});
-        expect(builder.typeParser("like%", "sasha")).to.be.deep.equal({$like: "sasha%"});
+        expect(builder.typeParser("$like", "%%%s%", "sasha")).to.be.deep.equal({$like: "%sasha%"});
+        expect(builder.typeParser("$like", "%%%s", "sasha")).to.be.deep.equal({$like: "%sasha"});
+        expect(builder.typeParser("$like", "%s%", "sasha")).to.be.deep.equal({$like: "sasha%"});
     });
     it("buildQueryByParams should build query for simple params", () => {
         const typeParserStub =  stub(builder, "typeParser");
@@ -46,8 +46,8 @@ describe("Query builder service", function() {
                 city: "Odessa",
         };
         expect(builder.buildQueryByParams( query, request, [
-            {name: "name", type: "%like%"},
-            {name: "email", type: "like%"},
+            {name: "name", type: "$like", format: "%%%s%"},
+            {name: "email", type: "$like", format: "%s%"},
         ])).to.be.deep.equal({
             _id: 1,
             attributes: ["_id", "name"],

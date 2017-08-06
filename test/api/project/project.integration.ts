@@ -324,5 +324,88 @@ describe("Project API:", function() {
                 });
         });
     });
+    describe("GET /api/projects/{projectId}/users", () => {
+        let tokenValid: string;
+        let tokenInvalid: string;
+        before(() => {
+            return createTestProjectUser()
+                .then(() => getToken(agent, "test@example.com", "password"))
+                .then((token) => tokenValid = token)
+                .then(() => getToken(agent, "test2@example.com", "password"))
+                .then((token) => (tokenInvalid = token));
+        });
+        after(function() {
+            return cleadDBData();
+        });
+        it("should respond with a 401 when not authenticated", function(done) {
+            agent
+                .get(`/api/projects/${1}/users`)
+                .expect(401)
+                .end(done);
+        });
+        it("should respond with a 403 when user not have access to edit project", function(done) {
+            agent
+                .get(`/api/projects/${1}/users`)
+                .set("authorization", `Bearer ${tokenInvalid}`)
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
+                    done();
+                });
+        });
+        it("should respond with 200 and list of project users if criteria is empty", function(done) {
+            agent
+                .get(`/api/projects/${1}/users`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(200)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 1,
+                            avatar: "uploads/pop.jpg",
+                            email: "test@example.com",
+                            name: "Fake User",
+                        },
+                        {
+                            _id: 3,
+                            avatar: "uploads/pop.jpg",
+                            email: "test3@example.com",
+                            name: "Fake User 3",
+                        },
+                    ]);
+                    done();
+                });
+        });
+        it("should respond with array of users who have similar", function(done) {
+            agent
+                .get(`/api/projects/${1}/users`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({email: "3"})
+                .expect(200)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 3,
+                            avatar: "uploads/pop.jpg",
+                            email: "test3@example.com",
+                            name: "Fake User 3",
+                        },
+                    ]);
+                    done();
+                });
+        });
+        it("should respond with 404 when user with email not found", function(done) {
+            agent
+                .get(`/api/projects/${1}/users`)
+                .query({email: "wrongMail"})
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(404)
+                .end((err, res) => {
+                    expect(res.body).to.be.empty;
+                    expect(res.status).to.be.equal(404);
+                    done();
+                });
+        });
+    });
 
 });

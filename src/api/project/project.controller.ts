@@ -2,6 +2,7 @@ import * as Promise from "bluebird";
 import {Response} from "express";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
+import {buildQueryByParams} from "../../common/query.builder";
 import {Request} from "../../models/IExpress";
 import {IProjectAttributes, IProjectInstance} from "../../models/project/IProject";
 import {db} from "../../sqldb/index";
@@ -24,7 +25,6 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                 {
                     model: db.Board,
                     as: "boards",
-
                     include: [{
                         model: db.User,
                         as: "users",
@@ -39,6 +39,32 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             ],
         })
             .then((user) => user.boards)
+            .then(this.handleEntityNotFound(res))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
+    public getUsers = (req: Request, res: Response) => {
+        return db.User.findAll({
+            where: buildQueryByParams({}, req.query, [
+                {type: "$like", name: "email", format: "%%%s%"},
+            ]),
+            attributes:[
+                "email",
+                "name",
+                "avatar",
+                "_id",
+            ],
+            include: [
+                {
+                    model: db.Project,
+                    as: "projects",
+                    attributes: [],
+                    where: {
+                        _id: req.params.projectId,
+                    },
+                },
+            ],
+        })
             .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));

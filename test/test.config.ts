@@ -88,6 +88,11 @@ export function createTestProjectUser() {
                 userId: 1,
                 projectId: 2,
                 accessRights: "user",
+            },{
+                _id: 4,
+                userId: 3,
+                projectId: 1,
+                accessRights: "user",
             },
         ]))
         .then(() => db.Board.bulkCreate([

@@ -73,7 +73,7 @@ export class User extends Sequilize.Model{
         const defaultKeyLength = 64;
         const salt = new Buffer(this.salt, "base64");
 
-        return new Sequilize.Promise((resolve: (string) => void, reject: (any) => void) => {
+        return new Sequilize.Promise((resolve: (password: string) => void, reject: (err: any) => void) => {
             return pbkdf2(password, salt, defaultIterations, defaultKeyLength, "sha1",
                 (err, key) => {
                     if (err) return reject(err);
@@ -177,24 +177,7 @@ export default function(sequelize, DataTypes) {
              * Virtual Getters
              */
             getterMethods: {
-                // Public profile information
-                // profile() {
-                //     return {
-                //         name: this.name,
-                //         avatar: this.avatar,
-                //         email: this.email,
-                //         provider: this.provider,
-                //         role: this.role
-                //     };
-                // },
-                //
-                // // Non-sensitive info we'll be putting in the token
-                // token() {
-                //     return {
-                //         _id: this._id,
-                //         role: this.role
-                //     };
-                // }
+
             },
             /**
              * Pre-save hooks

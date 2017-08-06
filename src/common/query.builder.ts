@@ -1,11 +1,14 @@
+import {format, isString} from "util";
 import {Request} from "../models/IExpress";
-import {isString} from "util";
 export interface ISearchParams {
     name: string;
     type: string;
+    format: string;
 }
-export function typeParser(type: string, value: string): object {
-    if(type.includes("like")) return ({$like: type.replace(/like/, value)});
+export function typeParser(type: string, mask: string, value: string): object {
+    const obj = {};
+    obj[type] =  format(mask, value);
+    return obj;
 }
 export function buildQueryByParams( where: object, q: object, searchParams: [ISearchParams] | [string] ): object {
     if (!searchParams.length) return where;
@@ -16,7 +19,7 @@ export function buildQueryByParams( where: object, q: object, searchParams: [ISe
             .forEach((item: string) => (query[item] = q[item]));
     } else {
         (searchParams as [ISearchParams]).filter((parameter) => q[parameter.name])
-            .forEach((item: ISearchParams) => (query[item.name] = typeParser(item.type, q[item.name])));
+            .forEach((item: ISearchParams) => (query[item.name] = typeParser(item.type, item.format, q[item.name])));
     }
     return Object.assign(where, query);
 }
