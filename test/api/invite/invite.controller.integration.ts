@@ -16,12 +16,12 @@ use(require("chai-subset"));
 const debug = require("debug")("test.invite");
 
 describe("Invite API:", function() {
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening//////////////");
-            done();
-        });
-    });
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening//////////////");
+    //         done();
+    //     });
+    // });
     describe("POST /api/invites", () => {
         let user1Token: string;
         let user2Tokn: string;
