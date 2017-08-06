@@ -68,11 +68,37 @@ describe("Invite API:", function() {
                     expect(res.body).to.be.deep.equal([
                         {
                             context: {
-                                key: "email",
+                                key: "emails",
                             },
-                            message: "\"email\" is required",
-                            path: "email",
+                            message: "\"emails\" is required",
+                            path: "emails",
                             type: "any.required",
+                        },
+                    ]);
+                    done();
+                });
+        });
+        it("should respond with email array empty", (done) =>  {
+            httpAgent
+                .post(`/api/invites`)
+                .set("authorization", `Bearer ${user1Token}`)
+                .send({
+                    projectId: 1,
+                    message: "a",
+                    emails: [],
+                })
+                .expect(422)
+                .end((err, res) => {
+                    expect(res.body).to.be.deep.equal([
+                        {
+                            context: {
+                                key: "emails",
+                                limit: 1,
+                                value: [],
+                            },
+                            message: "\"emails\" must contain at least 1 items",
+                            path: "emails",
+                            type: "array.min",
                         },
                     ]);
                     done();
@@ -83,14 +109,14 @@ describe("Invite API:", function() {
                 .post(`/api/invites`)
                 .set("authorization", `Bearer ${user1Token}`)
                 .send({
-                    email: "test322@example.com",
+                    emails: ["test322@example.com"],
                     projectId: 1,
                     message: "hello",
                 })
                 .expect(404)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({
-                        message: "User with this email not found",
+                        message: "Users with this email not found",
                     });
                     done();
                 });
@@ -100,32 +126,41 @@ describe("Invite API:", function() {
                 .post(`/api/invites`)
                 .set("authorization", `Bearer ${user1Token}`)
                 .send({
-                    email: "test3@example.com",
+                    emails: ["test3@example.com", "test2@example.com"],
                     projectId: 1,
                     message: "hello",
                 })
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body).to.containSubset({
-                        _id: 4,
-                        message: "hello",
-                        projectId: 1,
-                        userFromId: 1,
-                        userToId: 3,
-                    });
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 4,
+                            message: "hello",
+                            projectId: 1,
+                            userFromId: 1,
+                            userToId: 2,
+                        },
+                        {
+                            _id: 5,
+                            message: "hello",
+                            projectId: 1,
+                            userFromId: 1,
+                            userToId: 3,
+                        },
+                    ]);
                     done();
                 });
         });
     });
     describe("POST /api/invites/{inviteId}/accept", () => {
         let user1Token: string;
-        let user2Token: string;
+        let user3Token: string;
         before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(httpAgent, "test@example.com", "password"))
                 .then((token) => (user1Token = token))
                 .then(() => getToken(httpAgent, "test3@example.com", "password"))
-                .then((token) => (user2Token = token))
+                .then((token) => (user3Token = token))
                 .catch((err) => {
                     console.error(err);
                     return err;
@@ -153,7 +188,7 @@ describe("Invite API:", function() {
         it("should respond with a 200 when user accept invite and include user to team", (done) =>  {
             httpAgent
                 .post(`/api/invites/3/accept`)
-                .set("authorization", `Bearer ${user2Token}`)
+                .set("authorization", `Bearer ${user3Token}`)
                 .send({projectId: 1})
                 .expect(403)
                 .end((err, res) => {

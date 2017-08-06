@@ -3,9 +3,9 @@
  */
 import {Request, Response, NextFunction} from 'express'
 import {ObjectSchema, validate} from "joi";
-export function validateReauest(schema: ObjectSchema){
-    return function (req: Request, res: Response, next: NextFunction) {
-        const result = validate(req.body, schema);
+export const validateReauest = (schema: ObjectSchema, key: string = "body") => {
+    return function(req: Request, res: Response, next: NextFunction) {
+        const result = validate(req[key], schema);
         if(!result.error) return next();
         return res.status(422).json(result.error.details);
     }

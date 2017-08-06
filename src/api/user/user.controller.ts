@@ -9,6 +9,9 @@ import {captureServiceInstance} from "../../common/captcha.service";
 import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
+import {buildQueryByParams} from "../../common/query.builder";
+const debug = require("debug")("test.user.controller");
+
 export class UserController extends BaseController<Sequelize.Model<IUserInstance, IUserAttributes>> {
     public createValidator = Joi.object().keys({
         name: Joi.string().optional(),
@@ -16,6 +19,9 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
         password: Joi.string().min(6).max(30).required(),
         token: Joi.string().required(),
     });
+    public findValidator = Joi.object().keys({
+        email: Joi.string().email().required(),
+    })
     constructor() {
         super(db.User);
     }
@@ -26,7 +32,8 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
         res.redirect("/");
     }
     public index = (req: Request, res: Response) => {
-        return db.User.findAll({
+    return db.User.findAll({
+            where: buildQueryByParams({}, req.query, ["email"]),
             attributes: [
                 "_id",
                 "email",
