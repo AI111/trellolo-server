@@ -13,6 +13,7 @@ use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
 use(require("chai-subset"));
+const debug = require("debug")("test.invite");
 
 describe("Invite API:", function() {
     // before((done) => {
@@ -279,6 +280,7 @@ describe("Invite API:", function() {
                 .set("authorization", `Bearer ${user2Token}`)
                 .expect(403)
                 .end((err, res) => {
+                    debug(res.body);
                     expect(res.body).to.containSubset({
                         count: 3,
                         limit: 50,

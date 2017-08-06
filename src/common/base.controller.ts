@@ -9,6 +9,7 @@ import * as Promise from "bluebird";
 import {ServerError} from "../models/IError";
 import {buildQueryByParams, ISearchParams} from "./query.builder";
 import {string} from "joi";
+const debug = require("debug")("test.base.controller");
 
 export class BaseController<Entity extends Sequelize.Model<any, any>> {
     constructor(protected entity: Entity) {
@@ -98,6 +99,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
 
     protected handleError(res: Response, statusCode: number = 500) {
         return (err) => {
+            debug(err);
             if (err instanceof ServerError) {
                 return res.status(err.status).json({message: err.error});
             } else if (err instanceof ValidationError) {

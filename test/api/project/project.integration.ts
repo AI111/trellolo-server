@@ -18,12 +18,12 @@ const agent = request.agent(app.default);
 describe("Project API:", function() {
     this.timeout(5000);
     //
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening");
-            done();
-        });
-    });
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening");
+    //         done();
+    //     });
+    // });
 
     describe("GET /api/projects", () => {
         let tokenValid: string;
