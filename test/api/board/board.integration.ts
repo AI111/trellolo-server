@@ -2,8 +2,10 @@
  * Created by sasha on 7/12/17.
  */
 import {expect, use} from "chai";
+import {number} from "joi";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
+import {db} from "../../../src/sqldb/index";
 import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
 
 const httpAgent: SuperTest<Test> = agent(app.default);
@@ -135,11 +137,22 @@ describe("Board API:", function() {
                 })
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body).to.containSubset({
+                const boardId: number = res.body._id;
+                expect(res.body).to.containSubset({
                         name: "test board",
                         projectId: 1,
                     });
-                    done();
+                db.BoardToUser.findOne({
+                        where: {
+                            userId: 1,
+                            boardId,
+                        },
+                    })
+                        .then((boardToUser) => {
+                            expect(boardToUser).to.not.null;
+                            done();
+                        });
+
                 });
         });
     });

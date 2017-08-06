@@ -493,7 +493,6 @@
         "description": "",
         "operationId": "createUsersWithArrayInput",
         "produces": [
-          "application/xml",
           "application/json"
         ],
         "parameters": [

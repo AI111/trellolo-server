@@ -6,6 +6,7 @@ import * as Joi from "joi";
 import {BoardAccessRights} from "../../models/board/IBoardToUser";
 import {ServerError} from "../../models/IError";
 import {db} from "../../sqldb/index";
+const debug = require("debug")("test.board.helper");
 
 export const boardValidator = Joi.object().keys({
     name: Joi.string().min(2).max(50).required(),
@@ -27,12 +28,13 @@ export function checkBoardUsers( projectId: number, users: [number] ){
             return usersModels;
         });
 }
-export function setBoardUsers(users: [number]){
+export const  setBoardUsers = (creator: number, users: [number] = [] as [number]) => {
     return (board) => {
-        if (!users || !users.length) return Promise.resolve(board);
+        users.push(creator);
         return db.BoardToUser.bulkCreate(users.map((userId) => ({
             userId,
             boardId: board._id,
+            accessRights: (userId === creator ? "creator" : "user") as BoardAccessRights,
         })))
             .then(() => board);
     };
