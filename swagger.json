@@ -143,8 +143,7 @@
           "application/json"
         ],
         "parameters": [
-          {
-          }
+
         ],
         "responses": {
           "200": {
@@ -220,9 +219,7 @@
           "application/json"
         ],
         "parameters": [
-          {
 
-          }
         ],
         "responses": {
           "200": {
@@ -267,6 +264,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "type": "object",
                 "$ref": "#/definitions/Board"
               }
             }
@@ -328,8 +326,7 @@
           "application/json"
         ],
         "parameters": [
-          {
-          }
+
         ],
         "responses": {
           "200": {
@@ -570,6 +567,7 @@
             "description": "Invite fields",
             "required": true,
             "schema": {
+              "type": "object",
               "$ref": "#/definitions/InviteRequest"
             }
           }
@@ -601,8 +599,7 @@
           "application/json"
         ],
         "parameters": [
-          {
-          }
+
         ],
         "responses": {
           "200": {
@@ -632,7 +629,7 @@
         ],
         "parameters": [
           {
-            "name": "boardId",
+            "name": "inviteId",
             "in": "path",
             "description": "ID of Invite that needs to be deleted",
             "required": true,
@@ -669,7 +666,7 @@
         ],
         "parameters": [
           {
-            "name": "boardId",
+            "name": "inviteId",
             "in": "path",
             "description": "ID of Invite that needs to be accepted",
             "required": true,
@@ -803,9 +800,7 @@
           "format": "email"
         },
         "message":{
-          "type": "string",
-          "minLength": "2",
-          "maxLength": "200"
+          "type": "string"
         },
         "projectId":{
           "type": "integer"
@@ -835,10 +830,10 @@
     },
     "BoardColumn":{
       "type": "object",
-        "required": [
-          "title",
-          "boardId"
-        ],
+      "required": [
+        "title",
+        "boardId"
+      ],
       "properties": {
         "_id":{
           "type": "integer"
@@ -870,8 +865,10 @@
         "users": {
           "type": "array",
           "items": {
-            "$ref":"#/definitions/User"
-          },
+            "type": "object",
+            "$ref": "#/definitions/User"
+          }
+        },
         "projectId": {
           "type": "integer"
         }
@@ -961,7 +958,7 @@
             "name": "tag",
             "wrapped": true
           },
-          "items": {
+          "item": {
             "$ref": "#/definitions/Tag"
           }
         },
