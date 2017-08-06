@@ -5,11 +5,11 @@
 const Sequilize = require("sequelize");
 
 export class Card extends Sequilize.Model{
-    static associate(models)  {
-        console.log('Card.associate')
-        Card.belongsTo(models.Board,{foreignKey: 'boardId', as: 'board' });
-        Card.belongsTo(models.ProjectColumn,{foreignKey: 'columnId', as: 'column' });
-    };
+    public static associate(models)  {
+        console.log("Card.associate");
+        Card.belongsTo(models.Board, {foreignKey: "boardId", as: "board" });
+        Card.belongsTo(models.ProjectColumn, {foreignKey: "columnId", as: "column" });
+    }
 }
 export default function(sequelize, DataTypes) {
     Card.init({
@@ -17,17 +17,24 @@ export default function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
         },
         name: DataTypes.STRING,
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
-        order:{
+        userId: {
+          type: DataTypes.INTEGER,
+          references: {
+              model: "Users",
+              key: "_id",
+          },
+        },
+        order: {
             type: DataTypes.INTEGER,
             notNull: true,
-        }
-    },{
-        sequelize
+        },
+    }, {
+        sequelize,
     });
     return Card;
 }

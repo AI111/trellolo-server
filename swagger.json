@@ -238,6 +238,36 @@
         }
       }
     },
+    "/projects/boards":{
+      "get": {
+        "tags": [
+          "Project",
+          "Board"
+        ],
+        "summary": "Get Project",
+        "description": "return last modified project",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Board"
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
     "/boards": {
       "post": {
         "tags": [

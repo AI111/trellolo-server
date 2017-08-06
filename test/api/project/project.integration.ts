@@ -18,12 +18,12 @@ const agent = request.agent(app.default);
 describe("Project API:", function() {
     this.timeout(5000);
     //
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening");
-    //         done();
-    //     });
-    // });
+    before((done) => {
+        app.default.on("listening", () => {
+            console.log("listening");
+            done();
+        });
+    });
 
     describe("GET /api/projects", () => {
         let tokenValid: string;
@@ -155,7 +155,7 @@ describe("Project API:", function() {
                 .end(done);
         });
         after(() => {
-           return deleteFiles([iconGenerated, iconSaved]);
+            return deleteFiles([iconGenerated, iconSaved]);
         });
     });
     describe("PUT /api/projects", () => {
@@ -291,18 +291,33 @@ describe("Project API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .expect(200)
                 .end((err, res) => {
+                    debug("%j", res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,
                             name: "board 1",
                             projectId: 1,
                             description: "description 1",
+                            users: [
+                                {
+                                    email: "test@example.com",
+                                    name: "Fake User",
+                                    avatar: "uploads/pop.jpg",
+                                    _id: 1,
+                                },
+                            ],
                         }, {
                             name: "board 2",
                             projectId: 2,
                             description: "description 2",
-                            info: null,
-                            active: null,
+                            users: [
+                                {
+                                    email: "test@example.com",
+                                    name: "Fake User",
+                                    avatar: "uploads/pop.jpg",
+                                    _id: 1,
+                                },
+                            ],
                         },
                     ]);
                     done();
