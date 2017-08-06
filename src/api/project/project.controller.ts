@@ -80,7 +80,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
         return this.entity.find({
             where: {
                 _id: req.params.projectId,
-            }
+            },
         })
             .then(this.handleEntityNotFound(res))
             .then((project) => project.updateAttributes(req.body, {validate: true}))
