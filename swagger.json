@@ -238,6 +238,45 @@
         }
       }
     },
+    "/projects/{projectId}/boards":{
+      "get": {
+        "tags": [
+          "Project",
+          "Board"
+        ],
+        "summary": "Get Project",
+        "description": "return project boards",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "ID of project that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Board"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
     "/boards": {
       "post": {
         "tags": [
@@ -818,8 +857,7 @@
     },
     "Board":{
       "required": [
-        "name",
-        "projectId"
+        "name"
       ],
       "type": "object",
       "properties": {
@@ -829,6 +867,11 @@
         "description":{
           "type": "string"
         },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref":"#/definitions/User"
+          },
         "projectId": {
           "type": "integer"
         }
