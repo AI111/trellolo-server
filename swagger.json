@@ -238,28 +238,37 @@
         }
       }
     },
-    "/projects/boards":{
+    "/projects/{projectId}/boards":{
       "get": {
         "tags": [
           "Project",
           "Board"
         ],
         "summary": "Get Project",
-        "description": "return last modified project",
+        "description": "return project boards",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-
+            "name": "projectId",
+            "in": "path",
+            "description": "ID of project that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/Board"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Board"
+              }
             }
           },
           "400": {
@@ -860,7 +869,14 @@
         },
         "icon":{
           "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref":"#/definitions/User"
+          }
         }
+
       }
     },
     "User": {
