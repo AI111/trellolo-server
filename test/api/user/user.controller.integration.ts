@@ -3,62 +3,135 @@
  */
 
 import {expect, use}  from "chai";
-import * as chaiAsPromised from "chai-as-promised";
 import {stat, unlink} from "fs";
 import * as path from "path";
 import * as request from "supertest";
 import {Config} from "../../../src/config/environment/index";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
-import {config} from "../../test.config";
-use(chaiAsPromised);
+import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+use(require("chai-subset"));
+use(require("chai-as-promised"));
+
 const agent = request.agent(app.default);
+const debug = require("debug")("test.user.controller.integration");
+
 describe("User API:", function() {
     let user;
-
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening//////////////");
+    //         done();
+    //     });
+    // });
     // Clear users before testing
-    before(function() {
-        return db.User.destroy({where: {}}).then(function() {
-            user = db.User.build({
-                name: "Fake User",
-                email: "test@example.com",
-                password: "password",
-            });
-            return user.save();
+
+    describe("GET /api/users", () => {
+        let user1Token: string;
+        let user2Token: string;
+        before(() =>  {
+            return createTestProjectUser()
+                .then(() => getToken(agent, "test@example.com", "password"))
+                .then((token) => (user1Token = token))
+                .then(() => getToken(agent, "test3@example.com", "password"))
+                .then((token) => (user2Token = token))
+                .catch((err) => {
+                    console.error(err);
+                    return err;
+                });
+        });
+        after(() =>  {
+            return cleadDBData();
+        });
+        it("should respond with a 401 when not authenticated", (done) => {
+            agent.get("/api/invites")
+                .expect(401)
+                .end(done);
+        });
+        it("should respond with empty rows array when invites not found", (done) =>  {
+            agent
+                .get(`/api/users`)
+                .set("authorization", `Bearer ${user1Token}`)
+                .expect(424)
+                .end((err, res) => {
+                    expect(res.body).to.be.deep.equal([
+                        {
+                            context: {
+                                key: "email",
+                            },
+                            message: "\"email\" is required",
+                            path: "email",
+                            type: "any.required",
+                        },
+                    ]);
+                    done();
+                });
+        });
+        it("should respond with 404 whe user not found", (done) =>  {
+            agent
+                .get(`/api/users`)
+                .query({email: "test31@example.com"})
+                .set("authorization", `Bearer ${user2Token}`)
+                .expect(404)
+                .end((err, res) => {
+                    debug(res.body);
+                    expect(res.body).to.be.empty;
+                    expect(res.status).to.be.equal(404);
+                    done();
+                });
+        });
+        it("should respond with user  who has this email  ", (done) =>  {
+            agent
+                .get(`/api/users`)
+                .query({email: "test3@example.com"})
+                .set("authorization", `Bearer ${user2Token}`)
+                .expect(403)
+                .end((err, res) => {
+                    debug(res.body);
+                    expect(res.body).to.containSubset([{
+                        _id: 3,
+                        email: "test3@example.com",
+                        avatar: "uploads/pop.jpg",
+                    }]);
+                    done();
+                });
         });
     });
 
-    // Clear users after testing
-    after(function() {
-        return db.User.destroy({where: {}});
-    });
-
     describe("GET /api/users/me", function() {
-        let token;
-
-        before(function(done) {
-            agent
-                .post("/auth/local")
-                .send({
-                    email: "test@example.com",
-                    password: "password",
-                })
-                .expect(200)
-                .expect("Content-Type", /json/)
-                .end((err, res) => {
-                    token = res.body.token;
-                    done();
+        let user1Token: string;
+        let user2Token: string;
+        before(() =>  {
+            return createTestProjectUser()
+                .then(() => getToken(agent, "test@example.com", "password"))
+                .then((token) => (user1Token = token))
+                .then(() => getToken(agent, "test3@example.com", "password"))
+                .then((token) => (user2Token = token))
+                .catch((err) => {
+                    console.error(err);
+                    return err;
                 });
+        });
+        after(() =>  {
+            return cleadDBData();
         });
 
         it("should respond with a user profile when authenticated", function(done) {
             agent
                 .get("/api/users/me")
-                .set("authorization", `Bearer ${token}`)
+                .set("authorization", `Bearer ${user1Token}`)
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
-                    expect(res.body._id.toString()).to.equal(user._id.toString());
+                    debug(res.body);
+                    expect(res.body).to.containSubset(
+                        { _id: 1,
+                            name: "Fake User",
+                            email: "test@example.com",
+                            avatar: "uploads/pop.jpg",
+                            role: "user",
+                        },
+                    );
                     done();
                 });
         });
@@ -71,6 +144,22 @@ describe("User API:", function() {
         });
     });
     describe("POST /api/users", function() {
+        let user1Token: string;
+        let user2Token: string;
+        before(() =>  {
+            return createTestProjectUser()
+                .then(() => getToken(agent, "test@example.com", "password"))
+                .then((token) => (user1Token = token))
+                .then(() => getToken(agent, "test3@example.com", "password"))
+                .then((token) => (user2Token = token))
+                .catch((err) => {
+                    console.error(err);
+                    return err;
+                });
+        });
+        after(() =>  {
+            return cleadDBData();
+        });
         let avatarPath: string ;
         it("should response with error when token not included", function(done) {
             agent.post("/api/users")

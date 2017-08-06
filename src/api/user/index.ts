@@ -8,7 +8,7 @@ import { iconParse} from "../../config/multer.config";
 import {controller} from "./user.controller";
 
 const router =  Router();
-router.get("/", isAuthenticated(), controller.index);
+router.get("/", isAuthenticated(), validateReauest(controller.findValidator, "query"),  controller.index);
 router.delete("/:id", hasRole("admin"), controller.destroy);
 router.get("/me", isAuthenticated(), controller.me);
 router.put("/:id/password", isAuthenticated(), controller.changePassword);
