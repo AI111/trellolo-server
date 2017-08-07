@@ -18,12 +18,12 @@ const agent = request.agent(app.default);
 describe("Project API:", function() {
     this.timeout(5000);
     //
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening");
-    //         done();
-    //     });
-    // });
+    before((done) => {
+        app.default.on("listening", () => {
+            console.log("listening");
+            done();
+        });
+    });
 
     describe("GET /api/projects", () => {
         let tokenValid: string;
@@ -257,14 +257,14 @@ describe("Project API:", function() {
         });
     });
     describe("GET /api/projects/{projectId}/boards", () => {
-        let tokenValid: string;
-        let tokenInvalid: string;
+        let user1Token: string;
+        let user2Token: string;
         before(() => {
             return createTestProjectUser()
                 .then(() => getToken(agent, "test@example.com", "password"))
-                .then((token) => tokenValid = token)
+                .then((token) => user1Token = token)
                 .then(() => getToken(agent, "test2@example.com", "password"))
-                .then((token) => (tokenInvalid = token));
+                .then((token) => (user2Token = token));
         });
         after(function() {
             return cleadDBData();
@@ -278,7 +278,7 @@ describe("Project API:", function() {
         it("should respond with a 403 when user not have access to edit project", function(done) {
             agent
                 .get(`/api/projects/${1}/boards`)
-                .set("authorization", `Bearer ${tokenInvalid}`)
+                .set("authorization", `Bearer ${user2Token}`)
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
@@ -287,11 +287,11 @@ describe("Project API:", function() {
         });
         it("should return list of user projects", function(done) {
             agent
-                .get(`/api/projects/${1}/boards`)
-                .set("authorization", `Bearer ${tokenValid}`)
+                .get(`/api/projects/1/boards`)
+                .set("authorization", `Bearer ${user1Token}`)
                 .expect(200)
                 .end((err, res) => {
-                    debug("%j", res.body);
+                    debug("%O", res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,
@@ -306,20 +306,20 @@ describe("Project API:", function() {
                                     _id: 1,
                                 },
                             ],
-                        }, {
-                            name: "board 2",
-                            projectId: 2,
-                            description: "description 2",
-                            users: [
-                                {
-                                    email: "test@example.com",
-                                    name: "Fake User",
-                                    avatar: "uploads/pop.jpg",
-                                    _id: 1,
-                                },
-                            ],
-                        },
+                        }
                     ]);
+                    done();
+                });
+        });
+        it("should return 404 when boards not found", function(done) {
+            agent
+                .get(`/api/projects/3/boards`)
+                .set("authorization", `Bearer ${user2Token}`)
+                .expect(200)
+                .end((err, res) => {
+                    debug("404 %O", res.body);
+                    expect(res.body).to.be.empty;
+                    expect(res.status).to.be.equal(404);
                     done();
                 });
         });

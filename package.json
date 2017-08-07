@@ -11,7 +11,7 @@
     "test:unit": "NODE_ENV=test nyc mocha --opts ./test/mocha.opts",
     "test:integration": "NODE_ENV=test nyc mocha --opts ./test/mocha.integration.opts --require ts-node/register",
     "coverage": "NODE_ENV=test nyc report --reporter=text-lcov | coveralls",
-    "seed:db": "sequelize db:seed:all --env=production",
+      "seed:db": "sequelize db:seed:all --env=production",
     "clear:db": "sequelize db:seed:undo:all --env=production"
   },
   "nyc": {

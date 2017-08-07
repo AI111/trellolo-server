@@ -6,6 +6,7 @@ import {buildQueryByParams} from "../../common/query.builder";
 import {Request} from "../../models/IExpress";
 import {IProjectAttributes, IProjectInstance} from "../../models/project/IProject";
 import {db} from "../../sqldb/index";
+const debug = require("debug")("test:project.controller");
 
 /**
  * Created by sasha on 6/22/17.
@@ -25,20 +26,24 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                 {
                     model: db.Board,
                     as: "boards",
-                    include: [{
-                        model: db.User,
-                        as: "users",
-                        attributes: [
-                            "email",
-                            "name",
-                            "avatar",
-                            "_id",
-                        ],
-                    }],
-                },
-            ],
+                    where: {
+                        projectId: req.params.projectId,
+                    },
+                    include: [
+                        {
+                            model: db.User,
+                            as: "users",
+                            attributes: [
+                                "email",
+                                "name",
+                                "avatar",
+                                "_id",
+                            ],
+                        },
+                    ],
+                }],
         })
-            .then((user) => user.boards)
+            .then((user) => user && user.boards)
             .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));

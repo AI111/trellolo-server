@@ -120,6 +120,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
 
     protected handleEntityNotFound(res: Response) {
         return (entity) => {
+
             if (!entity || (entity instanceof Array && !entity.length)) {
                 res.status(404).end();
                 return null;
