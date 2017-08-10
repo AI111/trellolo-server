@@ -14,6 +14,7 @@ const proxyquire = require("proxyquire").noCallThru();
 class ModelStub {
     public static update = stub();
     public static init = stub();
+    public static belongsTo = spy();
 }
 const literalStub = stub();
 

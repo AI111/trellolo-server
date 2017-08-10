@@ -5,11 +5,9 @@ import {expect, use} from "chai";
 import * as request from "supertest";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {cleadDBData, config, createTestProjectUser, getToken, timeoutPromise} from "../../test.config";
 import {deleteFiles} from "../../test.helper";
 const debug = require("debug")("test.project");
-const util = require("util");
-const setTimeoutPromise = util.promisify(setTimeout);
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -224,7 +222,7 @@ describe("Project API:", function() {
                 .then((token) => tokenValid = token)
                 .then(() => getToken(agent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
-                .then(() => setTimeoutPromise(1500))
+                .then(() => timeoutPromise(1500))
                 .then(() => db.Project.findById(2))
                 .then((project) => project.updateAttributes({title: "new title"}));
         });

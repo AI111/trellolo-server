@@ -202,6 +202,11 @@ export function cleadDBData() {
         .then(() => db.BoardToUser.destroy({where: {}}));
 
 }
+export function timeoutPromise(time: number): Promise<void>{
+    return new Promise((resolve: () => void, reject: () => void) => {
+        setTimeout(resolve, time);
+    });
+}
 export function getToken(agent: SuperTest<Test>, email: string, password: string): Promise<string> {
     return new Promise((resolve, reject) => {
         agent
