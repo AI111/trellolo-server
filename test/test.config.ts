@@ -83,7 +83,7 @@ export function createTestProjectUser() {
                 userId: 2,
                 projectId: 2,
                 accessRights: "admin",
-            },{
+            }, {
                 _id: 3,
                 userId: 1,
                 projectId: 2,
@@ -159,6 +159,16 @@ export function createTestProjectUser() {
                 position: 5,
             },
         ]))
+        .then(() => db.Card.bulkCreate([
+            {
+                _id: 1,
+                title: "test title",
+                position: 1,
+                userId: 1,
+                boardId: 1,
+                columnId: 1,
+            },
+        ]))
         .then(() => db.Invite.bulkCreate([
             {
                 _id: 1,
@@ -188,7 +198,8 @@ export function cleadDBData() {
         .then(() => db.Team.destroy({where: {}}))
         .then(() => db.Board.destroy({where: {}}))
         .then(() => db.Project.destroy({where: {}}))
-        .then(() => db.BoardToUser.destroy({where: {}}))
+        // .then(() => db.Card.destroy({where: {}}))
+        .then(() => db.BoardToUser.destroy({where: {}}));
 
 }
 export function getToken(agent: SuperTest<Test>, email: string, password: string): Promise<string> {
@@ -206,18 +217,5 @@ export function getToken(agent: SuperTest<Test>, email: string, password: string
                 if (!token) return reject(err);
                 return resolve(token);
             });
-    });
-}
-export function CustomMatchers(chai) {
-    chai.Assertion.addMethod("friendlyNewsPath", function() {
-        const obj = this._obj;
-
-        const expectedMessage = 'expected #{this} to seems like "/materia/:editorial/:slug"';
-        const notExpectedMessage = 'expected #{this} to not seems like "/materia/:editorial/:slug"';
-
-        const paths = obj.split("/");
-        const assertion = paths.length === 3 && paths[0] === "" && paths[1] === "materia" && paths[2].match(/^.{1,}/);
-
-        this.assert(assertion, expectedMessage, notExpectedMessage, "/materia/:editorial/:slug", obj);
     });
 }

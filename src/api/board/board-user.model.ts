@@ -20,7 +20,7 @@ export default function(sequelize, DataTypes) {
         userId: {
             type: DataTypes.INTEGER,
             references: {
-                modal: "Users",
+                model: "Users",
                 key: "_id",
             },
             constraint: false,
@@ -34,7 +34,7 @@ export default function(sequelize, DataTypes) {
         boardId: {
             type: DataTypes.INTEGER,
             references: {
-                modal: "Boards",
+                model: "Boards",
                 key: "_id",
             },
             constraint: false,

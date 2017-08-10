@@ -15,6 +15,10 @@ export class Project extends Sequilize.Model{
             foreignKey: "projectId",
             as: "users",
         });
+        Project.hasMany(models.Team, {
+            foreignKey: "projectId",
+            constraints: false,
+        });
     }
 }
 export default function(sequelize, DataTypes) {

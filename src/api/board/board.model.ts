@@ -39,7 +39,7 @@ export default function(sequelize, DataTypes) {
         projectId: {
             type: DataTypes.INTEGER,
             references: {
-                modal: "Projects",
+                model: "Projects",
                 key: "_id",
             },
         },

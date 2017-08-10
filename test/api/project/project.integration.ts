@@ -8,6 +8,8 @@ import {db} from "../../../src/sqldb";
 import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
 import {deleteFiles} from "../../test.helper";
 const debug = require("debug")("test.project");
+const util = require("util");
+const setTimeoutPromise = util.promisify(setTimeout);
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -18,12 +20,12 @@ const agent = request.agent(app.default);
 describe("Project API:", function() {
     this.timeout(5000);
     //
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening");
-            done();
-        });
-    });
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening");
+    //         done();
+    //     });
+    // });
 
     describe("GET /api/projects", () => {
         let tokenValid: string;
@@ -222,10 +224,9 @@ describe("Project API:", function() {
                 .then((token) => tokenValid = token)
                 .then(() => getToken(agent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
-                .then(() => {
-                    db.Project.findById(1)
-                        .then((project) => project.updateAttributes({title: "new title"}));
-                });
+                .then(() => setTimeoutPromise(1500))
+                .then(() => db.Project.findById(2))
+                .then((project) => project.updateAttributes({title: "new title"}));
         });
         after(() => {
             return cleadDBData();
@@ -237,15 +238,16 @@ describe("Project API:", function() {
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
-                    expect(res.body).not.to.be.an("array");
-                    expect(res.body).to.containSubset(
+                // db.Project.findAll({raw: true}).then((p) => console.log(p));
+                expect(res.body).not.to.be.an("array");
+                expect(res.body).to.containSubset(
                         {
-                            _id: 1,
+                            _id: 2,
                             title: "new title",
-                            description: "description 1",
+                            description: "description 2",
                         },
                     );
-                    done();
+                done();
                 });
         });
 
@@ -306,7 +308,7 @@ describe("Project API:", function() {
                                     _id: 1,
                                 },
                             ],
-                        }
+                        },
                     ]);
                     done();
                 });

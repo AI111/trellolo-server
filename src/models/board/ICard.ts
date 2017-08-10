@@ -8,9 +8,13 @@ import {IBoardInstance} from "./IBoard";
 export interface ICardAttributes {
     _id?: number;
     name?: string;
-    creator: IUserInstance;
-    board: IBoardInstance
-    order: number;
+    title?: string;
+    creator?: IUserInstance;
+    userId?: number;
+    board?: IBoardInstance;
+    boardId?: number;
+    columnId?: number;
+    position?: number;
 
 }
 

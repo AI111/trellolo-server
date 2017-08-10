@@ -527,6 +527,44 @@
             "description": "successful operation"
           }
         }
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get users by email",
+        "description": "This can only be done by the logged in user.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "email of searched user",
+            "required": true,
+            "type": "string",
+            "format": "email"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
       }
     },
     "/user/createWithArray": {

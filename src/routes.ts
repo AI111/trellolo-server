@@ -16,5 +16,6 @@ export function initRouter(app: Application) {
     app.use("/api/boards", require("./api/board").default());
     app.use("/api/columns", require("./api/column").default());
     app.use("/api/invites", require("./api/invite").default());
+    app.use("/api/cards", require("./api/card").default());
 
 }

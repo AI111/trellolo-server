@@ -5,11 +5,11 @@ import * as Joi from "joi";
 import * as jwt from "jsonwebtoken";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
-import {captureServiceInstance} from "../../common/captcha.service";
 import {Config as config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
 import {buildQueryByParams} from "../../common/query.builder";
+
 const debug = require("debug")("test.user.controller");
 
 export class UserController extends BaseController<Sequelize.Model<IUserInstance, IUserAttributes>> {
