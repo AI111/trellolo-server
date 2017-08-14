@@ -31,6 +31,9 @@
     {
       "name": "Column"
     },
+    {
+      "name": "Cards"
+    },
     {"name":"BoardColumn"},
 
     {
@@ -480,6 +483,134 @@
 
           }
         ]
+      }
+    },
+    "/cards": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Create a new Card",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Card object that needs to be added to the store",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Card"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}": {
+      "put": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Finds Project by id",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findPetsByStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "ID of card that needs to be updated",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
+          },{
+            "in": "body",
+            "name": "body",
+            "description": "Card object that needs to be updated",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Card"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/Card"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Delete Card by id",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findPetsByStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "ID of card that needs to be updated",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
       }
     },
     "/users": {
@@ -934,6 +1065,35 @@
           "type": "integer"
         },
         "boardId":{
+          "type": "integer"
+        }
+      }
+    },
+    "Card":{
+      "type": "object",
+      "required": [
+        "title",
+        "boardId",
+        "columnId"
+      ],
+      "properties": {
+        "_id":{
+          "type": "integer"
+        },
+        "title":{
+          "type": "string",
+          "minLength": "2"
+        },
+        "position":{
+          "type": "integer"
+        },
+        "boardId":{
+          "type": "integer"
+        },
+        "columnId": {
+          "type": "integer"
+        },
+        "projectId": {
           "type": "integer"
         }
       }

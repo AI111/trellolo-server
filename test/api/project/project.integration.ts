@@ -111,12 +111,14 @@ describe("Project API:", function() {
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal([
-                        {
-                            message: "",
-                            path: "title",
-                            type: "notNull Violation",
-                            value: null,
-                        },
+                            {
+                                context: {
+                                    key: "title",
+                                },
+                                message: "\"title\" is required",
+                                path: "title",
+                                type: "any.required",
+                            },
                     ]);
                     done();
                 });
