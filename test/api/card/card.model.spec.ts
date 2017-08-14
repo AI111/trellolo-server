@@ -11,6 +11,7 @@ use(require("chai-as-promised"));
 use(require("chai-things"));
 
 const proxyquire = require("proxyquire").noCallThru();
+// const proxyquire = require("proxyquire").noPreserveCache().noCallThru();
 class ModelStub {
     public static update = stub();
     public static init = stub();
@@ -71,7 +72,7 @@ describe("Check card.model", function() {
                 },
             });
     });
-    it("Card updateCard update positions in same column", () => {
+    it("Card updateCard update positions in same column down", () => {
         ModelStub.update.reset();
         const card: any = new cardCtrl.Card();
         ModelStub.update.returns(Promise.resolve(card));
@@ -93,5 +94,53 @@ describe("Check card.model", function() {
                     },
                 },
             });
+    });
+    it("Card updateCard update positions in same column up", () => {
+        ModelStub.update.reset();
+        const card: any = new cardCtrl.Card();
+        ModelStub.update.returns(Promise.resolve(card));
+        literalStub.callsFake(str => str);
+        card.position = 7;
+        card.columnId = 1;
+        card.boardId = 2;
+        expect(card.updateCard(1, 3)).to.be.fulfilled;
+        expect(ModelStub.update).to.be.calledWith(
+            {
+                position:  `position +1`,
+            },
+            {
+                where: {
+                    boardId: 2,
+                    columnId: 1,
+                    position: {
+                        $between: [3, 7],
+                    },
+                },
+            });
+    });
+    it("Card moveTo change card position in same column", () => {
+        ModelStub.update.reset();
+        const card: any = new cardCtrl.Card();
+        const updateCardStub = stub(card, "updateCard");
+        updateCardStub.returns(Promise.resolve());
+        card.position = 7;
+        card.columnId = 1;
+        card.boardId = 2;
+        expect(card.updateCard(1, 3)).to.be.fulfilled;
+        expect(updateCardStub).to.be.calledWith(1, 3);
+        updateCardStub.restore();
+    });
+    it("Card moveTo change card position in different columns", () => {
+        ModelStub.update.reset();
+        const card: any = new cardCtrl.Card();
+        const updateCardStub = stub(card, "updateCard");
+        updateCardStub.returns(Promise.resolve());
+        card.position = 7;
+        card.columnId = 1;
+        card.boardId = 2;
+        expect(card.updateCard(2, 3)).to.be.fulfilled;
+        expect(updateCardStub).to.be.calledWith(2);
+        expect(updateCardStub).to.be.calledWith(2, 3);
+        updateCardStub.restore();
     });
 });

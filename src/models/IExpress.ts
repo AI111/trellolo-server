@@ -1,10 +1,16 @@
 import {Request} from "express";
-import {IUserInstance} from "./user/IUser";
+import * as SocketIO from "socket.io";
+import {IUserAttributes, IUserInstance} from "./user/IUser";
+
 /**
  * Created by sasha on 7/8/17.
  */
 export interface Request extends Request{
-    projectId?:number;
+    projectId?: number;
     user?: IUserInstance;
     filePath: string;
+}
+export interface ISocket extends SocketIO.Socket{
+    decoded_token: IUserAttributes,
+
 }

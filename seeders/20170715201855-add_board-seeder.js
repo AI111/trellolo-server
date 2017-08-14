@@ -8,6 +8,7 @@ module.exports = {
                 name: 'name',
                 description: 'trollolo',
                 active: true,
+                projectId: 1,
                 createdAt : new Date(),
                 updatedAt : new Date()
             },
@@ -16,6 +17,7 @@ module.exports = {
                 name: 'name2',
                 description: 'trollolo2',
                 active: true,
+                projectId: 1,
                 createdAt : new Date(),
                 updatedAt : new Date()
             },
@@ -24,6 +26,7 @@ module.exports = {
                 name: 'name3',
                 description: 'trollolo3',
                 active: true,
+                projectId: 2,
                 createdAt : new Date(),
                 updatedAt : new Date()
             }

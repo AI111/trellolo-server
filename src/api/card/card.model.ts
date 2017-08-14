@@ -3,6 +3,7 @@
  * Created by sasha on 6/20/17.
  */
 const Sequilize = require("sequelize");
+const debug = require("debug")("test:card:model");
 
 export class Card extends Sequilize.Model {
     public static associate(models)  {
@@ -17,10 +18,6 @@ export class Card extends Sequilize.Model {
                 columnId,
             },
         });
-        // .then(m => {
-        //     // console.log("MAX CARD",m)
-        //     return m;
-        // });
     }
 
     /**
@@ -29,27 +26,14 @@ export class Card extends Sequilize.Model {
      * @param {number} position
      * @returns {Promise<Card>}
      */
-    public moveTo(coumnId: number, position: number): Promise<Card> {
-        if ((this.position === position && coumnId === this.columnId) || !position) return Sequilize.Promise.resolve(this);
-        const inc: boolean = this.position > position;
-        const between = [position, this.position].sort();
-        return Card.update({
-                position: Sequilize.literal(`position ${inc ? "+" : "-"}1`),
-            },
-            {
-                where: {
-                    boardId: this.boardId,
-                    position: {
-                        $between: between,
-                    },
-                },
-                order: ["position", "DESC"],
-            },
-        )
-            .then(() => {
-                this.position = position;
-                return this;
-            });
+    public moveTo(columnId: number, position: number): Promise<Card> {
+        if ((this.position === position && columnId === this.columnId) || !position) return Sequilize.Promise.resolve(this);
+        if(this.columnId === columnId) {
+            return this.updateCard(columnId, position);
+        } else {
+            return this.updateCard(columnId)
+                .then(() => this.updateCard(columnId, position));
+        }
     }
     /**
      * change card position in column or remove from column
@@ -65,6 +49,7 @@ export class Card extends Sequilize.Model {
         const operator: string = sameCol ? "$between" : "$gte";
         const pos: object = {};
         pos[operator] = sameCol ? between : gt;
+        debug("%d / %d / %s / %O",this.columnId,columnId,sameCol,pos);
         return Card.update({
                 position: Sequilize.literal(`position ${inc ? "+" : "-"}1`),
             },
@@ -77,7 +62,7 @@ export class Card extends Sequilize.Model {
             },
         )
             .then(() => {
-                this.position = position;
+                if (!(position === undefined)) this.position = position;
                 return this;
             });
     }

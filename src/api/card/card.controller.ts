@@ -1,9 +1,9 @@
+import {Request, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
-import {db} from "../../sqldb/index";
 import {ICardAttributes, ICardInstance} from "../../models/board/ICard";
-import {Request, Response} from "express";
+import {db} from "../../sqldb/index";
 
 /**
  * Created by sasha on 6/22/17.
@@ -16,9 +16,10 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         columnId: Joi.number().integer().required(),
     });
     public updateValidator = Joi.object().keys({
-        _id: Joi.number().integer().required(),
+        title: Joi.string().min(4).max(50).optional(),
         boardId: Joi.number().integer().required(),
         columnId: Joi.number().integer().required(),
+        position: Joi.number().integer().required(),
     });
     constructor() {
         super(db.Card);
@@ -30,8 +31,17 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    // public patch = (req: Request, res: Response) => {
-    //
-    // }
+    public patch = (req: Request, res: Response) => {
+        if (req.body._id) {
+        Reflect.deleteProperty(req.body, "_id");
+    }
+        return this.entity.findById(req.params.cardId)
+            .then(this.handleEntityNotFound(res))
+            .then((card) => card.moveTo(req.body.columnId, req.body.position))
+            .then((card) => card.updateAttributes(req.body, {validate: true}))
+            .then((column) => column.updateAttributes(req.body, {validate: true}))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
 }
 export const controller = new CardController();

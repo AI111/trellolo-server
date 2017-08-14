@@ -39,7 +39,6 @@ export class DBConnection {
         for (const pr in this){
            if ((this[pr] as any).associate)(this[pr] as any).associate(connection.models);
         }
-        // (<any>this.Team).associate(connection.models)
     }
 }
 export const db = new DBConnection();

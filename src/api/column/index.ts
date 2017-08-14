@@ -11,7 +11,7 @@ import {controller} from "./column.controller";
 export default function(): Router {
     const router =  Router();
     // router.get("/:boardId/columns", hasBoardRoles(),  controller.index);
-    // router.delete("/:id", hasRole("admin"), controller.destroy);
+    router.delete("/:id", isAuthenticated(), controller.destroy);
     // router.get("/me", hasProjectRoles(), controller.show);
     router.put("/:columnId", isAuthenticated(), controller.patch);
     // router.get("/boards/:id", hasBoardRoles(), controller.show);

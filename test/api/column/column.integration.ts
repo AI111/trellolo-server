@@ -161,10 +161,10 @@ describe("Column API:", () =>  {
                 .end((err, res) => {
                     debug(res.body);
                     expect(res.body).to.containSubset({
-                            position: 2,
-                            boardId: 1,
-                            title: "New Title 5",
-                        });
+                        position: 2,
+                        boardId: 1,
+                        title: "New Title 5",
+                    });
                     db.ProjectColumn.findAll({
                         where: {
                             boardId: 1,
@@ -174,11 +174,11 @@ describe("Column API:", () =>  {
                     }).then((cols) => {
                         debug(cols);
                         expect(cols).to.containSubset([{
-                                _id: 1,
-                                boardId: 1,
-                                title: "Column 1",
-                                position: 1,
-                            },
+                            _id: 1,
+                            boardId: 1,
+                            title: "Column 1",
+                            position: 1,
+                        },
                             {
                                 _id: 2,
                                 title: "Title 2",
@@ -246,9 +246,28 @@ describe("Column API:", () =>  {
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
             httpAgent
-                .put(`/api/columns/5`)
+                .delete(`/api/columns/5`)
                 .expect(401)
                 .end(done);
+        });
+        it("should respond with a 204 when successfully delete column", (done) =>  {
+            httpAgent
+                .delete(`/api/columns/1`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.be.empty;
+                    expect(res.status).to.be.equal(204);
+                    db.ProjectColumn.findById(1)
+                        .then((col) => {
+                            expect(col).to.be.null;
+                        })
+                        .then(() => db.Card.findAll({where: {columnId: 1}}))
+                        .then((cards) => {
+                            expect(cards).to.be.an("array").that.is.empty;
+                            done();
+                        });
+                });
         });
     });
     // describe("GET /api//boards/columns", () =>  {

@@ -4,6 +4,7 @@
 import {Instance, Model} from "sequelize";
 import {IUserInstance} from "../user/IUser";
 import {IBoardInstance} from "./IBoard";
+import {Card} from "../../api/card/card.model";
 
 export interface ICardAttributes {
     _id?: number;
@@ -20,4 +21,7 @@ export interface ICardAttributes {
 
 export interface ICardInstance  extends Instance<ICardAttributes>, ICardAttributes {
     dataValues: ICardAttributes;
+    getMaxCardPosition(boardId: number, columnId: number): Promise<number>;
+    moveTo(columnId: number, position: number): Promise<Card>;
+    updateCard(columnId: number, position?: number): Promise<Card>;
 }
