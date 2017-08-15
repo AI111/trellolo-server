@@ -12,29 +12,37 @@ import {setBoardUsers} from "./board.helpers";
  * Created by sasha on 6/22/17.
  */
 export class BoardController extends BaseController<Sequelize.Model<IBoardInstance, IBoardAttributes>> {
-    constructor() {
-        super(db.Board);
-    }
     public createValidator = Joi.object().keys({
         name: Joi.string().min(2).max(30).required(),
         description: Joi.string().min(4).max(200).optional(),
         projectId: Joi.number().integer().required(),
     });
-    // public myProjects = (req: Request, res: Response) => {
-    //    return db.Team.findAll({
-    //        where:{
-    //            userId: req.user._id
-    //        },
-    //         include:[
-    //                 {model: db.Project, as: 'project'}
-    //             ]
-    //    })
-    //        .then(teams => teams.map(t => t.project))
-    //        .then(this.handleEntityNotFound(res))
-    //        .then(this.respondWithResult(res))
-    //        .catch(this.handleError(res))
-    // };
-    // addUsersToBoard()
+
+    constructor() {
+        super(db.Board);
+    }
+    public show = (req: Request, res: Response) => {
+        return this.entity.findOne({
+            where: {
+                _id: req.params.id,
+            },
+            include: [
+                {
+                    model: db.BoardColumn,
+                    as: "columns",
+                    include: [
+                        {
+                            model: db.Card,
+                            as: "cards",
+                        },
+                    ],
+                },
+            ],
+        })
+            .then(this.handleEntityNotFound(res))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
     public create = (req: Request, res: Response) => {
          return this.entity.create(req.body)
             .then(setBoardUsers(req.user._id, req.body.users))
@@ -42,7 +50,7 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
             .catch(this.handleError(res));
     }
     public getColumns = (req: Request, res: Response) => {
-        return db.ProjectColumn.findAll({
+        return db.BoardColumn.findAll({
             where: {
                 boardId: req.params.boardId,
             },

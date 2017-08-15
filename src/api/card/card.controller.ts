@@ -10,13 +10,12 @@ import {db} from "../../sqldb/index";
  */
 export class CardController extends BaseController<Sequelize.Model<ICardInstance, ICardAttributes>> {
     public createValidator = Joi.object().keys({
-        title: Joi.string().min(4).max(50).required(),
-        description: Joi.string().min(4).max(1000).optional(),
+        description: Joi.string().min(4).max(1000).required(),
         boardId: Joi.number().integer().required(),
         columnId: Joi.number().integer().required(),
     });
     public updateValidator = Joi.object().keys({
-        title: Joi.string().min(4).max(50).optional(),
+        description: Joi.string().min(4).max(1000).optional(),
         boardId: Joi.number().integer().required(),
         columnId: Joi.number().integer().required(),
         position: Joi.number().integer().required(),
@@ -39,7 +38,6 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then(this.handleEntityNotFound(res))
             .then((card) => card.moveTo(req.body.columnId, req.body.position))
             .then((card) => card.updateAttributes(req.body, {validate: true}))
-            .then((column) => column.updateAttributes(req.body, {validate: true}))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

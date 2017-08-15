@@ -165,7 +165,7 @@ describe("Column API:", () =>  {
                         boardId: 1,
                         title: "New Title 5",
                     });
-                    db.ProjectColumn.findAll({
+                    db.BoardColumn.findAll({
                         where: {
                             boardId: 1,
                         },
@@ -258,7 +258,7 @@ describe("Column API:", () =>  {
                 .end((err, res) => {
                     expect(res.body).to.be.empty;
                     expect(res.status).to.be.equal(204);
-                    db.ProjectColumn.findById(1)
+                    db.BoardColumn.findById(1)
                         .then((col) => {
                             expect(col).to.be.null;
                         })
@@ -321,7 +321,7 @@ describe("Column API:", () =>  {
     //     //                     "boardId":1,
     //     //                     "title": "New Title 5"
     //     //                 });
-    //     //             // db.ProjectColumn.findAll({
+    //     //             // db.BoardColumn.findAll({
     //     //             //     where:{
     //     //             //         boardId:1
     //     //             //     },

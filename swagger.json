@@ -442,6 +442,49 @@
         ]
       }
     },
+    "/boards/{boardId}":{
+      "get": {
+        "tags": [
+          "Board"
+        ],
+        "summary": "Get Board BoardColumn list",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "description": "ID of Board that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 1,
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Board"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "security": [
+          {
+
+          }
+        ]
+      }
+    },
     "/boards/{boardId}/columns":{
       "get": {
         "tags": [
@@ -1025,7 +1068,8 @@
           "type": "integer"
         }
       }
-    },"Invite":{
+    },
+    "Invite":{
       "required": [
         "projectId"
       ],
@@ -1066,6 +1110,10 @@
         },
         "boardId":{
           "type": "integer"
+        },
+        "cards":{
+          "type": "object",
+          "$ref": "#/definitions/Card"
         }
       }
     },
@@ -1116,6 +1164,10 @@
             "type": "object",
             "$ref": "#/definitions/User"
           }
+        },
+        "columns": {
+          "type": "object",
+          "$ref": "#/definitions/BoardColumn"
         },
         "projectId": {
           "type": "integer"

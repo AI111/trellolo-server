@@ -14,7 +14,7 @@ function clearAllTables() {
         .then(() => db.Board.destroy({where: {}}))
         .then(() => db.Card.destroy({where: {}}))
         .then(() => db.Team.destroy({where: {}}))
-        .then(() => db.ProjectColumn.destroy({where: {}}))
+        .then(() => db.BoardColumn.destroy({where: {}}))
         .then(() => db.BoardToUser.destroy({where: {}}));
 }
 function seedUsers() {

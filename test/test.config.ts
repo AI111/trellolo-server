@@ -127,7 +127,7 @@ export function createTestProjectUser() {
                 boardId: 2,
             },
         ]))
-        .then(() => db.ProjectColumn.bulkCreate([
+        .then(() => db.BoardColumn.bulkCreate([
             {
                 _id: 1,
                 boardId: 1,
@@ -162,56 +162,56 @@ export function createTestProjectUser() {
         .then(() => db.Card.bulkCreate([
             {
                 _id: 1,
-                title: "test title",
+                description: "test title",
                 position: 1,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
             },{
                 _id: 2,
-                title: "test title",
+                description: "test title",
                 position: 2,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
             },{
                 _id: 3,
-                title: "test title",
+                description: "test title",
                 position: 3,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
             },{
                 _id: 4,
-                title: "test title",
+                description: "test title",
                 position: 4,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
             }, {
                 _id: 5,
-                title: "test title",
+                description: "test title",
                 position: 1,
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
             },{
                 _id: 6,
-                title: "test title",
+                description: "test title",
                 position: 2,
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
             },{
                 _id: 7,
-                title: "test title",
+                description: "test title",
                 position: 3,
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
             },{
                 _id: 8,
-                title: "test title",
+                description: "test title",
                 position: 4,
                 userId: 1,
                 boardId: 1,

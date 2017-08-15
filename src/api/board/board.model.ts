@@ -3,8 +3,8 @@
  */
 const Sequilize = require("sequelize");
 
-export class Board extends Sequilize.Model{
-    static associate(models)  {
+export class Board extends Sequilize.Model {
+    public static associate(models)  {
         Board.belongsTo(models.Project, {
             foreignKey: "projectId",
             as: "boards",
@@ -16,6 +16,10 @@ export class Board extends Sequilize.Model{
             },
             foreignKey: "boardId",
             as: "users",
+        });
+        Board.hasMany(models.BoardColumn, {
+            foreignKey: "boardId",
+            as: "columns",
         });
     }
 }

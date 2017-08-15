@@ -3,13 +3,14 @@
  */
 const Sequilize = require("sequelize");
 
-export class ProjectColumn extends Sequilize.Model {
+export class BoardColumn extends Sequilize.Model {
     public static associate(models) {
-        ProjectColumn.belongsTo(models.Board, {foreignKey: "boardId", as: "board"});
+        BoardColumn.belongsTo(models.Board, {foreignKey: "boardId", as: "board"});
+        BoardColumn.hasMany(models.Card, {foreignKey: "columnId", as: "cards"});
     }
 
-    public getMaxBoardPosition(boardId: number): Promise<number> {
-        return ProjectColumn.max("position", {
+    public static getMaxBoardPosition(boardId: number): Promise<number> {
+        return BoardColumn.max("position", {
             where: {
                 boardId,
             },
@@ -20,7 +21,7 @@ export class ProjectColumn extends Sequilize.Model {
         if (this.position === position || !position) return Sequilize.Promise.resolve(this);
         const inc: boolean = this.position > position;
         const between = [position, this.position].sort();
-        return ProjectColumn.update({
+        return BoardColumn.update({
                 position: Sequilize.literal(`position ${inc ? "+" : "-"}1`),
             },
             {
@@ -42,7 +43,7 @@ export class ProjectColumn extends Sequilize.Model {
 }
 
 export default function(sequelize, DataTypes) {
-    ProjectColumn.init({
+    BoardColumn.init({
         _id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -74,11 +75,11 @@ export default function(sequelize, DataTypes) {
         sequelize,
         hooks: {
             beforeCreate(column, fields, fn) {
-               return column.getMaxBoardPosition(column.boardId)
+               return BoardColumn.getMaxBoardPosition(column.boardId)
                     .then((position) => (column.position = position + 1));
             },
         },
 
     });
-    return ProjectColumn;
+    return BoardColumn;
 }

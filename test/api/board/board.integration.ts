@@ -9,6 +9,8 @@ import {db} from "../../../src/sqldb/index";
 import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
 
 const httpAgent: SuperTest<Test> = agent(app.default);
+const debug = require("debug")("test:board:controller");
+
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
@@ -52,13 +54,15 @@ describe("Board API:", function() {
                     done();
                 });
         });
-        it("should return one board", function(done) {
+        it("should return one board with status 200", function(done) {
             httpAgent
                 .get(`/api/boards/1`)
 
                 .set("authorization", `Bearer ${tokenValid}`)
                 .expect(200)
                 .end((err, res) => {
+                    // debug("%0",res.body);
+                    expect(res.status).to.be.equal(200);
                     expect(res.body).to.containSubset(
                         {
                             _id: 1,
@@ -66,6 +70,9 @@ describe("Board API:", function() {
                             projectId: 1,
                             description: "description 1",
                         });
+                    expect(res.body.columns).to.be.an("array").length(5);
+                    expect(res.body.columns[0].cards).to.be.an("array").length(4);
+                    expect(res.body.columns[2].cards).to.be.an("array").length(4);
                     done();
                 });
         });

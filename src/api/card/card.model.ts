@@ -9,7 +9,7 @@ export class Card extends Sequilize.Model {
     public static associate(models)  {
         console.log("Card.associate");
         Card.belongsTo(models.Board, {foreignKey: "boardId", as: "board" });
-        Card.belongsTo(models.ProjectColumn, {foreignKey: "columnId", as: "column" });
+        Card.belongsTo(models.BoardColumn, {foreignKey: "columnId", as: "column" });
     }
     public getMaxCardPosition(boardId: number, columnId: number): Promise<number> {
         return Card.max("position", {
@@ -75,13 +75,12 @@ export default function(sequelize, DataTypes) {
             primaryKey: true,
             autoIncrement: true,
         },
-        title: DataTypes.STRING,
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
         columnId: {
             type: DataTypes.INTEGER,
             references: {
-                model: "ProjectColumns",
+                model: "BoardColumns",
                 key: "_id",
             },
             onDelete: "CASCADE",

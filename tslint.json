@@ -9,7 +9,8 @@
         "no-string-literal": false,
         "object-literal-sort-keys": false,
         "no-var-requires": false,
-        "only-arrow-functions": false
+        "only-arrow-functions": false,
+        "cyclomatic-complexity": [true, 8]
     },
     "rulesDirectory": []
 }

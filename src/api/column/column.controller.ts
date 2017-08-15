@@ -13,11 +13,11 @@ import {checkBoardAccessRights} from "../board/board.helpers";
  */
 export class BoardController extends BaseController<Sequelize.Model<IColumnInstance, IColumnAttributes>> {
     constructor() {
-        super(db.ProjectColumn);
+        super(db.BoardColumn);
     }
     public createValidator = Joi.object().keys({
         title: Joi.string().min(2).max(30).required(),
-        position: Joi.string().min(4).max(200).optional(),
+        position: Joi.string().min(1).max(200).optional(),
     });
     // public index
     public patch = (req: Request, res: Response) => {

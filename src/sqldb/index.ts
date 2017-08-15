@@ -28,7 +28,7 @@ export class DBConnection {
     public Board: Sequelize.Model<IBoardInstance, IBoardAttributes> =  connection.import("../api/board/board.model");
     public BoardToUser: Sequelize.Model<IBoardToUserInstance, IBoardToUserAttributes> =
         connection.import("../api/board/board-user.model");
-    public ProjectColumn: Sequelize.Model<IColumnInstance, IColumnAttributes> =
+    public BoardColumn: Sequelize.Model<IColumnInstance, IColumnAttributes> =
         connection.import("../api/column/column.model");
     public Card: Sequelize.Model<ICardInstance, ICardAttributes> =  connection.import("../api/card/card.model");
     public Team: Sequelize.Model<ITeamInstance, ITeamAttributes> =  connection.import("../api/team/team.model");

@@ -10,6 +10,7 @@ export interface ICardAttributes {
     _id?: number;
     name?: string;
     title?: string;
+    description?: string;
     creator?: IUserInstance;
     userId?: number;
     board?: IBoardInstance;

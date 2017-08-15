@@ -62,22 +62,22 @@ describe("Card API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     boardId: 1,
-                    title: "t",
+                    description: "t",
                     columnId: 1,
                 })
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal([
-                        {
-                            context: {
-                                key: "title",
-                                limit: 4,
-                                value: "t",
+                            {
+                                context: {
+                                    key: "description",
+                                    limit: 4,
+                                    value: "t",
+                                },
+                                message: "\"description\" length must be at least 4 characters long",
+                                path: "description",
+                                type: "string.min",
                             },
-                            message: "\"title\" length must be at least 4 characters long",
-                            path: "title",
-                            type: "string.min",
-                        },
                     ]);
                     done();
                 });
@@ -88,7 +88,7 @@ describe("Card API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     boardId: 1,
-                    title: "test",
+                    description: "test",
                     columnId: 1,
                 })
                 .expect(403)
@@ -98,7 +98,7 @@ describe("Card API:", function() {
                         boardId: 1,
                         columnId: 1,
                         position: 5,
-                        title: "test",
+                        description: "test",
                         userId: 1,
                     });
                     done();
@@ -146,7 +146,7 @@ describe("Card API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     boardId: 1,
-                    title: "t",
+                    description: "t",
                     columnId: 1,
                 })
                 .expect(403)
@@ -154,12 +154,12 @@ describe("Card API:", function() {
                     expect(res.body).to.be.deep.equal([
                         {
                             context: {
-                                key: "title",
+                                key: "description",
                                 limit: 4,
                                 value: "t",
                             },
-                            message: "\"title\" length must be at least 4 characters long",
-                            path: "title",
+                            message: "\"description\" length must be at least 4 characters long",
+                            path: "description",
                             type: "string.min",
                         },
                     ]);
@@ -172,7 +172,7 @@ describe("Card API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     boardId: 1,
-                    title: "test",
+                    description: "test",
                     columnId: 3,
                     position: 3,
                 })
@@ -202,7 +202,7 @@ describe("Card API:", function() {
                             },
                             {
                                 _id: 7,
-                                title: "test title",
+                                description: "test title",
                                 position: 4,
                                 userId: 1,
                                 boardId: 1,
@@ -220,7 +220,7 @@ describe("Card API:", function() {
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     boardId: 1,
-                    title: "test",
+                    description: "test",
                     columnId: 1,
                     position: 3,
                 })
@@ -295,10 +295,10 @@ describe("Card API:", function() {
                     expect(res.body).to.be.empty;
                     expect(res.status).to.be.equal(204);
                     db.Card.findById(1)
-                        .then(card =>{
+                        .then((card) => {
                             expect(card).to.be.null;
                             done();
-                        })
+                        });
                 });
         });
 
