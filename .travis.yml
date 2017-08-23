@@ -4,6 +4,8 @@ branches:
 language: node_js
 node_js:
   - 7
+services:
+  - redis-server
 matrix:
   fast_finish: true
   allow_failures:

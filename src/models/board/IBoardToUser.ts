@@ -14,7 +14,6 @@ export interface IBoardToUserAttributes {
     user?: IUserInstance;
     userId?: number;
     accessRights?: BoardAccessRights;
-
 }
 
 export interface IBoardToUserInstance  extends Instance<IBoardToUserAttributes>, IBoardToUserAttributes {

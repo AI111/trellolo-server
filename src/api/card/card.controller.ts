@@ -2,9 +2,9 @@ import {Request, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
+import {ScocketServiceInstance as notify} from "../../common/socket.service";
 import {ICardAttributes, ICardInstance} from "../../models/board/ICard";
 import {db} from "../../sqldb/index";
-
 /**
  * Created by sasha on 6/22/17.
  */
@@ -27,6 +27,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         const card = this.entity.build(req.body);
         card.setDataValue("userId", req.user._id);
         return card.save()
+            .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
@@ -40,6 +41,11 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then((card) => card.updateAttributes(req.body, {validate: true}))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
+    }
+    private emmitEvent() {
+        return (entity) => {
+
+        };
     }
 }
 export const controller = new CardController();

@@ -5,8 +5,9 @@ import {Instance, Model} from "sequelize";
 import {IUserInstance} from "../user/IUser";
 import {IBoardInstance} from "./IBoard";
 import {Card} from "../../api/card/card.model";
+import {IBoardItem} from "../activity/IBoardEvent";
 
-export interface ICardAttributes {
+export interface ICardAttributes{
     _id?: number;
     name?: string;
     title?: string;
@@ -19,7 +20,6 @@ export interface ICardAttributes {
     position?: number;
 
 }
-
 export interface ICardInstance  extends Instance<ICardAttributes>, ICardAttributes {
     dataValues: ICardAttributes;
     getMaxCardPosition(boardId: number, columnId: number): Promise<number>;

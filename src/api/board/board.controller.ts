@@ -34,7 +34,8 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
                         {
                             model: db.Card,
                             as: "cards",
-                        },
+                            order: [[ "position", "DESC"]],
+                        } as object,
                     ],
                 },
             ],

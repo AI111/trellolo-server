@@ -4,14 +4,14 @@ import * as  redis from "socket.io-redis";
 import * as socketioJwt from "socketio-jwt";
 import {checkBoardAccessRights} from "../api/board/board.helpers";
 import {Config} from "../config/environment";
+import {BoardEvent, IBoardEvent, IBoardItem, eventsMap} from "../models/activity/IBoardEvent";
 import {ISocket} from "../models/IExpress";
+import {Request} from "express";
+
 export class SocketService{
     private server: http.Server;
     private io: SocketIO.Server;
     private boards: SocketIO.Namespace;
-    constructor() {
-
-    }
     public init(server: http.Server) {
         this.io = SocketIO(server);
         this.io.use(socketioJwt.authorize({
@@ -19,7 +19,30 @@ export class SocketService{
             handshake: true,
         }));
         this.io.adapter(redis({ host: "localhost", port: 6379 }));
+        this.startListener(this.io);
     }
+
+    public broadcastToRoom(method: string, message: object, room: string): boolean{
+        return this.boards.to(room).emit(method, message);
+    }
+
+    public emmitEvent(req: Request, transform: (req: Request, item: IBoardItem) =>
+        IBoardEvent = this.defualtTransformer) {
+        return (entity) => {
+            const boardId = req.headers.board || req.params.boardId || req.body.boardId || req.params.id;
+            this.broadcastToRoom("notify", transform(req, entity), `board/${boardId}`);
+            return entity;
+        };
+    }
+    private defualtTransformer(req: Request, item: IBoardItem): IBoardEvent{
+        const event = new BoardEvent();
+        event.activityType = eventsMap[req.method];
+        if(event.activityType === "CREATE" || event.activityType === "UPDATE")event.toState = item.dataValues;
+        if(event.activityType === "DELETE" || event.activityType === "UPDATE")event.fromState = item._previousDataValues;
+        event.modelName = item._modelOptions.name.singular;
+        return event;
+    }
+
     private startListener(io: SocketIO.Server): void {
         this.boards = this.io.of("boards");
         this.boards.on("connection", (socket: ISocket) => {
@@ -45,8 +68,5 @@ export class SocketService{
         };
     }
 
-    public broadcastToRoom(method: string, message: object, room: string): void{
-        throw this.boards.to(room).emit(method, message);
-    }
-
 }
+export const ScocketServiceInstance = new SocketService();

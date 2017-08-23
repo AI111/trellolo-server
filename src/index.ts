@@ -6,6 +6,7 @@ import * as http from "http";
 import App from "./app";
 import {db} from "./sqldb";
 import {seedDatabase} from "./sqldb/seed";
+import {ScocketServiceInstance} from "./common/socket.service";
 // global.Promise = require("sequelize").Promise;
 
 debug("ts-express:server");
@@ -23,6 +24,7 @@ db.connection.sync({force: true})
 function startServer(){
     server.listen(port, onListening);
     server.on("error", onError);
+    ScocketServiceInstance.init(server);
 }
 function normalizePort(val: number|string): number|string|boolean {
     const port: number = (typeof val === "string") ? parseInt(val, 10) : val;

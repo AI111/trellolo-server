@@ -33,7 +33,7 @@ describe("Check card.model", function() {
         literalStub.callsFake(str => str);
         card.position = 1;
         card.columnId = 1;
-        card.boardId = 2
+        card.boardId = 2;
         expect(card.updateCard(2)).to.be.fulfilled;
         expect(ModelStub.update).to.be.calledWith(
             {
