@@ -4,8 +4,11 @@
 import {Response} from "express";
 import {func} from "joi";
 import {spy, stub} from "sinon";
+import * as io from "socket.io-client";
+
 // import {Promise} from 'sequelize'
 import {SuperTest, Test} from "supertest";
+import {Config} from "../src/config/environment";
 import {db} from "../src/sqldb/index";
 
 export const config = {
@@ -167,21 +170,21 @@ export function createTestProjectUser() {
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
-            },{
+            }, {
                 _id: 2,
                 description: "test title",
                 position: 2,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
-            },{
+            }, {
                 _id: 3,
                 description: "test title",
                 position: 3,
                 userId: 1,
                 boardId: 1,
                 columnId: 1,
-            },{
+            }, {
                 _id: 4,
                 description: "test title",
                 position: 4,
@@ -195,21 +198,21 @@ export function createTestProjectUser() {
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
-            },{
+            }, {
                 _id: 6,
                 description: "test title",
                 position: 2,
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
-            },{
+            }, {
                 _id: 7,
                 description: "test title",
                 position: 3,
                 userId: 1,
                 boardId: 1,
                 columnId: 3,
-            },{
+            }, {
                 _id: 8,
                 description: "test title",
                 position: 4,
@@ -271,5 +274,20 @@ export function getToken(agent: SuperTest<Test>, email: string, password: string
                 if (!token) return reject(err);
                 return resolve(token);
             });
+    });
+}
+export function getSocketConnection(jwt: string, boardId: number): Promise<SocketIOClient.Socket> {
+    const socket = io.connect(`http://localhost:3000/boards`, {
+        path: "/sockets",
+        query: `token=${jwt}`,
+    });
+    return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
+        console.log("EMMIT");
+        socket.emit("join_board", boardId, (status: number, mess: string) => {
+            socket.on("notify", () => {console.log("///////*notify*---------"); });
+
+            if (status === 200) return resolve(socket);
+            return reject(socket);
+        });
     });
 }

@@ -1,28 +1,31 @@
+import {Request} from "express";
 import * as http from "http";
 import * as SocketIO from "socket.io";
 import * as  redis from "socket.io-redis";
 import * as socketioJwt from "socketio-jwt";
 import {checkBoardAccessRights} from "../api/board/board.helpers";
 import {Config} from "../config/environment";
-import {BoardEvent, IBoardEvent, IBoardItem, eventsMap} from "../models/activity/IBoardEvent";
+import {BoardEvent, eventsMap, IBoardEvent, IBoardItem} from "../models/activity/IBoardEvent";
 import {ISocket} from "../models/IExpress";
-import {Request} from "express";
+import {number} from "joi";
 
 export class SocketService{
     private server: http.Server;
     private io: SocketIO.Server;
     private boards: SocketIO.Namespace;
+    private authorize = (socketioJwt.authorize({
+        secret: Config.secrets.session,
+        handshake: true,
+    }))
     public init(server: http.Server) {
-        this.io = SocketIO(server);
-        this.io.use(socketioJwt.authorize({
-            secret: Config.secrets,
-            handshake: true,
-        }));
+        this.io = SocketIO(server, {
+            path: "/sockets",
+        });
         this.io.adapter(redis({ host: "localhost", port: 6379 }));
         this.startListener(this.io);
     }
 
-    public broadcastToRoom(method: string, message: object, room: string): boolean{
+    public broadcastToRoom(method: string, message: object, room: string): boolean {
         return this.boards.to(room).emit(method, message);
     }
 
@@ -37,14 +40,15 @@ export class SocketService{
     private defualtTransformer(req: Request, item: IBoardItem): IBoardEvent{
         const event = new BoardEvent();
         event.activityType = eventsMap[req.method];
-        if(event.activityType === "CREATE" || event.activityType === "UPDATE")event.toState = item.dataValues;
-        if(event.activityType === "DELETE" || event.activityType === "UPDATE")event.fromState = item._previousDataValues;
+        if (event.activityType === "CREATE" || event.activityType === "UPDATE")event.toState = item.dataValues;
+        if (event.activityType === "DELETE" || event.activityType === "UPDATE")event.fromState = item._previousDataValues;
         event.modelName = item._modelOptions.name.singular;
         return event;
     }
 
     private startListener(io: SocketIO.Server): void {
-        this.boards = this.io.of("boards");
+        this.boards = this.io.of("/boards");
+        this.boards.use(this.authorize);
         this.boards.on("connection", (socket: ISocket) => {
             //  socket.emit('ferret', 'tobi', function (data) {
             socket.on("join_board", this.joinHandler(socket));

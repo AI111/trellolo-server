@@ -39,13 +39,9 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then(this.handleEntityNotFound(res))
             .then((card) => card.moveTo(req.body.columnId, req.body.position))
             .then((card) => card.updateAttributes(req.body, {validate: true}))
+            .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    }
-    private emmitEvent() {
-        return (entity) => {
-
-        };
     }
 }
 export const controller = new CardController();

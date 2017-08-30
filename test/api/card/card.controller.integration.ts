@@ -4,9 +4,10 @@
 import {expect, use} from "chai";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {cleadDBData, config, createTestProjectUser, getSocketConnection, getToken} from "../../test.config";
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
+import {setTimeout} from "timers";
 import {db} from "../../../src/sqldb/index";
 
 use(require("sinon-chai"));
@@ -25,18 +26,22 @@ describe("Card API:", function() {
     describe("POST /api/cards", () => {
         let tokenValid: string;
         let tokenInvalid: string;
+        let socket: SocketIOClient.Socket;
         before(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(httpAgent, "test@example.com", "password"))
                 .then((token) => (tokenValid = token))
                 .then(() => getToken(httpAgent, "test3@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
+                .then(() => getSocketConnection(tokenValid, 1))
+                .then((s) => (socket = s))
                 .catch((err) => {
                     console.error(err);
                     return err;
                 });
         });
         after(() =>  {
+            socket.off("notify");
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -82,7 +87,7 @@ describe("Card API:", function() {
                     done();
                 });
         });
-        it("should respond with a 422 when position is not defined", (done) =>  {
+        it("should respond with a 200 when data is valid", (done) =>  {
             httpAgent
                 .post(`/api/cards`)
                 .set("authorization", `Bearer ${tokenValid}`)
@@ -91,7 +96,7 @@ describe("Card API:", function() {
                     description: "test",
                     columnId: 1,
                 })
-                .expect(403)
+                .expect(200)
                 .end((err, res) => {
                     expect(res.body).to.containSubset({
                         _id: 9,
@@ -101,26 +106,45 @@ describe("Card API:", function() {
                         description: "test",
                         userId: 1,
                     });
-                    done();
+                    console.log("RESP");
                 });
+            socket.on("notify", (data) => {
+                console.log("RESP SOCKET", data);
+                expect(data).to.containSubset({ activityType: "CREATE",
+                    toState:
+                        { _id: 9,
+                            boardId: 1,
+                            description: "test",
+                            columnId: 1,
+                            userId: 1,
+                            position: 5 },
+                    modelName: "Card" });
+                setTimeout(done, 500);
+                // done();?
+            });
         });
 
     });
     describe("PUT /api/cards/{cardId}", () => {
         let tokenValid: string;
         let tokenInvalid: string;
+        let socket: SocketIOClient.Socket;
+
         beforeEach(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(httpAgent, "test@example.com", "password"))
                 .then((token) => (tokenValid = token))
                 .then(() => getToken(httpAgent, "test3@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
+                .then(() => getSocketConnection(tokenValid, 1))
+                .then((s) => (socket = s))
                 .catch((err) => {
                     console.error(err);
                     return err;
                 });
         });
         afterEach(() =>  {
+            socket.off("notify");
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -261,6 +285,35 @@ describe("Card API:", function() {
                     });
                 });
         });
+        // it("should respond with a 200 when notify all users in room", (done) =>  {
+        //     httpAgent
+        //         .put(`/api/cards/2`)
+        //         .set("authorization", `Bearer ${tokenValid}`)
+        //         .send({
+        //             boardId: 1,
+        //             description: "test",
+        //             columnId: 1,
+        //             position: 1,
+        //         })
+        //         .expect(403)
+        //         .end((err, res) => {
+        //
+        //         });
+        //     socket.on("notify", (data) => {
+        //         console.log("RESP SOCKET", data);
+        //         expect(data).to.containSubset({ activityType: "CREATE",
+        //             toState:
+        //                 { _id: 9,
+        //                     boardId: 1,
+        //                     description: "test",
+        //                     columnId: 1,
+        //                     userId: 1,
+        //                     position: 5 },
+        //             modelName: "Card" });
+        //         setTimeout(done, 500);
+        //         // done();?
+        //     });
+        // });
 
     });
     describe("DELETE /api/cards", () => {
