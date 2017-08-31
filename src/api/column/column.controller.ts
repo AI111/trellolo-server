@@ -7,6 +7,7 @@ import {IColumnAttributes, IColumnInstance} from "../../models/board/IColumn";
 import {Request} from "../../models/IExpress";
 import {db} from "../../sqldb/index";
 import {checkBoardAccessRights} from "../board/board.helpers";
+import {ScocketServiceInstance as notify} from "../../common/socket.service";
 
 /**
  * Created by sasha on 6/22/17.
@@ -27,12 +28,25 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
                 .then(() => col))
             .then((column) => column.moveToPosition(req.body.position))
             .then((column) => column.updateAttributes(req.body, {validate: true}))
+            // .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
     public create = (req: Request, res: Response) => {
         return this.entity.create(req.body, {validate: true})
+            .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
+    public destroy = (req: Request, res: Response) => {
+        return this.entity.find({
+            where: {
+                _id: req.params.id,
+            },
+        })
+            .then(this.handleEntityNotFound(res))
+            .then(notify.emmitEvent(req))
+            .then(this.removeEntity(res))
             .catch(this.handleError(res));
     }
 }

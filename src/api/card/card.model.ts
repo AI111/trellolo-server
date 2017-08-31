@@ -1,7 +1,10 @@
-
 /**
  * Created by sasha on 6/20/17.
  */
+
+import {number} from "joi";
+import {Transaction} from "sequelize";
+
 const Sequilize = require("sequelize");
 const debug = require("debug")("test:card:model");
 
@@ -28,7 +31,7 @@ export class Card extends Sequilize.Model {
      */
     public moveTo(columnId: number, position: number): Promise<Card> {
         if ((this.position === position && columnId === this.columnId) || !position) return Sequilize.Promise.resolve(this);
-        if(this.columnId === columnId) {
+        if (this.columnId === columnId) {
             return this.updateCard(columnId, position);
         } else {
             return this.updateCard(columnId)
@@ -42,6 +45,10 @@ export class Card extends Sequilize.Model {
      * @returns {Promise<Card>}
      */
     public updateCard(columnId: number, position?: number): Promise<Card> {
+        // if (typeof position !== "number"){
+        //     t = position as Transaction;
+        //     position = undefined;
+        // }
         const sameCol = this.columnId === columnId;
         const inc: boolean = sameCol ? this.position > position : !(position === undefined) ;
         const between: number[] = [position, this.position].sort();
@@ -49,7 +56,7 @@ export class Card extends Sequilize.Model {
         const operator: string = sameCol ? "$between" : "$gte";
         const pos: object = {};
         pos[operator] = sameCol ? between : gt;
-        debug("%d / %d / %s / %O",this.columnId,columnId,sameCol,pos);
+        debug("%d / %d / %s / %O", this.columnId, columnId, sameCol, pos);
         return Card.update({
                 position: Sequilize.literal(`position ${inc ? "+" : "-"}1`),
             },

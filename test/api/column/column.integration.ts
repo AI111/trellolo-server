@@ -4,10 +4,11 @@
 import {expect, use} from "chai";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {config, getToken} from "../../test.config";
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
 import {db} from "../../../src/sqldb/index";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));

@@ -29,19 +29,19 @@ export class SocketService{
         return this.boards.to(room).emit(method, message);
     }
 
-    public emmitEvent(req: Request, transform: (req: Request, item: IBoardItem) =>
+    public emmitEvent(req: Request, prevState?: IBoardItem, transform: (req: Request, item: IBoardItem, prevState?: IBoardItem) =>
         IBoardEvent = this.defualtTransformer) {
         return (entity) => {
             const boardId = req.headers.board || req.params.boardId || req.body.boardId || req.params.id;
-            this.broadcastToRoom("notify", transform(req, entity), `board/${boardId}`);
+            this.broadcastToRoom("notify", transform(req, entity, prevState), `board/${boardId}`);
             return entity;
         };
     }
-    private defualtTransformer(req: Request, item: IBoardItem): IBoardEvent{
+    private defualtTransformer(req: Request, item: IBoardItem, prevState?: IBoardItem): IBoardEvent{
         const event = new BoardEvent();
         event.activityType = eventsMap[req.method];
         if (event.activityType === "CREATE" || event.activityType === "UPDATE")event.toState = item.dataValues;
-        if (event.activityType === "DELETE" || event.activityType === "UPDATE")event.fromState = item._previousDataValues;
+        if (event.activityType === "DELETE" || event.activityType === "UPDATE")event.fromState = prevState || item._previousDataValues;
         event.modelName = item._modelOptions.name.singular;
         return event;
     }

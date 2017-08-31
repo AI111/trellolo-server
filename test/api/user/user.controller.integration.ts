@@ -9,7 +9,9 @@ import * as request from "supertest";
 import {Config} from "../../../src/config/environment/index";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {config,  getToken} from "../../test.config";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
+
 use(require("chai-subset"));
 use(require("chai-as-promised"));
 

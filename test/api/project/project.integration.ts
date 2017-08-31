@@ -5,7 +5,9 @@ import {expect, use} from "chai";
 import * as request from "supertest";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
-import {cleadDBData, config, createTestProjectUser, getToken, timeoutPromise} from "../../test.config";
+import { config,  getToken, timeoutPromise} from "../../test.config";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
+
 import {deleteFiles} from "../../test.helper";
 const debug = require("debug")("test.project");
 

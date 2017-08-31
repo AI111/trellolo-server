@@ -33,14 +33,27 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
     }
     public patch = (req: Request, res: Response) => {
         if (req.body._id) {
-        Reflect.deleteProperty(req.body, "_id");
-    }
+            Reflect.deleteProperty(req.body, "_id");
+        }
+        // let prevState = null;        // db.connection.transaction((t) =>
+
         return this.entity.findById(req.params.cardId)
-            .then(this.handleEntityNotFound(res))
-            .then((card) => card.moveTo(req.body.columnId, req.body.position))
-            .then((card) => card.updateAttributes(req.body, {validate: true}))
+                .then(this.handleEntityNotFound(res))
+                .then((card) =>  card.moveTo(req.body.columnId, req.body.position))
+                .then((card) => card.updateAttributes(req.body, {validate: true}))
             .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
+    public destroy = (req: Request, res: Response) => {
+        return this.entity.find({
+            where: {
+                _id: req.params.id,
+            },
+        })
+            .then(this.handleEntityNotFound(res))
+            .then(notify.emmitEvent(req))
+            .then(this.removeEntity(res))
             .catch(this.handleError(res));
     }
 }

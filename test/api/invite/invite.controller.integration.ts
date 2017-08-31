@@ -6,7 +6,9 @@ import {token} from "morgan";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb/index";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import { config,  getToken} from "../../test.config";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
+
 
 const httpAgent: SuperTest<Test> = agent(app.default);
 use(require("sinon-chai"));

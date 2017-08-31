@@ -54,21 +54,6 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             .catch(this.handleError(res));
     }
 
-// Upserts the given Thing in the DB at the specified ID
-//     public upsert(req:Request, res: Response) {
-//     if(req.body._id) {
-//         Reflect.deleteProperty(req.body, '_id');
-//     }
-//
-//     return this.entity.upsert(req.body, {
-//         where: {
-//             _id: req.params.id
-//         }
-//     })
-//         .then(this.respondWithResult(res))
-//         .catch(this.handleError(res));
-// }
-
 // Updates an existing Thing in the DB
     public patch = (req: Request, res: Response) => {
         if (req.body._id) {

@@ -2,11 +2,11 @@
  * Created by sasha on 7/12/17.
  */
 import {expect, use} from "chai";
-import {number} from "joi";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb/index";
-import {cleadDBData, config, createTestProjectUser, getToken} from "../../test.config";
+import {getToken} from "../../test.config";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 const httpAgent: SuperTest<Test> = agent(app.default);
 const debug = require("debug")("test:board:controller");
@@ -28,12 +28,11 @@ describe("Board API:", function() {
     describe("GET /api/boards/{boardId}", function() {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(function() {
-          return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => tokenValid = token)
-                .then(() => getToken(httpAgent, "test2@example.com", "password"))
-                .then((token) => (tokenInvalid = token));
+        before(async () => {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
+            return tokenInvalid;
         });
         after(function() {
             return cleadDBData();
@@ -89,7 +88,7 @@ describe("Board API:", function() {
                 .catch((err) => {
                     console.error(err);
                     return err;
-            });
+                });
         });
         after(function() {
             return cleadDBData();
@@ -143,12 +142,12 @@ describe("Board API:", function() {
                 })
                 .expect(200)
                 .end((err, res) => {
-                const boardId: number = res.body._id;
-                expect(res.body).to.containSubset({
+                    const boardId: number = res.body._id;
+                    expect(res.body).to.containSubset({
                         name: "test board",
                         projectId: 1,
                     });
-                db.BoardToUser.findOne({
+                    db.BoardToUser.findOne({
                         where: {
                             userId: 1,
                             boardId,

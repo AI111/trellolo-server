@@ -4,11 +4,12 @@
 import {expect, use} from "chai";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {cleadDBData, config, createTestProjectUser, getSocketConnection, getToken} from "../../test.config";
+import { config,  getSocketConnection, getToken} from "../../test.config";
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
 import {setTimeout} from "timers";
 import {db} from "../../../src/sqldb/index";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -27,18 +28,12 @@ describe("Card API:", function() {
         let tokenValid: string;
         let tokenInvalid: string;
         let socket: SocketIOClient.Socket;
-        before(() =>  {
-            return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => (tokenValid = token))
-                .then(() => getToken(httpAgent, "test3@example.com", "password"))
-                .then((token) => (tokenInvalid = token))
-                .then(() => getSocketConnection(tokenValid, 1))
-                .then((s) => (socket = s))
-                .catch((err) => {
-                    console.error(err);
-                    return err;
-                });
+        before(async () =>  {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(tokenValid, 1);
+            return socket;
         });
         after(() =>  {
             socket.off("notify");
@@ -73,16 +68,16 @@ describe("Card API:", function() {
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal([
-                            {
-                                context: {
-                                    key: "description",
-                                    limit: 4,
-                                    value: "t",
-                                },
-                                message: "\"description\" length must be at least 4 characters long",
-                                path: "description",
-                                type: "string.min",
+                        {
+                            context: {
+                                key: "description",
+                                limit: 4,
+                                value: "t",
                             },
+                            message: "\"description\" length must be at least 4 characters long",
+                            path: "description",
+                            type: "string.min",
+                        },
                     ]);
                     done();
                 });
@@ -130,22 +125,16 @@ describe("Card API:", function() {
         let tokenInvalid: string;
         let socket: SocketIOClient.Socket;
 
-        beforeEach(() =>  {
-            return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => (tokenValid = token))
-                .then(() => getToken(httpAgent, "test3@example.com", "password"))
-                .then((token) => (tokenInvalid = token))
-                .then(() => getSocketConnection(tokenValid, 1))
-                .then((s) => (socket = s))
-                .catch((err) => {
-                    console.error(err);
-                    return err;
-                });
+        beforeEach(async () =>  {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(tokenValid, 1);
+            return tokenInvalid;
         });
-        afterEach(() =>  {
+        afterEach(async () =>  {
             socket.off("notify");
-            return cleadDBData();
+            return await cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
             httpAgent
@@ -202,40 +191,40 @@ describe("Card API:", function() {
                 })
                 .expect(403)
                 .end((err, res) => {
-                db.Card.findAll({
-                    where: {
-                        boardId: 1,
-                    },
-                    raw: true,
-                })
-                    .then((cards) => {
-                        debug(cards);
-                        expect(cards).to.containSubset([
-                            {
-                                _id: 2,
-                                position: 3,
-                                columnId: 3,
-                                boardId: 1,
-                            },
-                            {
-                                _id: 3,
-                                position: 2,
-                                userId: 1,
-                                boardId: 1,
-                                columnId: 1,
-                            },
-                            {
-                                _id: 7,
-                                description: "test title",
-                                position: 4,
-                                userId: 1,
-                                boardId: 1,
-                                columnId: 3,
-                            },
+                    db.Card.findAll({
+                        where: {
+                            boardId: 1,
+                        },
+                        raw: true,
+                    })
+                        .then((cards) => {
+                            debug(cards);
+                            expect(cards).to.containSubset([
+                                {
+                                    _id: 2,
+                                    position: 3,
+                                    columnId: 3,
+                                    boardId: 1,
+                                },
+                                {
+                                    _id: 3,
+                                    position: 2,
+                                    userId: 1,
+                                    boardId: 1,
+                                    columnId: 1,
+                                },
+                                {
+                                    _id: 7,
+                                    description: "test title",
+                                    position: 4,
+                                    userId: 1,
+                                    boardId: 1,
+                                    columnId: 3,
+                                },
 
-                        ]);
-                        done();
-                    });
+                            ]);
+                            done();
+                        });
                 });
         });
         it("should respond with a 200 when card mowed in column", (done) =>  {
@@ -250,39 +239,39 @@ describe("Card API:", function() {
                 })
                 .expect(403)
                 .end((err, res) => {
-                db.Card.findAll({
-                    where: {
-                        boardId: 1,
-                    },
-                    raw: true,
-                })
-                    .then((cards) => {
-                        debug(cards);
-                        expect(cards).to.containSubset([
-                            {
-                                _id: 2,
-                                position: 3,
-                                columnId: 1,
-                                boardId: 1,
-                            },
-                            {
-                                _id: 3,
-                                position: 2,
-                                userId: 1,
-                                boardId: 1,
-                                columnId: 1,
-                            },
-                            {
-                                _id: 4,
-                                position: 4,
-                                userId: 1,
-                                boardId: 1,
-                                columnId: 1,
-                            },
+                    db.Card.findAll({
+                        where: {
+                            boardId: 1,
+                        },
+                        raw: true,
+                    })
+                        .then((cards) => {
+                            debug(cards);
+                            expect(cards).to.containSubset([
+                                {
+                                    _id: 2,
+                                    position: 3,
+                                    columnId: 1,
+                                    boardId: 1,
+                                },
+                                {
+                                    _id: 3,
+                                    position: 2,
+                                    userId: 1,
+                                    boardId: 1,
+                                    columnId: 1,
+                                },
+                                {
+                                    _id: 4,
+                                    position: 4,
+                                    userId: 1,
+                                    boardId: 1,
+                                    columnId: 1,
+                                },
 
-                        ]);
-                        done();
-                    });
+                            ]);
+                            done();
+                        });
                 });
         });
         // it("should respond with a 200 when notify all users in room", (done) =>  {
@@ -319,18 +308,17 @@ describe("Card API:", function() {
     describe("DELETE /api/cards", () => {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(() =>  {
-            return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => (tokenValid = token))
-                .then(() => getToken(httpAgent, "test3@example.com", "password"))
-                .then((token) => (tokenInvalid = token))
-                .catch((err) => {
-                    console.error(err);
-                    return err;
-                });
+        let socket: SocketIOClient.Socket;
+
+        beforeEach(async () =>  {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(tokenValid, 1);
+            return socket;
         });
-        after(() =>  {
+        afterEach(() =>  {
+            socket.off("notify");
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -343,7 +331,7 @@ describe("Card API:", function() {
             httpAgent
                 .delete(`/api/cards/1`)
                 .set("authorization", `Bearer ${tokenValid}`)
-                .expect(403)
+                .expect(200)
                 .end((err, res) => {
                     expect(res.body).to.be.empty;
                     expect(res.status).to.be.equal(204);
@@ -353,6 +341,33 @@ describe("Card API:", function() {
                             done();
                         });
                 });
+        });
+        it("should respond with a 200 when notify all users in room", (done) =>  {
+            httpAgent
+                .delete(`/api/cards/1`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(204)
+                .end((err, res) => {
+
+                });
+            socket.on("notify", (data) => {
+                console.log("RESP SOCKET", data);
+                expect(data).to.containSubset(
+                    {
+                        activityType: "DELETE",
+                        fromState: {
+                            _id: 1,
+                            boardId: 1,
+                            columnId: 1,
+                            description: "test title",
+                            position: 1,
+                            userId: 1,
+                        },
+                        modelName: "Card",
+                    });
+                setTimeout(done, 500);
+                // done();?
+            });
         });
 
     });
