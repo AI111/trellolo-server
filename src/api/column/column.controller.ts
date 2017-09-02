@@ -13,13 +13,18 @@ import {ScocketServiceInstance as notify} from "../../common/socket.service";
  * Created by sasha on 6/22/17.
  */
 export class BoardController extends BaseController<Sequelize.Model<IColumnInstance, IColumnAttributes>> {
+    public createValidator = Joi.object().keys({
+        title: Joi.string().min(2).max(30).required(),
+        boardId: Joi.number().integer(),
+    });
+    public updateValidator = Joi.object().keys({
+        title: Joi.string().min(2).max(30).optional(),
+        position: Joi.number().integer().optional(),
+    });
     constructor() {
         super(db.BoardColumn);
     }
-    public createValidator = Joi.object().keys({
-        title: Joi.string().min(2).max(30).required(),
-        position: Joi.string().min(1).max(200).optional(),
-    });
+
     // public index
     public patch = (req: Request, res: Response) => {
         return this.entity.findById(req.params.columnId)
@@ -28,7 +33,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
                 .then(() => col))
             .then((column) => column.moveToPosition(req.body.position))
             .then((column) => column.updateAttributes(req.body, {validate: true}))
-            // .then(notify.emmitEvent(req))
+            .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

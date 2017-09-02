@@ -146,7 +146,7 @@ describe("Card API:", function() {
             httpAgent
                 .put(`/api/columns/1`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({boardId: 1})
+                .send({title: "title"})
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});

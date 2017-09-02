@@ -30,14 +30,15 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
                 {
                     model: db.BoardColumn,
                     as: "columns",
+                    order: [[ "position", "DESC"]],
                     include: [
                         {
                             model: db.Card,
                             as: "cards",
                             order: [[ "position", "DESC"]],
-                        } as object,
+                        } ,
                     ],
-                },
+                } as object,
             ],
         })
             .then(this.handleEntityNotFound(res))

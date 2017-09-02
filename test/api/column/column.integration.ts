@@ -77,12 +77,14 @@ describe("Column API:", () =>  {
                 .expect(422)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal([
-                        {
-                            message: "title cannot be null",
-                            path: "title",
-                            type: "notNull Violation",
-                            value: null,
-                        },
+                            {
+                                context: {
+                                    key: "title",
+                                },
+                                message: "\"title\" is required",
+                                path: "title",
+                                type: "any.required",
+                            },
                     ]);
                     done();
                 });
@@ -133,7 +135,7 @@ describe("Column API:", () =>  {
             httpAgent
                 .put(`/api/columns/5`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({boardId: 1})
+                .send({title: "ads"})
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});
@@ -271,85 +273,4 @@ describe("Column API:", () =>  {
                 });
         });
     });
-    // describe("GET /api//boards/columns", () =>  {
-    //     let tokenValid: string;
-    //     let tokenInvalid: string;
-    //     before(() =>  {
-    //         return createTestProjectUser()
-    //             .then(() => getToken(httpAgent, "test@example.com", "password"))
-    //             .then((token) => (tokenValid = token))
-    //             .then(() => getToken(httpAgent, "test2@example.com", "password"))
-    //             .then((token) => (tokenInvalid = token))
-    //             .catch((err) => {
-    //                 console.error(err);
-    //                 return err;
-    //             });
-    //     });
-    //     after(() =>  {
-    //         return cleadDBData();
-    //     });
-    //     it("should respond with a 401 when not authenticated", (done) =>  {
-    //         httpAgent
-    //             .get(`/api/board/1/columns`)
-    //             .expect(401)
-    //             .end(done);
-    //     });
-    //     it("should respond with a 403 when user not have access to edit project", (done) =>  {
-    //         httpAgent
-    //             .get(`/api/board/1/columns`)
-    //             .set("authorization", `Bearer ${tokenInvalid}`)
-    //             .send({boardId: 1})
-    //             .expect(403)
-    //             .end((err, res) => {
-    //                 expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});
-    //                 done();
-    //             });
-    //     });
-    //
-    //     // it('should respond with a 422 if column validation failed', function (done) {
-    //     //     httpAgent
-    //     //         .put(`/api/board/columns/`)
-    //     //         .set('authorization', `Bearer ${tokenValid}`)
-    //     //         .send({
-    //     //             title: 'New Title 5',
-    //     //             position: 2
-    //     //         })
-    //     //         .expect(200)
-    //     //         .end((err,res)=>{
-    //     //             console.log(res.body);
-    //     //             expect(res.body).to.containSubset({
-    //     //                     "position": 2,
-    //     //                     "boardId":1,
-    //     //                     "title": "New Title 5"
-    //     //                 });
-    //     //             // db.BoardColumn.findAll({
-    //     //             //     where:{
-    //     //             //         boardId:1
-    //     //             //     },
-    //     //             //     // order:['position']
-    //     //             // }).then(cols =>{
-    //     //             //     console.log(cols.map(c=>c.dataValues));
-    //     //             // })
-    //     //             done()
-    //     //
-    //     //
-    //     //         });
-    //     // });
-    //     // it('should respond with a 200 if new column was created', function (done) {
-    //     //     httpAgent
-    //     //         .get('/api/board/1/columns')
-    //     //         .set('authorization', `Bearer ${tokenValid}`)
-    //     //         .expect(200)
-    //     //         .end((err,res)=>{
-    //     //             console.log('--------------',res.body);
-    //     //             expect(res.body).to.containSubset({
-    //     //                 "title": "test board",
-    //     //                 "boardId": 11111111111,
-    //     //                 "position":6
-    //     //             });
-    //     //             done()
-    //     //         });
-    //     // });
-    // });
-
 });
