@@ -15,6 +15,7 @@ use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
 use(require("chai-subset"));
+use(require("chai-arrays"));
 
 describe("Board API:", function() {
     before((done) => {
@@ -70,8 +71,10 @@ describe("Board API:", function() {
                             description: "description 1",
                         });
                     expect(res.body.columns).to.be.an("array").length(5);
+                    expect(res.body.columns.map(c => c.position)).to.be.sorted();
+
                     expect(res.body.columns[0].cards).to.be.an("array").length(4);
-                    expect(res.body.columns[2].cards).to.be.an("array").length(4);
+                    expect(res.body.columns[3].cards).to.be.an("array").length(4);
                     done();
                 });
         });

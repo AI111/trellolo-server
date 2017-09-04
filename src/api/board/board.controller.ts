@@ -30,15 +30,17 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
                 {
                     model: db.BoardColumn,
                     as: "columns",
-                    order: [[ "position", "DESC"]],
                     include: [
                         {
                             model: db.Card,
                             as: "cards",
-                            order: [[ "position", "DESC"]],
                         } ,
                     ],
-                } as object,
+                },
+            ],
+            order:  [
+                [{model: db.BoardColumn, as: "columns"}, "position"],
+                [{model: db.BoardColumn, as: "columns"}, {model: db.Card, as: "cards"}, "position"],
             ],
         })
             .then(this.handleEntityNotFound(res))
@@ -46,7 +48,7 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
             .catch(this.handleError(res));
     }
     public create = (req: Request, res: Response) => {
-         return this.entity.create(req.body)
+        return this.entity.create(req.body)
             .then(setBoardUsers(req.user._id, req.body.users))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));

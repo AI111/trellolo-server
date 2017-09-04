@@ -29,14 +29,23 @@ export class SocketService{
         return this.boards.to(room).emit(method, message);
     }
 
-    public emmitEvent(req: Request, prevState?: IBoardItem, transform: (req: Request, item: IBoardItem, prevState?: IBoardItem) =>
-        IBoardEvent = this.defualtTransformer) {
+    public emmitEvent(req: Request, prevState?: IBoardItem,
+                      transform: (req: Request, item: IBoardItem, prevState?: IBoardItem) =>
+                          IBoardEvent = this.defualtTransformer) {
         return (entity) => {
             const boardId = req.headers.board || req.params.boardId || req.body.boardId || req.params.id;
             this.broadcastToRoom("notify", transform(req, entity, prevState), `board/${boardId}`);
             return entity;
         };
     }
+
+    public emmitEventSync(req: Request, item: IBoardItem, prevState: IBoardItem = null,
+                          transform: (req: Request, item: IBoardItem, prevState?: IBoardItem) =>
+                              IBoardEvent = this.defualtTransformer ) {
+            const boardId = req.headers.board || req.params.boardId || req.body.boardId || req.params.id;
+            this.broadcastToRoom("notify", transform(req, item, prevState), `board/${boardId}`);
+    }
+
     private defualtTransformer(req: Request, item: IBoardItem, prevState?: IBoardItem): IBoardEvent{
         const event = new BoardEvent();
         event.activityType = eventsMap[req.method];

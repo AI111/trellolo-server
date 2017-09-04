@@ -5,6 +5,7 @@ import {BaseController} from "../../common/base.controller";
 import {ScocketServiceInstance as notify} from "../../common/socket.service";
 import {ICardAttributes, ICardInstance} from "../../models/board/ICard";
 import {db} from "../../sqldb/index";
+import {IBoardItem} from "../../models/activity/IBoardEvent";
 /**
  * Created by sasha on 6/22/17.
  */
@@ -44,6 +45,23 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then(notify.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
+    }
+    public updateCard = async (req: Request, res: Response) => {
+        if (req.body._id) {
+            Reflect.deleteProperty(req.body, "_id");
+        }
+        try {
+            let card = await this.entity.findById(req.params.cardId);
+            this.handleEntityNotFoundSync(res, card);
+            const t = await db.connection.transaction({});
+            const prevState = {...card.dataValues} as IBoardItem;
+            await card.moveTo(req.body.columnId, req.body.position, t);
+            await card.updateAttributes(req.body, {transaction: t});
+            notify.emmitEventSync(req, card, prevState);
+            this.respondWithResultSync(res, card);
+        } catch (e){
+            this.handleErrorSync(res, e);
+        }
     }
     public destroy = (req: Request, res: Response) => {
         return this.entity.find({

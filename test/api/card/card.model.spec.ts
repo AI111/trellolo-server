@@ -47,7 +47,7 @@ describe("Check card.model", function() {
                         $gte: 1,
                     },
                 },
-                // transaction: undefined,
+                transaction: undefined,
             });
     });
     it("Card updateCard add to column ", () => {
@@ -71,7 +71,7 @@ describe("Check card.model", function() {
                         $gte: 3,
                     },
                 },
-                // transaction: undefined,
+                transaction: undefined,
             });
     });
     it("Card updateCard update positions in same column down", () => {
@@ -95,7 +95,7 @@ describe("Check card.model", function() {
                         $between: [3, 6],
                     },
                 },
-                // transaction: undefined,
+                transaction: undefined,
             });
     });
     it("Card updateCard update positions in same column up", () => {
@@ -119,7 +119,7 @@ describe("Check card.model", function() {
                         $between: [3, 7],
                     },
                 },
-                // transaction: undefined,
+                transaction: undefined,
             });
     });
     it("Card moveTo change card position in same column", () => {

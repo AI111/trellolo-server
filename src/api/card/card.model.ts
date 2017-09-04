@@ -29,26 +29,29 @@ export class Card extends Sequilize.Model {
      * @param {number} position
      * @returns {Promise<Card>}
      */
-    public moveTo(columnId: number, position: number): Promise<Card> {
+    public moveTo(columnId: number, position: number, t?: Transaction): Promise<Card> {
         if ((this.position === position && columnId === this.columnId) || !position) return Sequilize.Promise.resolve(this);
         if (this.columnId === columnId) {
-            return this.updateCard(columnId, position);
+            return this.updateCard(columnId, position, t);
         } else {
-            return this.updateCard(columnId)
-                .then(() => this.updateCard(columnId, position));
+            return this.updateCard(columnId, t)
+                .then(() => this.updateCard(columnId, position, t));
         }
     }
+
     /**
      * change card position in column or remove from column
      * @param {number} columnId
      * @param {number} position if position undefined then card removed from  column
      * @returns {Promise<Card>}
      */
-    public updateCard(columnId: number, position?: number): Promise<Card> {
-        // if (typeof position !== "number"){
-        //     t = position as Transaction;
-        //     position = undefined;
-        // }
+    public updateCard(columnId: number,  t?: Transaction): Promise<Card>;
+    public updateCard(columnId: number, position?: number, t?: Transaction): Promise<Card>;
+    public updateCard(columnId: number, position?: number | Transaction, t?: Transaction): Promise<Card> {
+        if (typeof position !== "number"){
+            t = position as Transaction;
+            position = undefined;
+        }
         const sameCol = this.columnId === columnId;
         const inc: boolean = sameCol ? this.position > position : !(position === undefined) ;
         const between: number[] = [position, this.position].sort();
@@ -66,6 +69,7 @@ export class Card extends Sequilize.Model {
                     columnId: (position === undefined) ? this.columnId : columnId,
                     position: pos,
                 },
+                transaction: t,
             },
         )
             .then(() => {

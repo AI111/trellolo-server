@@ -115,13 +115,13 @@ export function createTestProjectUser() {
                 _id: 3,
                 title: "Title 3",
                 boardId: 1,
-                position: 3,
+                position: 4,
             },
             {
                 _id: 4,
                 title: "Title 4",
                 boardId: 1,
-                position: 4,
+                position: 3,
             },
             {
                 _id: 5,

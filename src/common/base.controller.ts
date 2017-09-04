@@ -93,6 +93,15 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             return res.status(statusCode).send(err);
         };
     }
+    protected handleErrorSync(res: Response, err: any, statusCode: number = 500) {
+        debug(err);
+        if (err instanceof ServerError) {
+            return res.status(err.status).json({message: err.error});
+        } else if (err instanceof ValidationError) {
+            return res.status(422).json((err as ValidationError).errors || err);
+        }
+        return res.status(statusCode).send(err);
+    }
 
     protected respondWithResult(res: Response, statusCode: number = 200) {
         return (entity) => {
@@ -102,7 +111,9 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             return null;
         };
     }
-
+    protected respondWithResultSync(res: Response, entity: any, statusCode: number = 200) {
+        return res.status(statusCode).json(entity);
+    }
     protected handleEntityNotFound(res: Response) {
         return (entity) => {
 
@@ -112,6 +123,14 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             }
             return entity;
         };
+    }
+    protected handleEntityNotFoundSync(res: Response, entity: any) {
+
+        if (!entity || (entity instanceof Array && !entity.length)) {
+            res.status(404).end();
+            return null;
+        }
+        return entity;
     }
 
     protected validationError(res: Response, statusCode: number = 422) {
