@@ -1,11 +1,10 @@
 /**
  * Created by sasha on 6/21/17.
  */
-import {Instance, Model} from "sequelize";
+import {Instance, Model, Transaction} from "sequelize";
+import {Card} from "../../api/card/card.model";
 import {IUserInstance} from "../user/IUser";
 import {IBoardInstance} from "./IBoard";
-import {Card} from "../../api/card/card.model";
-import {IBoardItem} from "../activity/IBoardEvent";
 
 export interface ICardAttributes{
     _id?: number;
