@@ -10,7 +10,7 @@ use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
 
-const proxyquire = require("proxyquire").noCallThru();
+const proxyquire = require("proxyquire");
 // const proxyquire = require("proxyquire").noPreserveCache().noCallThru();
 class ModelStub {
     public static update = stub();

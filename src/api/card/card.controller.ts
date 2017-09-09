@@ -3,9 +3,11 @@ import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {ScocketServiceInstance as notify} from "../../common/socket.service";
+import {IBoardItem} from "../../models/activity/IBoardEvent";
 import {ICardAttributes, ICardInstance} from "../../models/board/ICard";
 import {db} from "../../sqldb/index";
-import {IBoardItem} from "../../models/activity/IBoardEvent";
+import {checkBoardAccessRights} from "../board/board.helpers";
+import {checkCardAccessRights} from "./card.helper";
 /**
  * Created by sasha on 6/22/17.
  */
@@ -17,7 +19,6 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
     });
     public updateValidator = Joi.object().keys({
         description: Joi.string().min(4).max(1000).optional(),
-        boardId: Joi.number().integer().required(),
         columnId: Joi.number().integer().required(),
         position: Joi.number().integer().required(),
     });
@@ -36,13 +37,17 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
-        // let prevState = null;        // db.connection.transaction((t) =>
-
-        return this.entity.findById(req.params.cardId)
+        let prevState = null;
+        return db.connection.transaction((t) =>
+            this.entity.findById(req.params.cardId)
+                .then(checkCardAccessRights(req.user._id))
                 .then(this.handleEntityNotFound(res))
-                .then((card) =>  card.moveTo(req.body.columnId, req.body.position))
-                .then((card) => card.updateAttributes(req.body, {validate: true}))
-            .then(notify.emmitEvent(req))
+                .then((card) => {
+                    prevState = {...card.dataValues} as IBoardItem;
+                    return card; })
+                .then((card) => card.moveTo(req.body.columnId, req.body.position, t))
+                .then((card) => card.updateAttributes(req.body, {transaction: t}))
+                .then((card) => notify.emmitEventSync(req, card, prevState)))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
@@ -52,13 +57,15 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         }
         try {
             let card = await this.entity.findById(req.params.cardId);
+            await checkBoardAccessRights(req.user._id, card.dataValues.boardId);
             this.handleEntityNotFoundSync(res, card);
-            const t = await db.connection.transaction({});
+            const t = await db.connection.transaction();
             const prevState = {...card.dataValues} as IBoardItem;
-            await card.moveTo(req.body.columnId, req.body.position, t);
-            await card.updateAttributes(req.body, {transaction: t});
+            card = await card.moveTo(req.body.columnId, req.body.position, t);
+            const ans = await card.updateAttributes(req.body, {transaction: t});
             notify.emmitEventSync(req, card, prevState);
-            this.respondWithResultSync(res, card);
+            t.commit();
+            this.respondWithResultSync(res, ans);
         } catch (e){
             this.handleErrorSync(res, e);
         }

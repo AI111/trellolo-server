@@ -144,9 +144,10 @@ describe("Card API:", function() {
         });
         it("should respond with a 403 when user not have access to edit board", (done) =>  {
             httpAgent
-                .put(`/api/columns/1`)
+                .put(`/api/cards/1`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({title: "title"})
+                .send({position: 1,
+                    columnId: 1})
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});
@@ -184,7 +185,6 @@ describe("Card API:", function() {
                 .put(`/api/cards/2`)
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
-                    boardId: 1,
                     description: "test",
                     columnId: 3,
                     position: 3,
@@ -232,7 +232,6 @@ describe("Card API:", function() {
                 .put(`/api/cards/2`)
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
-                    boardId: 1,
                     description: "test",
                     columnId: 1,
                     position: 3,
@@ -274,35 +273,44 @@ describe("Card API:", function() {
                         });
                 });
         });
-        // it("should respond with a 200 when notify all users in room", (done) =>  {
-        //     httpAgent
-        //         .put(`/api/cards/2`)
-        //         .set("authorization", `Bearer ${tokenValid}`)
-        //         .send({
-        //             boardId: 1,
-        //             description: "test",
-        //             columnId: 1,
-        //             position: 1,
-        //         })
-        //         .expect(403)
-        //         .end((err, res) => {
-        //
-        //         });
-        //     socket.on("notify", (data) => {
-        //         console.log("RESP SOCKET", data);
-        //         expect(data).to.containSubset({ activityType: "CREATE",
-        //             toState:
-        //                 { _id: 9,
-        //                     boardId: 1,
-        //                     description: "test",
-        //                     columnId: 1,
-        //                     userId: 1,
-        //                     position: 5 },
-        //             modelName: "Card" });
-        //         setTimeout(done, 500);
-        //         // done();?
-        //     });
-        // });
+        it("should respond with a 200 when notify all users in room", (done) =>  {
+            httpAgent
+                .put(`/api/cards/2`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    description: "test",
+                    columnId: 1,
+                    position: 1,
+                })
+                .expect(403)
+                .end((err, res) => {
+
+                });
+            socket.on("notify", (data) => {
+                expect(data).to.containSubset({
+                        activityType: "UPDATE",
+                        fromState: {
+                            _id: 2,
+                            boardId: 1,
+                            columnId: 1,
+                            description: "test title",
+                            position: 2,
+                            userId: 1,
+                        },
+                        modelName: "Card",
+                        toState: {
+                            _id: 2,
+                            boardId: 1,
+                            columnId: 1,
+                            description: "test",
+                            position: 1,
+                            userId: 1,
+                        },
+                    },
+                );
+                setTimeout(done, 500);
+            });
+        });
 
     });
     describe("DELETE /api/cards", () => {

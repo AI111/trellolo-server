@@ -22,6 +22,6 @@ export interface ICardAttributes{
 export interface ICardInstance  extends Instance<ICardAttributes>, ICardAttributes {
     dataValues: ICardAttributes;
     getMaxCardPosition(boardId: number, columnId: number): Promise<number>;
-    moveTo(columnId: number, position: number, t?: Transaction): Promise<Card>;
-    updateCard(columnId: number, position?: number): Promise<Card>;
+    moveTo(columnId: number, position: number, t?: Transaction): Promise<this>;
+    updateCard(columnId: number, position?: number): Promise<this>;
 }

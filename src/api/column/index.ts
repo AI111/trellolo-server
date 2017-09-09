@@ -2,13 +2,12 @@
  * Created by sasha on 6/22/17.
  */
 
-
 "use strict";
 
 import {Router} from "express";
 import {hasBoardRoles, hasProjectRoles, isAuthenticated} from "../../auth/auth.service";
-import {controller} from "./column.controller";
 import {validateReauest} from "../../common/validation.service";
+import {controller} from "./column.controller";
 
 export default function(): Router {
     const router =  Router();

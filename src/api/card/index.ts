@@ -10,7 +10,7 @@ export default function(): Router {
     // router.get("/:boardId/columns", hasBoardRoles(),  controller.index);
     router.delete("/:id", isAuthenticated(), controller.destroy);
     // router.get("/me", hasProjectRoles(), controller.show);
-    router.put("/:cardId", isAuthenticated(), validateReauest(controller.updateValidator), controller.patch);
+    router.put("/:cardId", isAuthenticated(), validateReauest(controller.updateValidator), controller.updateCard);
     // router.get("/boards/:id", hasBoardRoles(), controller.show);
     router.post("/" , hasBoardRoles(), validateReauest(controller.createValidator), controller.create);
     return router;

@@ -1,7 +1,7 @@
 /**
  * Created by sasha on 7/4/17.
  */
-import {expect, use}  from "chai";
+import {expect, use} from "chai";
 import * as Sequelize from "sequelize";
 import {spy, stub} from "sinon";
 import {BaseController} from "../../src/common/base.controller";
@@ -11,27 +11,25 @@ import {req, res} from "../test.config";
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
-const proxyquire = require("proxyquire").noPreserveCache().noCallThru();
-
-const jsonSpec: any = {
-    default: {
-        apply: stub(),
-    },
-};
-const bCtrl = proxyquire("../../src/common/base.controller", {
-    "fast-json-patch": jsonSpec,
-});
 
 describe("Base controller class:", function() {
+    const proxyquire = require("proxyquire").noPreserveCache().noCallThru();
+
+    const jsonSpec: any = {
+        default: {
+            apply: stub(),
+        },
+    };
+    const bCtrl = proxyquire("../../src/common/base.controller", {
+        "fast-json-patch": jsonSpec,
+    });
     const modelStub: any = {
         destroy: stub(),
         save: stub(),
         findAll: stub(),
         create: stub(),
     };
-    beforeEach(function(){
 
-    });
     describe("Check respondWithResult", function() {
         it("It should return null if entity empty", function() {
             const cntrl: any = new BaseController<Sequelize.Model<IUserInstance, IUserAttributes>>(modelStub as any);

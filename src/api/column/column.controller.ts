@@ -8,6 +8,7 @@ import {Request} from "../../models/IExpress";
 import {db} from "../../sqldb/index";
 import {checkBoardAccessRights} from "../board/board.helpers";
 import {ScocketServiceInstance as notify} from "../../common/socket.service";
+import {checkColumnAccessRights} from "./column.helper";
 
 /**
  * Created by sasha on 6/22/17.
@@ -29,8 +30,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
     public patch = (req: Request, res: Response) => {
         return this.entity.findById(req.params.columnId)
             .then(this.handleEntityNotFound(res))
-            .then((col) => checkBoardAccessRights(req.user._id, col.boardId)
-                .then(() => col))
+            .then(checkColumnAccessRights(req.user._id))
             .then((column) => column.moveToPosition(req.body.position))
             .then((column) => column.updateAttributes(req.body, {validate: true}))
             .then(notify.emmitEvent(req))

@@ -42,8 +42,10 @@ export class SocketService{
     public emmitEventSync(req: Request, item: IBoardItem, prevState: IBoardItem = null,
                           transform: (req: Request, item: IBoardItem, prevState?: IBoardItem) =>
                               IBoardEvent = this.defualtTransformer ) {
-            const boardId = req.headers.board || req.params.boardId || req.body.boardId || req.params.id;
+            const boardId = req.headers.board || req.params.boardId
+                || req.body.boardId || item.dataValues.boardId || req.params.id;
             this.broadcastToRoom("notify", transform(req, item, prevState), `board/${boardId}`);
+            return item;
     }
 
     private defualtTransformer(req: Request, item: IBoardItem, prevState?: IBoardItem): IBoardEvent{

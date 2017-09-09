@@ -19,5 +19,5 @@ export interface IColumnAttributes{
 export interface IColumnInstance  extends Instance<IColumnAttributes>, IColumnAttributes {
     dataValues: IColumnAttributes;
     getMaxBoardPosition(boardId: number): Promise<number>;
-    moveToPosition(position: number): Promise<void>;
+    moveToPosition(position: number): Promise<this>;
 }

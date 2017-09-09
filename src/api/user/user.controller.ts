@@ -28,9 +28,6 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
     /**
      * Authentication callback
      */
-    public authCallback(req: Request, res: Response) {
-        res.redirect("/");
-    }
     public index = (req: Request, res: Response) => {
     return db.User.findAll({
             where: buildQueryByParams({}, req.query, ["email"]),

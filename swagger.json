@@ -645,12 +645,21 @@
             "format": "int64"
           },{
             "in": "body",
-            "name": "body",
-            "description": "Card object that needs to be updated",
+            "name": "position",
+            "description": "Card position in column",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/Card"
-            }
+            "type": "integer"
+          },{
+            "in": "body",
+            "name": "columnId",
+            "description": "Card column id",
+            "required": "true"
+          }
+          ,{
+            "in": "body",
+            "name": "codescriptionlumnId",
+            "description": "Card text description",
+            "required": "false"
           }
         ],
         "responses": {
