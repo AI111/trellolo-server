@@ -3,7 +3,7 @@
  */
 import * as Promise from "bluebird";
 import * as Joi from "joi";
-import {BoardAccessRights} from "../../models/board/IBoardToUser";
+import {BoardAccessRights, IBoardToUserInstance} from "../../models/board/IBoardToUser";
 import {ServerError} from "../../models/IError";
 import {db} from "../../sqldb/index";
 const debug = require("debug")("test.board.helper");
@@ -40,7 +40,7 @@ export const  setBoardUsers = (creator: number, users: [number] = [] as [number]
     };
 }
 export function  checkBoardAccessRights(userId: number, boardId: number,
-                                        roles: [BoardAccessRights] = ["user", "admin", "creator"]): Promise<void> {
+                                        roles: [BoardAccessRights] = ["user", "admin", "creator"]): Promise<IBoardToUserInstance[]> {
     return db.BoardToUser.findAll({
         where: {
             boardId,
@@ -50,7 +50,7 @@ export function  checkBoardAccessRights(userId: number, boardId: number,
             },
         },
     }).then((team) => {
-        if (!team.length) return Promise.reject(new ServerError("Yo not have access rights for using this board", 403));
+        if (!team.length) throw new ServerError("Yo not have access rights for using this board", 403);
         return team;
     });
 }

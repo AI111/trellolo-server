@@ -1,6 +1,8 @@
 /**
  * Created by sasha on 6/20/17.
  */
+import {Transaction} from "sequelize";
+
 const Sequilize = require("sequelize");
 
 export class BoardColumn extends Sequilize.Model {
@@ -17,7 +19,7 @@ export class BoardColumn extends Sequilize.Model {
         });
     }
 
-    public moveToPosition(position: number): Promise<this> {
+    public moveToPosition(position: number, transaction?: Transaction): Promise<this> {
         if (this.position === position || !position) return Sequilize.Promise.resolve(this);
         const inc: boolean = this.position > position;
         const between = [position, this.position].sort();
@@ -33,6 +35,7 @@ export class BoardColumn extends Sequilize.Model {
                 },
                 order: ["position", "DESC"],
             },
+            transaction,
         )
             .then(() => {
                 this.position = position;
@@ -51,7 +54,7 @@ export default function(sequelize, DataTypes) {
             autoIncrement: true,
         },
         title: {
-          type: DataTypes.STRING,
+            type: DataTypes.STRING,
             isLength: {min: 2, max: 50},
             notEmpty: {
                 msg: "Column title is required field",
@@ -60,7 +63,6 @@ export default function(sequelize, DataTypes) {
         },
         position: {
             type: DataTypes.INTEGER,
-            // unique: "compositeIndex",
         },
         boardId: {
             type: DataTypes.INTEGER,
@@ -69,17 +71,15 @@ export default function(sequelize, DataTypes) {
                 key: "_id",
             },
             onDelete: "cascade",
-            // unique: "compositeIndex",
         },
     }, {
         sequelize,
         hooks: {
             beforeCreate(column, fields, fn) {
-               return BoardColumn.getMaxBoardPosition(column.boardId)
+                return BoardColumn.getMaxBoardPosition(column.boardId)
                     .then((position) => (column.position = position + 1));
             },
         },
-
     });
     return BoardColumn;
 }

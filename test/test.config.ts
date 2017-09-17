@@ -17,13 +17,10 @@ export const config = {
     icon: "./test/assets/test.icon.jpeg",
 };
 export const req: any = {
-    body: {
         user: {
             _id: 777,
             role: "user",
         },
-    },
-
 };
 export let res: any = {
     status: stub(),
@@ -60,7 +57,6 @@ export function getSocketConnection(jwt: string, boardId: number): Promise<Socke
         query: `token=${jwt}`,
     });
     return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
-        console.log("EMMIT");
         socket.emit("join_board", boardId, (status: number, mess: string) => {
             if (status === 200) return resolve(socket);
             return reject(socket);

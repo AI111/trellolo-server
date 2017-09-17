@@ -10,7 +10,9 @@
         "object-literal-sort-keys": false,
         "no-var-requires": false,
         "only-arrow-functions": false,
-        "cyclomatic-complexity": [true, 8]
+        "cyclomatic-complexity": [true, 8],
+        "curly": [true, "ignore-same-line"]
+
     },
     "rulesDirectory": []
 }

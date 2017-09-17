@@ -2,13 +2,13 @@
 
 import {pbkdf2, pbkdf2Sync, randomBytes} from "crypto";
 const Sequilize = require("sequelize");
-let authTypes = ["github", "twitter", "facebook", "google"];
+const authTypes = ["github", "twitter", "facebook", "google"];
 
-let validatePresenceOf = function(value) {
+const validatePresenceOf = function(value) {
     return value && value.length;
 };
 export class User extends Sequilize.Model{
-    static  associate(models)  {
+    public static  associate(models)  {
         console.log("User.associate");
 
         User.belongsToMany(models.Project, {
@@ -37,7 +37,7 @@ export class User extends Sequilize.Model{
      * @api public
      */
     public authenticate(password): Promise<boolean> {
-        let _this = this;
+        const _this = this;
         return this.encryptPassword(password)
             .then( (pwdGen) => _this.password === pwdGen);
     }

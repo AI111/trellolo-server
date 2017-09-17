@@ -7,16 +7,15 @@ import {checkBoardAccessRights} from "../api/board/board.helpers";
 import {Config} from "../config/environment";
 import {BoardEvent, eventsMap, IBoardEvent, IBoardItem} from "../models/activity/IBoardEvent";
 import {ISocket} from "../models/IExpress";
-import {number} from "joi";
 
 export class SocketService{
     private server: http.Server;
     private io: SocketIO.Server;
     private boards: SocketIO.Namespace;
-    private authorize = (socketioJwt.authorize({
+    private authorize = socketioJwt.authorize({
         secret: Config.secrets.session,
         handshake: true,
-    }))
+    });
     public init(server: http.Server) {
         this.io = SocketIO(server, {
             path: "/sockets",
@@ -58,10 +57,9 @@ export class SocketService{
     }
 
     private startListener(io: SocketIO.Server): void {
-        this.boards = this.io.of("/boards");
+        this.boards = io.of("/boards");
         this.boards.use(this.authorize);
         this.boards.on("connection", (socket: ISocket) => {
-            //  socket.emit('ferret', 'tobi', function (data) {
             socket.on("join_board", this.joinHandler(socket));
         });
     }

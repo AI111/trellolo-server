@@ -7,10 +7,10 @@ import * as app from "../../../src/index";
 import { config,  getSocketConnection, getToken} from "../../test.config";
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
-import {setTimeout} from "timers";
+import * as Promise from "bluebird";
+import {ActivityMessagesEnum as msg} from "../../../src/models/activity/IActivity";
 import {db} from "../../../src/sqldb/index";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
-
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
@@ -28,14 +28,14 @@ describe("Card API:", function() {
         let tokenValid: string;
         let tokenInvalid: string;
         let socket: SocketIOClient.Socket;
-        before(async () =>  {
+        beforeEach(async () =>  {
             await createTestProjectUser();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test3@example.com", "password");
             socket = await getSocketConnection(tokenValid, 1);
             return socket;
         });
-        after(() =>  {
+        afterEach(() =>  {
             socket.off("notify");
             return cleadDBData();
         });
@@ -94,29 +94,63 @@ describe("Card API:", function() {
                 .expect(200)
                 .end((err, res) => {
                     expect(res.body).to.containSubset({
-                        _id: 9,
                         boardId: 1,
                         columnId: 1,
                         position: 5,
                         description: "test",
                         userId: 1,
                     });
-                    console.log("RESP");
+                    done();
                 });
+        });
+        it("should receive event when card created", (done) =>  {
             socket.on("notify", (data) => {
-                console.log("RESP SOCKET", data);
                 expect(data).to.containSubset({ activityType: "CREATE",
                     toState:
-                        { _id: 9,
+                        {
                             boardId: 1,
                             description: "test",
                             columnId: 1,
                             userId: 1,
                             position: 5 },
                     modelName: "Card" });
-                setTimeout(done, 500);
-                // done();?
+                done();
             });
+            httpAgent
+                .post(`/api/cards`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    boardId: 1,
+                    description: "test",
+                    columnId: 1,
+                })
+                .expect(200)
+                .end((err, res) => {
+                });
+        });
+        it("should create activity record when card was created", (done) =>  {
+            httpAgent
+                .post(`/api/cards`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    boardId: 1,
+                    description: "test",
+                    columnId: 1,
+                })
+                .expect(200)
+                .end((err, res) => {
+                    db.Activity.findOne({
+                        where: {
+                            table: db.Card.getTableName(),
+                            userId: 1,
+                            messageId: msg.CREATE_CARD,
+                        },
+                    })
+                        .then((activity) => {
+                            expect(activity).to.not.be.null;
+                            done();
+                        });
+                });
         });
 
     });
@@ -273,7 +307,7 @@ describe("Card API:", function() {
                         });
                 });
         });
-        it("should respond with a 200 when notify all users in room", (done) =>  {
+        it("should create activity record when card change position", (done) =>  {
             httpAgent
                 .put(`/api/cards/2`)
                 .set("authorization", `Bearer ${tokenValid}`)
@@ -282,10 +316,32 @@ describe("Card API:", function() {
                     columnId: 1,
                     position: 1,
                 })
-                .expect(403)
-                .end((err, res) => {
-
+                .expect(200)
+                .end(  (err, res) => {
+                    db.Activity.findOne({
+                        where: {
+                            table: db.Card.getTableName(),
+                            tableId: 2,
+                            userId: 1,
+                        },
+                        // order: ["createdAt"],
+                    })
+                        .then((activity) => {
+                            expect(activity).to.not.be.null;
+                            expect(activity.dataValues).to.containSubset({
+                                tableId: 2,
+                                userId: 1,
+                                table: db.Card.getTableName(),
+                            });
+                            expect(activity.dataValues.diff).to.containSubset([
+                                { op: "replace", path: "/position", value: 2 },
+                                { op: "replace", path: "/description", value: "test title" },
+                            ]);
+                            done();
+                        });
                 });
+        });
+        it("should respond with a 200 when notify all users in room", (done) =>  {
             socket.on("notify", (data) => {
                 expect(data).to.containSubset({
                         activityType: "UPDATE",
@@ -308,8 +364,21 @@ describe("Card API:", function() {
                         },
                     },
                 );
-                setTimeout(done, 500);
+                done()
             });
+
+            httpAgent
+                .put(`/api/cards/2`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    description: "test",
+                    columnId: 1,
+                    position: 1,
+                })
+                .expect(403)
+                .end((err, res) => {
+
+                });
         });
 
     });
@@ -351,15 +420,7 @@ describe("Card API:", function() {
                 });
         });
         it("should respond with a 200 when notify all users in room", (done) =>  {
-            httpAgent
-                .delete(`/api/cards/1`)
-                .set("authorization", `Bearer ${tokenValid}`)
-                .expect(204)
-                .end((err, res) => {
-
-                });
             socket.on("notify", (data) => {
-                console.log("RESP SOCKET", data);
                 expect(data).to.containSubset(
                     {
                         activityType: "DELETE",
@@ -373,10 +434,40 @@ describe("Card API:", function() {
                         },
                         modelName: "Card",
                     });
-                setTimeout(done, 500);
-                // done();?
+                done();
             });
-        });
+            httpAgent
+                .delete(`/api/cards/1`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .expect(204)
+                .end((err, res) => {
 
+                });
+        });
+        it("should create activity record when card was deleted", (done) =>  {
+            httpAgent
+                .delete(`/api/cards/1`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    boardId: 1,
+                    description: "t",
+                    columnId: 1,
+                })
+                .expect(200)
+                .end( (err, res) => {
+                    db.Activity.findOne({
+                        where: {
+                            table: db.Card.getTableName(),
+                            userId: 1,
+                            messageId: msg.DELETE_CARD,
+                            tableId: 1,
+                        },
+                    })
+                        .then((activity) => {
+                            expect(activity).to.not.be.null;
+                            done();
+                        });
+                });
+        });
     });
 });

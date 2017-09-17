@@ -16,9 +16,7 @@ describe("Base controller class:", function() {
     const proxyquire = require("proxyquire").noPreserveCache().noCallThru();
 
     const jsonSpec: any = {
-        default: {
-            apply: stub(),
-        },
+        applyPatch: stub(),
     };
     const bCtrl = proxyquire("../../src/common/base.controller", {
         "fast-json-patch": jsonSpec,
@@ -125,17 +123,17 @@ describe("Base controller class:", function() {
             const ctrl: any = new bCtrl.BaseController(modelStub);
             const data = {data: "test"};
             const path = {data: "test"};
-            jsonSpec.default.apply.callsFake(() => {throw new Error("test"); });
+            jsonSpec.applyPatch.callsFake(() => {throw new Error("test"); });
             expect(ctrl.patchUpdates(path)(data)).to.be.rejectedWith(Error, "test");
         });
         it("It should return Sequelize.Promise resolve if json apply success", function() {
             const ctrl: any = new bCtrl.BaseController(modelStub);
             const data = {data: "test"};
             const path = {data: "test"};
-            jsonSpec.default.apply.callsFake(() => {});
+            jsonSpec.applyPatch.callsFake(() => {});
             modelStub.save.returns(Sequelize.Promise.resolve());
             expect(ctrl.patchUpdates(path)(modelStub)).to.be.fulfilled;
-            expect(jsonSpec.default.apply).to.be.calledWith(modelStub, path, true);
+            expect(jsonSpec.applyPatch).to.be.calledWith(modelStub, path, true);
             expect(modelStub.save).to.be.calledOnce;
         });
     });

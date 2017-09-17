@@ -14,7 +14,7 @@ export default function(): Router {
     // router.get("/:boardId/columns", hasBoardRoles(),  controller.index);
     router.delete("/:id", isAuthenticated(), controller.destroy);
     // router.get("/me", hasProjectRoles(), controller.show);
-    router.put("/:columnId", isAuthenticated(), validateReauest(controller.updateValidator), controller.patch);
+    router.put("/:columnId", isAuthenticated(), validateReauest(controller.updateValidator), controller.updateColumn);
     // router.get("/boards/:id", hasBoardRoles(), controller.show);
     router.post("/" , hasBoardRoles(), validateReauest(controller.createValidator) , controller.create);
     return router;

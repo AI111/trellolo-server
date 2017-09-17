@@ -1,11 +1,9 @@
 /**
  * Created by sasha on 6/21/17.
  */
-import {Instance, Model} from "sequelize";
-import {IUserInstance} from "../user/IUser";
-import {ICardAttributes} from "./ICard";
+import {Instance, Model, Transaction} from "sequelize";
 import {IBoardInstance} from "./IBoard";
-import {IBoardItem} from "../activity/IBoardEvent";
+import {ICardAttributes} from "./ICard";
 
 export interface IColumnAttributes{
     _id?: number;
@@ -19,5 +17,5 @@ export interface IColumnAttributes{
 export interface IColumnInstance  extends Instance<IColumnAttributes>, IColumnAttributes {
     dataValues: IColumnAttributes;
     getMaxBoardPosition(boardId: number): Promise<number>;
-    moveToPosition(position: number): Promise<this>;
+    moveToPosition(position: number, transaction?: Transaction): Promise<this>;
 }

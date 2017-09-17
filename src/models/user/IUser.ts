@@ -19,8 +19,8 @@ export interface IUserAttributes {
     google?: string;
     github?: string;
     projects?: [IProjectAttributes]
-    boards?: [IBoardAttributes],
-    profile?: Object,
+    boards?: [IBoardAttributes];
+    profile?: object,
 }
 
 export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttributes {

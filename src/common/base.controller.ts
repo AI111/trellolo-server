@@ -127,8 +127,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
     protected handleEntityNotFoundSync(res: Response, entity: any) {
 
         if (!entity || (entity instanceof Array && !entity.length)) {
-            res.status(404).end();
-            return null;
+            return res.status(404).end();
         }
         return entity;
     }
@@ -154,7 +153,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
         return (entity) => {
             try {
                 // eslint-disable-next-line prefer-reflect
-                jsonpatch.default.apply(entity, patches, /*validate*/ true);
+                jsonpatch.applyPatch(entity, patches, /*validate*/ true);
             } catch (err) {
                 return Promise.reject(err);
             }
