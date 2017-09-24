@@ -9,15 +9,17 @@ import * as cookieParser from "cookie-parser";
 import * as cors from "cors";
 import * as errorHandler from "errorhandler";
 import {Application} from "express";
-import * as session from "express-session";
 import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
 import * as path from "path";
 import * as shrinkRay from "shrink-ray";
 import * as swaggerUi from "swagger-ui-express";
-import {Config} from "./environment";
-const swaggerDocument = require(path.join(Config.root, "swagger.json"));
+import {config} from "./environment";
+console.log('CONFIG ****** ',config);
+console.log('CONFIG ****** ',process.env.NODE_ENV);
+
+const swaggerDocument = require(path.join(config.root, "swagger.json"));
 
 export function configExpress(app: Application) {
     const env = app.get("env");

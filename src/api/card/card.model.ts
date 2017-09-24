@@ -25,12 +25,13 @@ export class Card extends Sequilize.Model {
 
     /**
      *
-     * @param {number} coumnId
+     * @param columnId
      * @param {number} position
+     * @param t
      * @returns {Promise<Card>}
      */
     public moveTo(columnId: number, position: number, t?: Transaction): Promise<Card> {
-        if ((this.position === position && columnId === this.columnId) || !position) return Sequilize.Promise.resolve(this);
+        if ((this.position === position && columnId === this.columnId) || !position)return Sequilize.Promise.resolve(this);
         if (this.columnId === columnId) {
             return this.updateCard(columnId, position, t);
         } else {
@@ -42,13 +43,13 @@ export class Card extends Sequilize.Model {
     /**
      * change card position in column or remove from column
      * @param {number} columnId
-     * @param {number} position if position undefined then card removed from  column
+     * @param t
      * @returns {Promise<Card>}
      */
     public updateCard(columnId: number,  t?: Transaction): Promise<Card>;
     public updateCard(columnId: number, position?: number, t?: Transaction): Promise<Card>;
     public updateCard(columnId: number, position?: number | Transaction, t?: Transaction): Promise<Card> {
-        if (typeof position !== "number"){
+        if (typeof position !== "number") {
             t = position as Transaction;
             position = undefined;
         }

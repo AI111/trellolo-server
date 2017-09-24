@@ -1,16 +1,9 @@
 /**
  * Created by sasha on 6/25/17.
  */
-import {Response} from "express";
-import {func} from "joi";
 import {spy, stub} from "sinon";
 import * as io from "socket.io-client";
-
-// import {Promise} from 'sequelize'
 import {SuperTest, Test} from "supertest";
-import {Config} from "../src/config/environment";
-import {db} from "../src/sqldb/index";
-
 export const config = {
     projectName: "TEST PROJECT name 777",
     testEmail: "test_email@trellolo.com",

@@ -5,7 +5,7 @@ import * as Joi from "joi";
 import * as jwt from "jsonwebtoken";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
-import {Config as config} from "../../config/environment";
+import {config} from "../../config/environment";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
 import {buildQueryByParams} from "../../common/query.builder";

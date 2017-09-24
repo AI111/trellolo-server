@@ -1,7 +1,7 @@
 "use strict";
 import * as expressJwt from "express-jwt";
 import {sign} from "jsonwebtoken";
-import {Config as config} from "../config/environment";
+import {config} from "../config/environment";
 const  compose  = require("composable-middleware");
 import {NextFunction, Response} from "express";
 import {checkBoardAccessRights, checkBoardUsers} from "../api/board/board.helpers";

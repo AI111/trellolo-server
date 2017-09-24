@@ -2,11 +2,11 @@
  * Created by sasha on 6/22/17.
  */
 
-import {expect, use}  from "chai";
+import {expect, use} from "chai";
 import {stat, unlink} from "fs";
 import * as path from "path";
 import * as request from "supertest";
-import {Config} from "../../../src/config/environment/index";
+import {config as serverConfig} from "../../../src/config/environment/index";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import {config,  getToken} from "../../test.config";
@@ -257,7 +257,7 @@ describe("User API:", function() {
                         avatarPath = user.dataValues.avatar;
                         expect(user.dataValues.name).to.be.equal(config.projectName);
                         expect(user.dataValues.email).to.be.equal(config.testEmail);
-                        stat(path.join(Config.root, user.avatar), (err) => {
+                        stat(path.join(serverConfig.root, user.avatar), (err) => {
                             expect(err).is.null;
                             done();
                         });
@@ -266,7 +266,7 @@ describe("User API:", function() {
                 });
         });
         after(function(done) {
-            unlink(path.join(Config.root, avatarPath), (err) => {
+            unlink(path.join(serverConfig.root, avatarPath), (err) => {
                 if (err)console.error(err);
                 return done();
             });

@@ -4,7 +4,7 @@
  */
 
 "use strict";
-import {Config as config} from "../config/environment";
+import {config as config} from "../config/environment";
 import {ProjectAccessRights} from "../models/team/ITeam";
 import {IUserAttributes, IUserInstance} from "../models/user/IUser";
 import {db} from "./index";

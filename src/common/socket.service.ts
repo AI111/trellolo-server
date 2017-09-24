@@ -4,7 +4,7 @@ import * as SocketIO from "socket.io";
 import * as  redis from "socket.io-redis";
 import * as socketioJwt from "socketio-jwt";
 import {checkBoardAccessRights} from "../api/board/board.helpers";
-import {Config} from "../config/environment";
+import {config} from "../config/environment";
 import {BoardEvent, eventsMap, IBoardEvent, IBoardItem} from "../models/activity/IBoardEvent";
 import {ISocket} from "../models/IExpress";
 
@@ -13,7 +13,7 @@ export class SocketService{
     private io: SocketIO.Server;
     private boards: SocketIO.Namespace;
     private authorize = socketioJwt.authorize({
-        secret: Config.secrets.session,
+        secret: config.secrets.session,
         handshake: true,
     });
     public init(server: http.Server) {

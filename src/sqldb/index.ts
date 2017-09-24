@@ -5,7 +5,7 @@
 "use strict";
 
 import * as Sequelize from "sequelize";
-import {Config as config} from "../config/environment/index";
+import {config as config} from "../config/environment/index";
 import {IActivityAttributes, IActivityInstance} from "../models/activity/IActivity";
 import {IActivityMessageAttributes, IActivityMessageInstance} from "../models/activity/IActivityMessage";
 import {IBoardAttributes, IBoardInstance} from "../models/board/IBoard";

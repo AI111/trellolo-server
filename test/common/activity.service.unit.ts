@@ -51,13 +51,13 @@ describe("Check activity.service.model", function() {
     describe("check function normalizeObject", () => {
         it("should object without Date objects", () => {
             const obj = {
-                date: new Date("1995-12-17T03:24:00"),
+                date: new Date("Sun, 24 Sep 2017 19:42:14 GMT"),
                 text: "test field",
                 number: 1,
                 boolean: true,
             };
             expect(activityService.normalizeObject(obj)).to.be.deep.equal({
-                date: "Sun, 17 Dec 1995 01:24:00 GMT" ,
+                date: "Sun, 24 Sep 2017 19:42:14 GMT" ,
                 text: "test field",
                 number: 1,
                 boolean: true,
