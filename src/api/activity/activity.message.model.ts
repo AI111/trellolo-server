@@ -22,6 +22,7 @@ export default function(sequelize, DataTypes) {
         },
     }, {
         sequelize,
+        timestamps: false,
     });
     return ActivityMessage;
 }

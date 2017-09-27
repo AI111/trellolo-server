@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-      return queryInterface.bulkInsert('Activitys', [
+      return queryInterface.bulkInsert('ActivityMessages', [
           {
               _id: 1,
               message: "Create new Column",
@@ -26,7 +26,7 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-      return queryInterface.bulkDelete('Activitys', null, {});
+      return queryInterface.bulkDelete('ActivityMessages', null, {});
 
   }
 };
