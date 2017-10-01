@@ -29,19 +29,20 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
+        const t = await db.connection.transaction();
         try {
             const column = await this.entity.findById(req.params.columnId);
             await checkBoardAccessRights(req.user._id, column.boardId);
             this.handleEntityNotFoundSync(res, column);
-            const t = await db.connection.transaction();
             const prevState = {...column.dataValues} as IBoardItem;
             await column.moveToPosition(req.body.position, t);
             await column.updateAttributes(req.body, {transaction: t});
-            await saveActivity(req, ActivityMessagesEnum.UPDATE_COLUMN, column,prevState);
+            await saveActivity(req, ActivityMessagesEnum.UPDATE_COLUMN, column, prevState);
             notify.emmitEventSync(req, column, prevState);
-            t.commit();
+            await t.commit();
             this.respondWithResultSync(res, column);
         } catch (e) {
+            await t.rollback();
             this.handleErrorSync(res, e);
         }
     }

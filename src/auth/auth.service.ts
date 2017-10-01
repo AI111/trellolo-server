@@ -67,11 +67,13 @@ export function hasRole(roleRequired) {
             }
         });
 }
-export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"]): NextFunction{
+export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"],
+                                clb?: (req: Request) => number): NextFunction {
     return compose()
         .use(isAuthenticated())
         .use((req: Request, res: Response, next: NextFunction) => {
-            req.projectId = req.headers.project || req.params.projectId || req.params.project || req.body.projectId;
+            req.projectId = (clb && clb(req)) || req.headers.project
+                || req.params.projectId || req.params.project || req.body.projectId;
             if (!req.projectId) return res.status(403).json({message: "Forbidden"});
             checkProjectAccessRights(req.user._id, req.projectId, roles)
                 .then(() => next())
@@ -80,11 +82,13 @@ export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin",
                 });
         });
 }
-export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"]): NextFunction{
+export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"],
+                              clb?: (req: Request) => number): NextFunction{
     return compose()
         .use(isAuthenticated())
         .use((req: Request, res: Response, next: NextFunction) => {
-            const boardId = req.headers.board || req.params.boardId || req.params.id || req.body.boardId;
+            const boardId = (clb && clb(req)) || req.headers.board
+                || req.params.boardId || req.params.id || req.body.boardId;
             if (!boardId) return res.status(403).json({message: "boardId is required field"});
             checkBoardAccessRights(req.user._id, boardId, roles)
                 .then(() => next())

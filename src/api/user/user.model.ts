@@ -27,6 +27,14 @@ export class User extends Sequilize.Model{
             foreignKey: "userId",
             as: "boards",
         });
+        User.belongsToMany(models.Room, {
+            through: {
+                model: models.UserToRoom,
+                unique: false,
+            },
+            foreignKey: "userId",
+            as: "rooms",
+        });
     }
     /**
      * Authenticate - check if the passwords are the same

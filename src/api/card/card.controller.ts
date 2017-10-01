@@ -40,19 +40,20 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
+        const t = await db.connection.transaction();
         try {
             let card = await this.entity.findById(req.params.cardId);
             await checkBoardAccessRights(req.user._id, card.dataValues.boardId);
             this.handleEntityNotFoundSync(res, card);
-            const t = await db.connection.transaction();
             const prevState = {...card.dataValues} as IBoardItem;
             card = await card.moveTo(req.body.columnId, req.body.position, t);
             await card.updateAttributes(req.body, {transaction: t});
             await saveActivity(req, msg.UPDATE_CARD, card, prevState);
             notify.emmitEventSync(req, card, prevState);
-            t.commit();
+            await t.commit();
             this.respondWithResultSync(res, card);
         } catch (e) {
+            await t.rollback();
             this.handleErrorSync(res, e);
         }
     }
