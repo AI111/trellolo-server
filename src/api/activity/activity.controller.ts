@@ -15,8 +15,16 @@ export class ActivityController extends BaseController<Sequelize.Model<IActivity
     constructor() {
         super(db.Activity);
     }
-        // public index = (req: Request, res: Response) => {
-        //
-        // }
+    public index = (req: Request, res: Response) => {
+        return this.findWithPagination({
+                where: {
+                    projectId: req.projectId,
+                }
+            },
+            req.query,
+            ["userId", "table", "boardId", "messageId", "projectId"])
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
 }
 export const controller = new ActivityController();

@@ -18,5 +18,6 @@ export function initRouter(app: Application) {
     app.use("/api/invites", require("./api/invite").default());
     app.use("/api/cards", require("./api/card").default());
     app.use("/api/rooms", require("./api/room").default());
+    app.use("/api/activities", require("./api/activity").default());
 
 }

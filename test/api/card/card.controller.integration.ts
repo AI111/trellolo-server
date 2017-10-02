@@ -143,6 +143,7 @@ describe("Card API:", function() {
                         where: {
                             table: db.Card.getTableName(),
                             userId: 1,
+                            projectId: 1,
                             messageId: msg.CREATE_CARD,
                         },
                     })
@@ -322,6 +323,7 @@ describe("Card API:", function() {
                         where: {
                             table: db.Card.getTableName(),
                             tableId: 2,
+                            projectId: 1,
                             userId: 1,
                         },
                         // order: ["createdAt"],
@@ -461,6 +463,7 @@ describe("Card API:", function() {
                             userId: 1,
                             messageId: msg.DELETE_CARD,
                             tableId: 1,
+                            projectId: 1,
                         },
                     })
                         .then((activity) => {

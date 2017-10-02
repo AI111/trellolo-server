@@ -1,14 +1,14 @@
 "use strict";
 import {NextFunction, Response} from "express";
-import {Request} from "../../models/IExpress";
 import * as Joi from "joi";
 import * as jwt from "jsonwebtoken";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
+import {buildQueryByParams} from "../../common/query.builder";
 import {config} from "../../config/environment";
+import {Request} from "../../models/IExpress";
 import {IUserAttributes, IUserInstance} from "../../models/user/IUser";
 import {db} from "../../sqldb";
-import {buildQueryByParams} from "../../common/query.builder";
 
 const debug = require("debug")("test.user.controller");
 
@@ -21,7 +21,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
     });
     public findValidator = Joi.object().keys({
         email: Joi.string().email().required(),
-    })
+    });
     constructor() {
         super(db.User);
     }
@@ -40,7 +40,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
             .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    };
+    }
     /**
      * Creates a new user
      */

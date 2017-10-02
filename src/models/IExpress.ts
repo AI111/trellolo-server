@@ -7,6 +7,7 @@ import {IUserAttributes, IUserInstance} from "./user/IUser";
  */
 export interface Request extends Request{
     projectId?: number;
+    boardId?: number;
     user?: IUserInstance;
     filePath: string;
 }

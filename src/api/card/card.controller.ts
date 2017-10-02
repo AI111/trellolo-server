@@ -43,7 +43,8 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         const t = await db.connection.transaction();
         try {
             let card = await this.entity.findById(req.params.cardId);
-            await checkBoardAccessRights(req.user._id, card.dataValues.boardId);
+            const team = await checkBoardAccessRights(req.user._id, card.dataValues.boardId);
+            req.projectId = team.board.projectId;
             this.handleEntityNotFoundSync(res, card);
             const prevState = {...card.dataValues} as IBoardItem;
             card = await card.moveTo(req.body.columnId, req.body.position, t);
@@ -58,12 +59,13 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         }
     }
     public destroy = (req: Request, res: Response) => {
-        return this.entity.find({
-            where: {
-                _id: req.params.id,
-            },
-        })
+        return this.entity.findById(req.params.id)
             .then(this.handleEntityNotFound(res))
+            .then( async (card) => {
+                const team = await checkBoardAccessRights(req.user._id, card.dataValues.boardId);
+                req.projectId = team.board.projectId;
+                return card;
+            })
             .then(logActivity(req, msg.DELETE_CARD))
             .then(notify.emmitEvent(req))
             .then(this.removeEntity(res))

@@ -91,7 +91,11 @@ export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "
                 || req.params.boardId || req.params.id || req.body.boardId;
             if (!boardId) return res.status(403).json({message: "boardId is required field"});
             checkBoardAccessRights(req.user._id, boardId, roles)
-                .then(() => next())
+                .then((boardToUser) => {
+                    req.projectId = boardToUser.board.projectId;
+                    req.boardId = boardToUser.boardId;
+                    return next();
+                })
                 .catch((err) => {
                     return res.status(err.status || 403).send({message: (err.error || "Forbidden")});
                 });

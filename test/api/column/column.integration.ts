@@ -9,6 +9,7 @@ const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
 import {db} from "../../../src/sqldb/index";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
+import {ActivityMessagesEnum as msg} from "../../../src/models/activity/IActivity";
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -77,14 +78,14 @@ describe("Column API:", () =>  {
                 .expect(422)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal([
-                            {
-                                context: {
-                                    key: "title",
-                                },
-                                message: "\"title\" is required",
-                                path: "title",
-                                type: "any.required",
+                        {
+                            context: {
+                                key: "title",
                             },
+                            message: "\"title\" is required",
+                            path: "title",
+                            type: "any.required",
+                        },
                     ]);
                     done();
                 });
@@ -107,11 +108,36 @@ describe("Column API:", () =>  {
                     done();
                 });
         });
+        it("should create activity if column was created", (done) =>  {
+            httpAgent
+                .post("/api/columns")
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    title: "test board",
+                    boardId: 1,
+                })
+                .expect(200)
+                .end( (err, res) => {
+                    db.Activity.findOne({
+                        where: {
+                            table: db.BoardColumn.getTableName(),
+                            userId: 1,
+                            projectId: 1,
+                            tableId: res.body._id,
+                            messageId: msg.CREATE_COLUMN,
+                        },
+                    })
+                        .then((activity) => {
+                            expect(activity).to.not.be.null;
+                            done();
+                        });
+                });
+        });
     });
     describe("PUT /api/columns/{columnId}", () =>  {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(() =>  {
+        beforeEach(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(httpAgent, "test@example.com", "password"))
                 .then((token) => (tokenValid = token))
@@ -122,7 +148,7 @@ describe("Column API:", () =>  {
                     return err;
                 });
         });
-        after(() =>  {
+        afterEach(() =>  {
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -144,11 +170,11 @@ describe("Column API:", () =>  {
         });
         it("should respond with a 403 when board id is not defined in body", (done) =>  {
             httpAgent
-                .post(`/api/columns`)
+                .put(`/api/columns/5`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
                 .expect(403)
                 .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({message: "boardId is required field"});
+                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});
                     done();
                 });
         });
@@ -211,21 +237,25 @@ describe("Column API:", () =>  {
 
                 });
         });
-        it("should respond with a 200 if new column was created", (done) =>  {
+        it("should create activity if column was updated", (done) =>  {
             httpAgent
-                .post("/api/columns")
+                .put("/api/columns/5")
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
                     title: "test board",
-                    boardId: 1,
                 })
                 .expect(200)
-                .end((err, res) => {
-                    expect(res.body).to.containSubset({
-                        title: "test board",
-                        boardId: 1,
-                        position: 6,
-                    });
+                .end( async (err, res) => {
+                    const activity = await db.Activity.findOne({
+                        where: {
+                            table: db.BoardColumn.getTableName(),
+                            userId: 1,
+                            projectId: 1,
+                            tableId: 5,
+                            messageId: msg.UPDATE_COLUMN,
+                        },
+                    })
+                    expect(activity).to.not.be.null;
                     done();
                 });
         });
@@ -233,7 +263,7 @@ describe("Column API:", () =>  {
     describe("DELETE /api/columns/{columnId}", () => {
         let tokenValid: string;
         let tokenInvalid: string;
-        before(() =>  {
+        beforeEach(() =>  {
             return createTestProjectUser()
                 .then(() => getToken(httpAgent, "test@example.com", "password"))
                 .then((token) => (tokenValid = token))
@@ -244,7 +274,7 @@ describe("Column API:", () =>  {
                     return err;
                 });
         });
-        after(() =>  {
+        afterEach(() =>  {
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -272,5 +302,28 @@ describe("Column API:", () =>  {
                         });
                 });
         });
+        it("should create activity if column was updated", (done) =>  {
+            httpAgent
+                .delete("/api/columns/5")
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    title: "test board",
+                })
+                .expect(200)
+                .end( async (err, res) => {
+                    const activity = await db.Activity.findOne({
+                        where: {
+                            table: db.BoardColumn.getTableName(),
+                            userId: 1,
+                            projectId: 1,
+                            tableId: 5,
+                            messageId: msg.DELETE_COLUMN,
+                        },
+                    })
+                    expect(activity).to.not.be.null;
+                    done();
+                });
+        });
+
     });
 });

@@ -21,8 +21,16 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     };
+    /**
+     * Model pagination function
+     * @param {sequelize.FindOptions<any>} options
+     * @param {Object} query
+     * @param {[string] | [ISearchParams]} rules
+     * @param {sequelize.Model<TInstance, TAttributes>} model
+     * @returns {Bluebird<{rows: TInstance[]; count: number; limit?: number; offset?: number}>}
+     */
     public findWithPagination = <TInstance, TAttributes>(options: FindOptions<any>, query: object = {},
-                                                         rules: [string] | [ISearchParams] = [] as [string],
+                                                         rules: string[] | [ISearchParams] = [] as string[],
                                                          model: Sequelize.Model<TInstance, TAttributes> = this.entity):
         Promise<{ rows: TInstance[], count: number, limit?: number, offset?: number }> => {
         options.where = buildQueryByParams(options.where || {}, query, rules);

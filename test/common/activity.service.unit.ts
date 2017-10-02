@@ -42,6 +42,7 @@ describe("Check activity.service.model", function() {
             expect(activityStub.create).to.be.calledWith({
                 userId: 777,
                 messageId: 1,
+                projectId: undefined,
                 table: "test",
                 tableId: 5,
             });
@@ -84,6 +85,7 @@ describe("Check activity.service.model", function() {
             expect(activityStub.create).to.be.calledWith({
                 userId: 777,
                 messageId: 1,
+                projectId: undefined,
                 table: "test",
                 tableId: 5,
                 diff: "test diff",

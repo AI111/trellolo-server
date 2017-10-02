@@ -7,7 +7,9 @@ const Sequilize = require("sequelize");
 export class BoardToUser extends Sequilize.Model{
     static associate(models)  {
         console.log("BoardToUser.associate");
+        BoardToUser.belongsTo(models.Board, {foreignKey: "boardId", as: "board" });
     }
+
 }
 export default function(sequelize, DataTypes) {
     BoardToUser.init({

@@ -1,5 +1,8 @@
 import {db} from "../src/sqldb/index";
 
+export function createTestActivitys(){
+    return
+}
 export function createTestProjectUser() {
     return db.User.bulkCreate([
         {

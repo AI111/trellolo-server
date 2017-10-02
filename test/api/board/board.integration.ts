@@ -18,12 +18,12 @@ use(require("chai-subset"));
 use(require("chai-arrays"));
 
 describe("Board API:", function() {
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening//////////////");
-            done();
-        });
-    });
+    // before((done) => {
+    //     app.default.on("listening", () => {
+    //         console.log("listening//////////////");
+    //         done();
+    //     });
+    // });
 
     this.timeout(5000);
     describe("GET /api/boards/{boardId}", function() {

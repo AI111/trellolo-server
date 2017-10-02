@@ -40,8 +40,8 @@ export const  setBoardUsers = (creator: number, users: [number] = [] as [number]
     };
 }
 export function  checkBoardAccessRights(userId: number, boardId: number,
-                                        roles: [BoardAccessRights] = ["user", "admin", "creator"]): Promise<IBoardToUserInstance[]> {
-    return db.BoardToUser.findAll({
+                                        roles: [BoardAccessRights] = ["user", "admin", "creator"]): Promise<IBoardToUserInstance> {
+    return db.BoardToUser.findOne({
         where: {
             boardId,
             userId,
@@ -49,8 +49,14 @@ export function  checkBoardAccessRights(userId: number, boardId: number,
                 $in: roles,
             },
         },
+        include: [
+            {
+                model: db.Board,
+                as: "board",
+            },
+        ],
     }).then((team) => {
-        if (!team.length) throw new ServerError("Yo not have access rights for using this board", 403);
+        if (!team) throw new ServerError("Yo not have access rights for using this board", 403);
         return team;
     });
 }

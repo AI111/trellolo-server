@@ -2,6 +2,7 @@ import {Instance} from "sequelize";
 import {db} from "../../sqldb/index";
 import {IBoardAttributes} from "../board/IBoard";
 import {IUserAttributes} from "../user/IUser";
+import {IProjectAttributes, IProjectInstance} from "../project/IProject";
 export enum ActivityMessagesEnum {
     CREATE_COLUMN= 1,
     UPDATE_COLUMN= 2,
@@ -24,6 +25,8 @@ export interface IActivityAttributes {
     message?: string;
     boardId?: number;
     board?: IBoardAttributes;
+    projectId?: number;
+    project?: IProjectAttributes;
     table?: string;
     tableId?: number;
     diff?: object;
