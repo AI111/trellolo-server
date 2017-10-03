@@ -1,5 +1,4 @@
-import {format, isString} from "util";
-import {Request} from "../models/IExpress";
+import {format} from "util";
 export interface ISearchParams {
     name: string;
     type: string;
@@ -13,7 +12,6 @@ export function typeParser(type: string, mask: string, value: string): object {
 export function buildQueryByParams( where: object, q: object, searchParams: [ISearchParams] | string[] ): object {
     if (!searchParams.length) return where;
     const query = {};
-    const isString = typeof searchParams[0] === "string";
     if (typeof searchParams[0] === "string") {
         (searchParams as string[]).filter((parameter) => q[parameter])
             .forEach((item: string) => (query[item] = q[item]));
@@ -22,4 +20,11 @@ export function buildQueryByParams( where: object, q: object, searchParams: [ISe
             .forEach((item: ISearchParams) => (query[item.name] = typeParser(item.type, item.format, q[item.name])));
     }
     return Object.assign(where, query);
+}
+export function sortSortParrams(rules: string[], sort: string): string[][] {
+    const desc = sort.charAt(0) === "-";
+    const order = [desc ? sort.substring(1) : sort];
+    if (!rules.includes(order[0])) return null;
+    if (desc) order.push("DESC");
+    return [order];
 }

@@ -73,7 +73,7 @@ export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin",
         .use(isAuthenticated())
         .use((req: Request, res: Response, next: NextFunction) => {
             req.projectId = (clb && clb(req)) || req.headers.project
-                || req.params.projectId || req.params.project || req.body.projectId;
+                || req.params.projectId || req.query.project || req.body.projectId;
             if (!req.projectId) return res.status(403).json({message: "Forbidden"});
             checkProjectAccessRights(req.user._id, req.projectId, roles)
                 .then(() => next())

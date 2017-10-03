@@ -19,10 +19,10 @@ export class ActivityController extends BaseController<Sequelize.Model<IActivity
         return this.findWithPagination({
                 where: {
                     projectId: req.projectId,
-                }
+                },
             },
             req.query,
-            ["userId", "table", "boardId", "messageId", "projectId"])
+            ["userId", "table", "boardId", "messageId"])
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

@@ -10,11 +10,12 @@ const httpAgent: SuperTest<Test> = agent(app.default);
 import * as Promise from "bluebird";
 import {ActivityMessagesEnum as msg} from "../../../src/models/activity/IActivity";
 import {db} from "../../../src/sqldb/index";
-import {cleadDBData, createTestProjectUser} from "../../test.seed";
+import {cleadDBData, createTestActivitys, createTestProjectUser} from "../../test.seed";
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
 use(require("chai-subset"));
+use(require("chai-arrays"));
 
 describe("Activity API:", function() {
     this.timeout(5000);
@@ -30,6 +31,7 @@ describe("Activity API:", function() {
         let socket: SocketIOClient.Socket;
         beforeEach(async () =>  {
             await createTestProjectUser();
+            await createTestActivitys();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
             return ;
@@ -47,87 +49,121 @@ describe("Activity API:", function() {
             httpAgent
                 .get(`/api/activities`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({projectId: 1})
+                .query({project: 1})
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this project"});
                     done();
                 });
         });
-        // it("should respond with a 422 when data not valid", (done) =>  {
-        //     httpAgent
-        //         .post(`/api/rooms`)
-        //         .set("authorization", `Bearer ${tokenValid}`)
-        //         .send({
-        //             projectId: 1,
-        //         })
-        //         .expect(403)
-        //         .end((err, res) => {
-        //             expect(res.body).to.be.deep.equal([
-        //                 {
-        //                     context: {
-        //                         key: "name",
-        //                     },
-        //                     message: "\"name\" is required",
-        //                     path: "name",
-        //                     type: "any.required",
-        //                 },
-        //             ]);
-        //             done();
-        //         });
-        // });
-        // it("should respond with a 403 when users not in same project", (done) =>  {
-        //     httpAgent
-        //         .post(`/api/rooms`)
-        //         .set("authorization", `Bearer ${tokenValid}`)
-        //         .send({
-        //             projectId: 1,
-        //             name: "all chat",
-        //             users: [2, 3],
-        //         })
-        //         .expect(403)
-        //         .end((err, res) => {
-        //             expect(res.body).to.be.deep.equal({
-        //                 message: "This users not assigned to this project",
-        //             });
-        //             done();
-        //         });
-        // });
-        // it("should respond with a 200 when ew room was created", (done) =>  {
-        //     httpAgent
-        //         .post(`/api/rooms`)
-        //         .set("authorization", `Bearer ${tokenValid}`)
-        //         .send({
-        //             projectId: 1,
-        //             name: "all chat",
-        //             users: [3],
-        //         })
-        //         .expect(403)
-        //         .end(async (err, res) => {
-        //             debug(res.body);
-        //             const room = await db.Room.findOne({
-        //                 where: {
-        //                     _id: res.body._id,
-        //                 },
-        //                 include: [
-        //                     {
-        //                         model: db.User,
-        //                         as: "users",
-        //                     },
-        //                 ],
-        //             });
-        //             expect(room).to.not.null;
-        //             expect(room.toJSON()).to.containSubset({
-        //                 name: "all chat",
-        //                 creator: 1,
-        //                 projectId: 1,
-        //                 users: [
-        //                     {_id: 3},
-        //                     {_id: 1},
-        //                 ],
-        //             });
-        //             done();
-        //         });
-        // });
+        it("should respond with a 200 and return data with pagination", (done) =>  {
+            httpAgent
+                .get(`/api/activities`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({project: 1})
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset({
+                        count: 165,
+                        limit: 50,
+                        offset: 0,
+                        rows: [],
+                    });
+                    expect(res.body.rows.length).to.be.equal(50);
+                    expect(res.body.rows.some((el) => el.projectId !== 1)).to.be.false;
+                    done();
+                });
+        });
+        it("should respond with a 200 and return last page", (done) =>  {
+            httpAgent
+                .get(`/api/activities`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({
+                    project: 1,
+                    limit: 50,
+                    offset: 150,
+                })
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset({
+                        count: 165,
+                        limit: 50,
+                        offset: 150,
+                        rows: [],
+                    });
+                    expect(res.body.rows.length).to.be.equal(15);
+                    expect(res.body.rows.some((el) => el.projectId !== 1)).to.be.false;
+                    done();
+                });
+        });
+        it("should respond with a 200 and first filtered page", (done) =>  {
+            httpAgent
+                .get(`/api/activities`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({
+                    project: 1,
+                    table: "cards",
+                    limit: 10,
+                })
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset({
+                        count: 55,
+                        limit: 10,
+                        offset: 0,
+                        rows: [],
+                    });
+                    expect(res.body.rows.length).to.be.equal(10);
+                    expect(res.body.rows.some((el) => el.projectId !== 1)).to.be.false;
+                    expect(res.body.rows.some((el) => el.table === "cards")).to.be.true;
+                    done();
+                });
+        });
+        it("should respond with a 200 and sort results", (done) =>  {
+            httpAgent
+                .get(`/api/activities`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({
+                    project: 1,
+                    limit: 200,
+                    sort: "table",
+                })
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset({
+                        count: 165,
+                        limit: 200,
+                        offset: 0,
+                        rows: [],
+                    });
+                    expect(res.body.rows.map((el) => el.table)).to.be.sorted();
+                    expect(res.body.rows.some((el) => el.projectId !== 1)).to.be.false;
+                    expect(res.body.rows.some((el) => el.table === "cards")).to.be.true;
+                    done();
+                });
+        });
+        it("should respond with a 200 and sort results reverse", (done) =>  {
+            httpAgent
+                .get(`/api/activities`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .query({
+                    project: 1,
+                    limit: 200,
+                    sort: "-table",
+                })
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.containSubset({
+                        count: 165,
+                        limit: 200,
+                        offset: 0,
+                        rows: [],
+                    });
+                    expect(res.body.rows.map((el) => el.table).reverse()).to.be.sorted();
+                    expect(res.body.rows.some((el) => el.projectId !== 1)).to.be.false;
+                    expect(res.body.rows.some((el) => el.table === "cards")).to.be.true;
+                    done();
+                });
+        });
     });
 });

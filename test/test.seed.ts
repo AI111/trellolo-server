@@ -1,7 +1,22 @@
 import {db} from "../src/sqldb/index";
 
-export function createTestActivitys(){
-    return
+export function createTestActivitys() {
+    const tables = ["cards", "column", "boards"];
+    return db.Activity.bulkCreate(
+        [...Array(330).keys()].map((i) => {
+          const id = ((i % 3) + 1);
+          const boardId = ((i % 2) + 1);
+          return {
+            _id: i,
+            userId: id,
+            projectId: boardId,
+            messageId: id,
+            boardId,
+            table: tables[id - 1],
+            tableId: id,
+            };
+        }),
+    );
 }
 export function createTestProjectUser() {
     return db.User.bulkCreate([
@@ -244,6 +259,7 @@ export function cleadDBData() {
         .then(() => db.Project.destroy({where: {}}))
         // .then(() => db.Card.destroy({where: {}}))
         .then(() => db.BoardToUser.destroy({where: {}}))
-        .then(() => db.ActivityMessage.destroy({where: {}}));
+        .then(() => db.ActivityMessage.destroy({where: {}}))
+        .then(() => db.Activity.destroy({where: {}}));
 
 }

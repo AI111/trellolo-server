@@ -8,7 +8,7 @@ import {findValidator} from "./activity.model";
 
 export default function(): Router {
     const router =  Router();
-    router.get("/", hasProjectRoles(), controller.index);
-    router.get("/:id", hasProjectRoles(), validateReauest(findValidator, "query"), controller.show);
+    router.get("/", hasProjectRoles(), validateReauest(findValidator, "query"),  controller.index);
+    router.get("/:id", hasProjectRoles(),  controller.show);
     return router;
 }

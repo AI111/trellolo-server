@@ -7,7 +7,7 @@ import {FindOptions, ValidationError} from "sequelize";
 import * as Sequelize from "sequelize";
 import * as Promise from "bluebird";
 import {ServerError} from "../models/IError";
-import {buildQueryByParams, ISearchParams} from "./query.builder";
+import {buildQueryByParams, ISearchParams, sortSortParrams} from "./query.builder";
 import {string} from "joi";
 const debug = require("debug")("test.base.controller");
 
@@ -34,8 +34,10 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
                                                          model: Sequelize.Model<TInstance, TAttributes> = this.entity):
         Promise<{ rows: TInstance[], count: number, limit?: number, offset?: number }> => {
         options.where = buildQueryByParams(options.where || {}, query, rules);
-        options.limit = query["limit"] || 50;
-        options.offset = query["offset"] || 0;
+        options.limit = parseInt(query["limit"], 10) || 50;
+        options.offset = parseInt(query["offset"], 10) || 0;
+        if(query["sort"] && rules.length
+            && typeof rules[0] === "string") options.order = sortSortParrams(rules as string[], query["sort"]);
         return model.findAndCount(options)
             .then((data: any) => {
                 data.limit = options.limit;

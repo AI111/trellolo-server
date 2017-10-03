@@ -12,6 +12,10 @@ export const findValidator = Joi.object().keys({
     boardId: Joi.number().integer().optional(),
     messageId: Joi.number().integer().optional(),
     projectId: Joi.number().integer().optional(),
+    project: Joi.number().integer().optional(),
+    limit: Joi.number().integer().optional(),
+    offset: Joi.number().integer().optional(),
+    sort: Joi.string().optional(),
 })
 export class Activity extends Sequilize.Model {
     public static associate(models)  {
