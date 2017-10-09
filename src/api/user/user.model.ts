@@ -7,7 +7,7 @@ const authTypes = ["github", "twitter", "facebook", "google"];
 const validatePresenceOf = function(value) {
     return value && value.length;
 };
-export class User extends Sequilize.Model{
+export class User extends Sequilize.Model {
     public static  associate(models)  {
         console.log("User.associate");
 

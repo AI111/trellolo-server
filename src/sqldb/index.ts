@@ -2,6 +2,7 @@
  * Sequelize initialization module
  */
 
+
 "use strict";
 
 import * as Sequelize from "sequelize";
@@ -18,12 +19,14 @@ import {IRoomAttributes, IRoomInstance} from "../models/room/IRoom";
 import {IRoomToUserAttributes, IRoomToUserMessageInstance} from "../models/room/IRoomToUser";
 import {ITeamAttributes, ITeamInstance} from "../models/team/ITeam";
 import {IUserAttributes, IUserInstance} from "../models/user/IUser";
+import {IMessageAttributes, IMessageInstance} from "../models/message/IMessage";
 
-const connection = config.env === "test" && new Sequelize(config.dbConfig.uri, config.dbConfig.options) ||
-    new Sequelize(config.dbConfig.dbName, config.dbConfig.name, config.dbConfig.password,
-        config.dbConfig.options);
+const connection = config.env === "test"
+    && new Sequelize(config.dbConfig.uri, config.dbConfig.options)
+    || new Sequelize(config.dbConfig.dbName, config.dbConfig.name, config.dbConfig.password, config.dbConfig.options);
+
 export class DBConnection {
-    public connection: Sequelize.Sequelize= connection;
+    public connection: Sequelize.Sequelize = connection;
     public Activity: Sequelize.Model<IActivityInstance, IActivityAttributes>= connection.import("../api/activity/activity.model");
     public ActivityMessage: Sequelize.Model<IActivityMessageInstance, IActivityMessageAttributes> = connection.import("../api/activity/activity.message.model");
     public User: Sequelize.Model<IUserInstance, IUserAttributes> =  connection.import("../api/user/user.model");
@@ -36,10 +39,9 @@ export class DBConnection {
     public Invite: Sequelize.Model<ITInviteInstance, IInviteAttributes> = connection.import("../api/invite/invite.model");
     public Room: Sequelize.Model<IRoomInstance, IRoomAttributes> = connection.import("../api/room/room.model");
     public UserToRoom: Sequelize.Model<IRoomToUserMessageInstance, IRoomToUserAttributes> = connection.import("../api/room/user-room.model");
-
-    constructor(){
-        console.log("DBConnection constructor");
-        for (const pr in this){
+    public Message: Sequelize.Model<IMessageInstance, IMessageAttributes> = connection.import("../api/message/message.model");
+    constructor() {
+        for (const pr in this) {
             if ((this[pr] as any).associate)(this[pr] as any).associate(connection.models);
         }
     }

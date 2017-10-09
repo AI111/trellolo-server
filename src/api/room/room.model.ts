@@ -55,7 +55,8 @@ export class Room extends Sequilize.Model {
         return usersModels;
     }
     public async setRoomUsers(users: number[] = [] as number[], tr?: Transaction) {
-        if (!users.includes(this._id))users.push(this.creator);
+        if (!users.includes(this.creatorId))users.push(this.creatorId);
+        console.log(users);
         await db.UserToRoom.bulkCreate(users.map((userId) => ({
                 userId,
                 roomId: this._id,
@@ -77,7 +78,7 @@ export default function(sequelize, types: DataTypes) {
         name: {
             type: types.STRING,
         },
-        creator: {
+        creatorId: {
             type: types.INTEGER,
             references: {
                 model: "Users",

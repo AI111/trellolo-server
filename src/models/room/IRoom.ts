@@ -8,6 +8,7 @@ export interface IRoomAttributes {
     _id?: number;
     name?: string;
     creator?: IUserInstance;
+    creatorId?: number;
     projectId?: number;
     project?: IProjectInstance;
 }

@@ -32,7 +32,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
         card.setDataValue("userId", req.user._id);
         return card.save()
             .then(logActivity(req, msg.CREATE_CARD))
-            .then(notify.emmitEvent(req))
+            .then(notify.board.emmitEvent(req))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
@@ -50,7 +50,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             card = await card.moveTo(req.body.columnId, req.body.position, t);
             await card.updateAttributes(req.body, {transaction: t});
             await saveActivity(req, msg.UPDATE_CARD, card, prevState);
-            notify.emmitEventSync(req, card, prevState);
+            notify.board.emmitEventSync(req, card, prevState);
             await t.commit();
             this.respondWithResultSync(res, card);
         } catch (e) {
@@ -67,7 +67,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
                 return card;
             })
             .then(logActivity(req, msg.DELETE_CARD))
-            .then(notify.emmitEvent(req))
+            .then(notify.board.emmitEvent(req))
             .then(this.removeEntity(res))
             .catch(this.handleError(res));
     }

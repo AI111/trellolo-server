@@ -6,19 +6,37 @@ import {ServerError} from "../../models/IError";
 import {Request} from "../../models/IExpress";
 import {IRoomAttributes, IRoomInstance} from "../../models/room/IRoom";
 import {db} from "../../sqldb/index";
+import {checkUsersOnline} from "./room.helper";
 const debug = require("debug")("test.room.controller");
 
 /**
  * Created by sasha on 6/22/17.
  */
-export class ActivityController extends BaseController<Sequelize.Model<IRoomInstance, IRoomAttributes>> {
+export class RoomController extends BaseController<Sequelize.Model<IRoomInstance, IRoomAttributes>> {
     constructor() {
         super(db.Room);
+    }
+    public show = (req: Request, res: Response) => {
+        return this.entity.findById(req.params.roomId, {
+            include: [
+                {
+                    model: db.User,
+                    as: "users",
+                    attributes: [
+                        "_id", "email", "avatar", "name",
+                    ],
+                },
+            ],
+        })
+            .then(this.handleEntityNotFound(res))
+            .then(checkUsersOnline())
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
     }
     public createRoom = async (req: Request, res: Response) => {
         const tr = await db.connection.transaction();
         try {
-            req.body.creator = req.user._id;
+            req.body.creatorId = req.user._id;
             const room = await db.Room.create(req.body, {transaction: tr});
             await room.checkRoomUsers(req.body.users);
             await room.setRoomUsers(req.body.users, tr);
@@ -30,4 +48,4 @@ export class ActivityController extends BaseController<Sequelize.Model<IRoomInst
         }
     }
 }
-export const controller = new ActivityController();
+export const controller = new RoomController();

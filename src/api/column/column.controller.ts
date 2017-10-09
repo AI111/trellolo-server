@@ -39,7 +39,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
             await column.moveToPosition(req.body.position, t);
             await column.updateAttributes(req.body, {transaction: t});
             await saveActivity(req, ActivityMessagesEnum.UPDATE_COLUMN, column, prevState);
-            notify.emmitEventSync(req, column, prevState);
+            notify.board.emmitEventSync(req, column, prevState);
             await t.commit();
             this.respondWithResultSync(res, column);
         } catch (e) {
@@ -50,7 +50,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
 
     public create = (req: Request, res: Response) => {
         return this.entity.create(req.body, {validate: true})
-            .then(notify.emmitEvent(req))
+            .then(notify.board.emmitEvent(req))
             .then(logActivity(req, ActivityMessagesEnum.CREATE_COLUMN))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
@@ -65,7 +65,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
             })
             .then(this.handleEntityNotFound(res))
             .then(logActivity(req, ActivityMessagesEnum.DELETE_COLUMN))
-            .then(notify.emmitEvent(req))
+            .then(notify.board.emmitEvent(req))
             .then(this.removeEntity(res))
             .catch(this.handleError(res));
     }

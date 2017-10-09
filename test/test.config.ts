@@ -4,6 +4,7 @@
 import {spy, stub} from "sinon";
 import * as io from "socket.io-client";
 import {SuperTest, Test} from "supertest";
+import {RoomUserEvents} from "../src/models/message/IMessage";
 export const config = {
     projectName: "TEST PROJECT name 777",
     testEmail: "test_email@trellolo.com",
@@ -51,6 +52,18 @@ export function getSocketConnection(jwt: string, boardId: number): Promise<Socke
     });
     return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
         socket.emit("join_board", boardId, (status: number, mess: string) => {
+            if (status === 200) return resolve(socket);
+            return reject(socket);
+        });
+    });
+}
+export function getRoomConnection(jwt: string, roomId: number): Promise<SocketIOClient.Socket> {
+    const socket = io.connect(`http://localhost:3000/rooms`, {
+        path: "/sockets",
+        query: `token=${jwt}`,
+    });
+    return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
+        socket.emit(RoomUserEvents.JOIN_ROOM, roomId, (status: number, mess: string) => {
             if (status === 200) return resolve(socket);
             return reject(socket);
         });

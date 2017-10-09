@@ -1,7 +1,7 @@
 import {Instance} from "sequelize";
-import {IProjectInstance} from "../project/IProject";
-import {IUserInstance} from "../user/IUser";
 import {IBoardInstance} from "../board/IBoard";
+import {IUserInstance} from "../user/IUser";
+import {IRoomAttributes} from "./IRoom";
 export type  RoomAccessRights = "user"| "admin" | "creator";
 
 export interface IRoomToUserAttributes {
@@ -9,8 +9,8 @@ export interface IRoomToUserAttributes {
     name?: string;
     userId?: number;
     user?: IUserInstance;
-    boardId?: number;
-    board?: IBoardInstance;
+    roomId?: number;
+    room?: IRoomAttributes;
     accessRights?: RoomAccessRights;
 }
 

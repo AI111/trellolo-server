@@ -9,6 +9,7 @@ import {checkProjectAccessRights} from "../api/project/project.helpers";
 import {Request} from "../models/IExpress";
 import {ProjectAccessRights} from "../models/team/ITeam";
 import {db} from "../sqldb/index";
+import {checkRoomAccessRights} from "../api/message/message.helpers";
 
 const validateJwt = expressJwt({
     secret: config.secrets.session,
@@ -96,6 +97,22 @@ export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "
                     req.boardId = boardToUser.boardId;
                     return next();
                 })
+                .catch((err) => {
+                    return res.status(err.status || 403).send({message: (err.error || "Forbidden")});
+                });
+        });
+}
+export function hasRoomAccess(roles: [ProjectAccessRights] = ["user", "admin", "creator"],
+                              clb?: (req: Request) => number): NextFunction {
+    return compose()
+        .use(isAuthenticated())
+        .use((req: Request, res: Response, next: NextFunction) => {
+            const roomId = (clb && clb(req))
+                || req.params.roomId
+                || req.body.roomId;
+            if (!roomId) return res.status(403).json({message: "boardId is required field"});
+            checkRoomAccessRights(req.user._id, roomId, roles)
+                .then(() => next())
                 .catch((err) => {
                     return res.status(err.status || 403).send({message: (err.error || "Forbidden")});
                 });

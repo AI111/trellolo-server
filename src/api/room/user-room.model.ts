@@ -5,9 +5,14 @@
 import {DataTypes} from "sequelize";
 const Sequilize = require("sequelize");
 export class UserToRoom extends Sequilize.Model {
+    public isUserOnline = false;
     public static associate(models)  {
         console.log("Room-User.associate");
     }
+    get test(){
+        return "dsfsdfsdf";
+    }
+
 }
 
 export default function(sequelize, types: DataTypes) {
@@ -40,6 +45,15 @@ export default function(sequelize, types: DataTypes) {
             type: types.ENUM,
             values: ["user", "admin", "creator"],
             defaultValue: "user",
+        },
+        online: {
+            type: types.VIRTUAL,
+            get() {
+                return this.isUserOnline;
+            },
+            set(val) {
+                this.isUserOnline = val;
+            },
         },
     }, {
         sequelize,
