@@ -61,11 +61,13 @@ export function getRoomConnection(jwt: string, roomId: number): Promise<SocketIO
     const socket = io.connect(`http://localhost:3000/rooms`, {
         path: "/sockets",
         query: `token=${jwt}`,
+        forceNew: true,
     });
     return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
         socket.emit(RoomUserEvents.JOIN_ROOM, roomId, (status: number, mess: string) => {
+            console.log("CONNECT", status, mess);
             if (status === 200) return resolve(socket);
-            return reject(socket);
+            return //re(socket);
         });
     });
 }

@@ -16,6 +16,38 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
     constructor() {
         super(db.Room);
     }
+    public index = (req: Request, res: Response) => {
+        return db.User.find({
+            where: {
+                _id: req.user._id,
+            },
+            include: [
+                {
+                    model: db.Room,
+                    as: "rooms",
+                    through: {
+                        attributes: [],
+                    },
+                    include: [
+                        {
+                            model: db.User,
+                            as: "users",
+                            through: {
+                                attributes: [],
+                            },
+                            attributes: [
+                                "_id", "email", "avatar", "name",
+                            ],
+                        },
+                    ],
+                },
+            ],
+        })
+            .then((user) => user.rooms)
+            .then(this.handleEntityNotFound(res))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
+    }
     public show = (req: Request, res: Response) => {
         return this.entity.findById(req.params.roomId, {
             include: [

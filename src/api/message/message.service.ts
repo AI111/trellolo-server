@@ -52,10 +52,11 @@ export class MessageService {
     private joinToRoom(socket: ISocket) {
         return (roomId: number, clb: (status: number, message: string) => void) => {
             checkRoomAccessRights(socket.decoded_token._id, roomId)
-                .then(() => socket.join(`board/${1}`, (err) => {
+                .then(() => socket.join(`room:${roomId}`, (err) => {
                     if (err) return clb(500, err);
                     return clb(200, "Success");
-                }));
+                }))
+                .catch((err) => clb(err.status, err.error));
         };
     }
     private leaveRoom(socket: ISocket) {

@@ -2,15 +2,16 @@
  * Created by sasha on 6/7/17.
  */
 import {Instance, Model} from "sequelize";
-import {IProjectAttributes} from "../project/IProject";
 import {IBoardAttributes} from "../board/IBoard";
+import {IProjectAttributes} from "../project/IProject";
+import {IRoomAttributes} from "../room/IRoom";
 
 export interface IUserAttributes {
     _id?: number;
     name?: string;
     email?: string;
     role?: string;
-    avatar?:string;
+    avatar?: string;
     password?: string;
     provider?: string;
     salt?: string;
@@ -18,9 +19,10 @@ export interface IUserAttributes {
     twitter?: string;
     google?: string;
     github?: string;
-    projects?: [IProjectAttributes]
+    projects?: [IProjectAttributes];
     boards?: [IBoardAttributes];
-    profile?: object,
+    profile?: object;
+    rooms?: IRoomAttributes[];
 }
 
 export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttributes {
@@ -52,7 +54,7 @@ export interface IUserInstance  extends Instance<IUserAttributes>, IUserAttribut
      * @return {String}
      * @api public
      */
-    encryptPassword(password: string, callback: (err:Error, sucess: boolean) => void);
+    encryptPassword(password: string, callback: (err: Error, sucess: boolean) => void);
     /**
      * Update password field
      *

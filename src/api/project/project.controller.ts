@@ -88,6 +88,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                     where: {
                         userId: req.user._id,
                     },
+                    required: true,
                 },
             ],
             order: [

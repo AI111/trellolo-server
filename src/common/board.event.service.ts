@@ -60,7 +60,7 @@ export class BoardEventService {
         return (boardId: number, clb: (status: number, message: string) => void) => {
             checkBoardAccessRights(boardId, socket.decoded_token._id)
                 .then(() => {
-                    socket.join(`board/${1}`, (err) => {
+                    socket.join(`board/${boardId}`, (err) => {
                         if (err) return clb(500, err);
                         return clb(200, "Success");
                     });

@@ -36,7 +36,7 @@ describe("Card API:", function() {
             return socket;
         });
         afterEach(() =>  {
-            socket.off("notify");
+            socket.close();
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -168,7 +168,7 @@ describe("Card API:", function() {
             return tokenInvalid;
         });
         afterEach(async () =>  {
-            socket.off("notify");
+            socket.close();
             return await cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {
@@ -397,7 +397,7 @@ describe("Card API:", function() {
             return socket;
         });
         afterEach(() =>  {
-            socket.off("notify");
+            socket.close();
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) =>  {

@@ -96,6 +96,7 @@ export default function(sequelize, types: DataTypes) {
         },
     }, {
         sequelize,
+        timestamps: false,
     });
     return Room;
 }

@@ -9,7 +9,6 @@ import {config, getRoomConnection, getSocketConnection, getToken} from "../../te
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
 import * as Promise from "bluebird";
-import {ActivityMessagesEnum as msg} from "../../../src/models/activity/IActivity";
 import {db} from "../../../src/sqldb/index";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
@@ -20,12 +19,62 @@ use(require("chai-subset"));
 
 describe("Room API:", function() {
     this.timeout(5000);
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening//////////////");
-    //         done();
-    //     });
-    // });
+    // before((done) => app.default.on("listening", () => done()));
+
+    describe("GET /api/rooms", () => {
+        let tokenValid: string;
+        let tokenInvalid: string;
+        let socket: SocketIOClient.Socket;
+
+        before(async () => {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
+            // socket = await getRoomConnection(tokenInvalid, 3);
+            return;
+        });
+        after(() => {
+            // socket.close();
+            return cleadDBData();
+        });
+        it("should respond with a 401 when not authenticated", (done) => {
+            httpAgent
+                .get("/api/rooms")
+                .expect(401)
+                .end(done);
+        });
+        it("should respond with list of user rooms", (done) => {
+            httpAgent
+                .get(`/api/rooms`)
+                .set("authorization", `Bearer ${tokenInvalid}`)
+                .end((err, res) => {
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.containSubset([
+                        {
+                            _id: 3,
+                            creatorId: 2,
+                            name: "room31",
+                            projectId: 1,
+                            users: [
+                                {
+                                    _id: 2,
+                                    avatar: "uploads/pop.jpg",
+                                    email: "test2@example.com",
+                                    name: "Fake User 2",
+                                },
+                                {
+                                    _id: 3,
+                                    avatar: "uploads/pop.jpg",
+                                    email: "test3@example.com",
+                                    name: "Fake User 3",
+                                },
+                            ],
+                        },
+                    ]);
+                    done();
+                });
+        });
+    });
     describe("GET /api/rooms/:id", () => {
         let tokenValid: string;
         let tokenInvalid: string;
@@ -35,10 +84,11 @@ describe("Room API:", function() {
             await createTestProjectUser();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
-            socket = await getRoomConnection(tokenValid, 1);
+            socket = await getRoomConnection(tokenInvalid, 3);
             return;
         });
         after(() => {
+            // socket.close();
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) => {
@@ -49,9 +99,8 @@ describe("Room API:", function() {
         });
         it("should respond with a 403 when user not have access to edit board", (done) => {
             httpAgent
-                .get(`/api/rooms/2`)
+                .get(`/api/rooms/1`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({projectId: 1})
                 .expect(403)
                 .end((err, res) => {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this room"});
@@ -61,7 +110,7 @@ describe("Room API:", function() {
         it("should return room with users array", (done) => {
             httpAgent
                 .get(`/api/rooms/1`)
-                .set("authorization", `Bearer ${tokenInvalid}`)
+                .set("authorization", `Bearer ${tokenValid}`)
                 .send({projectId: 1})
                 .end((err, res) => {
                     expect(res.status).to.be.equal(200);
@@ -83,10 +132,10 @@ describe("Room API:", function() {
                                 UserToRoom: {
                                     online: false,
                                 },
-                                _id: 2,
+                                _id: 3,
                                 avatar: "uploads/pop.jpg",
-                                email: "test2@example.com",
-                                name: "Fake User 2",
+                                email: "test3@example.com",
+                                name: "Fake User 3",
                             },
                         ],
 
@@ -95,13 +144,38 @@ describe("Room API:", function() {
                 });
         });
         it("should return room with users online", async () => {
-           const res = await httpAgent
-                .get(`/api/rooms/1`)
+            const res = await httpAgent
+                .get(`/api/rooms/3`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .send({projectId: 1})
                 .then();
-                expect(res.status).to.be.equal(200);
-                return;
+            expect(res.status).to.be.equal(200);
+            expect(res.body).to.containSubset({
+                _id: 3,
+                name: "room31",
+                creatorId: 2,
+                projectId: 1,
+                users: [
+                    {
+                        UserToRoom: {
+                            online: true,
+                        },
+                        _id: 2,
+                        avatar: "uploads/pop.jpg",
+                        email: "test2@example.com",
+                        name: "Fake User 2",
+                    }, {
+                        UserToRoom: {
+                            online: false,
+                        },
+                        _id: 3,
+                        avatar: "uploads/pop.jpg",
+                        email: "test3@example.com",
+                        name: "Fake User 3",
+                    },
+                ],
+
+            });
+            return;
         });
 
     });

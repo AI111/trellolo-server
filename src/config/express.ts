@@ -34,26 +34,6 @@ export function configExpress(app: Application) {
     app.use(methodOverride());
     app.use(cookieParser());
     app.use(initialize());
-
-    /**
-     * Lusca - express server security
-     * https://github.com/krakenjs/lusca
-     */
-    // if (env !== "test" && !process.env.SAUCE_USERNAME) {
-    //     app.use(lusca({
-    //         csrf: {
-    //             angular: true,
-    //         },
-    //         xframe: "SAMEORIGIN",
-    //         hsts: {
-    //             maxAge: 31536000, //1 year, in seconds
-    //             includeSubDomains: true,
-    //             preload: true,
-    //         },
-    //         xssProtection: true,
-    //     }));
-    // }
-    //
     if (env === "development" || env === "test") {
         app.use(errorHandler()); // Error handler - has to be last
     }

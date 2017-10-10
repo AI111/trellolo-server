@@ -124,7 +124,7 @@ export function hasRoomAccess(roles: [ProjectAccessRights] = ["user", "admin", "
  */
 export function signToken(id, role) {
     return sign({ _id: id, role } as object, config.secrets.session, {
-        expiresIn: 60 * 60 * 5,
+        expiresIn: 60 * 60 * 12,
     });
 }
 

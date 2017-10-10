@@ -18,6 +18,7 @@ export function checkRoomAccessRights(userId: number,
                 $in: roles,
             },
         },
+        raw: true,
     }).then((team) => {
         if (!team.length) throw new ServerError("Yo not have access rights for editing this room", 403);
         return team;
