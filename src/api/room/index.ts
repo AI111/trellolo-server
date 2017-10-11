@@ -11,6 +11,7 @@ export default function(): Router {
     const router =  Router();
     router.get("/", isAuthenticated(), controller.index);
     router.get("/:roomId", hasRoomAccess(), controller.show);
+    router.delete("/:roomId", hasRoomAccess(), controller.destroy);
     router.post("/", hasProjectRoles(), validateReauest(createValidator),  controller.createRoom);
     return router;
 }

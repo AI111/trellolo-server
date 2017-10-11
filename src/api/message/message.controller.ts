@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import {Response, Response} from "express";
+import {Response} from "express";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {Request} from "../../models/IExpress";
@@ -18,7 +18,8 @@ export class MessageController extends BaseController<Sequelize.Model<IMessageIn
         const message = this.entity.build(req.body);
         message.setDataValue("userId", req.user._id);
         return message.save()
-            .then();
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
     }
 }
 export const controller = new MessageController();

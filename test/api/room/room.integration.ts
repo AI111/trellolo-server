@@ -88,7 +88,7 @@ describe("Room API:", function() {
             return;
         });
         after(() => {
-            // socket.close();
+            socket.close();
             return cleadDBData();
         });
         it("should respond with a 401 when not authenticated", (done) => {
@@ -280,6 +280,36 @@ describe("Room API:", function() {
                             {_id: 1},
                         ],
                     });
+                    done();
+                });
+        });
+    });
+    describe("DELETE /api/rooms/:id", () => {
+        let tokenValid: string;
+        let tokenInvalid: string;
+
+        before(async () => {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
+            return;
+        });
+        after(() => {
+            return cleadDBData();
+        });
+        it("should respond with a 401 when not authenticated", (done) => {
+            httpAgent
+                .get("/api/rooms/3")
+                .expect(401)
+                .end(done);
+        });
+        it("should respond with a 403 when user not have access to edit board", (done) => {
+            httpAgent
+                .get(`/api/rooms/1`)
+                .set("authorization", `Bearer ${tokenInvalid}`)
+                .expect(403)
+                .end((err, res) => {
+                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this room"});
                     done();
                 });
         });

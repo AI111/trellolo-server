@@ -16,8 +16,6 @@ import * as path from "path";
 import * as shrinkRay from "shrink-ray";
 import * as swaggerUi from "swagger-ui-express";
 import {config} from "./environment";
-console.log('CONFIG ****** ',config);
-console.log('CONFIG ****** ',process.env.NODE_ENV);
 
 const swaggerDocument = require(path.join(config.root, "swagger.json"));
 
