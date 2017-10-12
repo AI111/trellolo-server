@@ -4,9 +4,7 @@ import {db} from "../../sqldb/index";
 import {checkRoomAccessRights} from "./message.helpers";
 
 export class MessageService {
-    private room: SocketIO.Namespace;
-    constructor(io: SocketIO.Namespace) {
-        this.room = io;
+    constructor(private room: SocketIO.Namespace) {
         this.room.on("connection", (socket: ISocket) => {
             this.onConnect(socket);
             socket.on("disconnect", () => this.onDisconnect(socket));

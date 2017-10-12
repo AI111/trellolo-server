@@ -1,6 +1,7 @@
 import * as Promise from "bluebird";
 import {Response} from "express";
 import * as Sequelize from "sequelize";
+import {where} from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {ServerError} from "../../models/IError";
 import {Request} from "../../models/IExpress";
@@ -78,6 +79,17 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
             await tr.rollback();
             this.handleErrorSync(res, error);
         }
+    }
+    public getRoomMessages = (req: Request, res: Response) => {
+        return this.findWithPagination({
+            where: {
+                roomId: req.params.roomId,
+            },
+            order: [["createdAt", "DESC"]],
+        }, req.query, [], db.Message)
+            .then(this.handleEntityNotFound(res))
+            .then(this.respondWithResult(res))
+            .catch(this.handleError(res));
     }
 }
 export const controller = new RoomController();
