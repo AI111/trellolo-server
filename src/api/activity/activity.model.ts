@@ -19,7 +19,6 @@ export const findValidator = Joi.object().keys({
 })
 export class Activity extends Sequilize.Model {
     public static associate(models)  {
-        console.log("Activity.associate");
     }
 }
 

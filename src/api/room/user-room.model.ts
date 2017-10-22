@@ -7,7 +7,6 @@ const Sequilize = require("sequelize");
 export class UserToRoom extends Sequilize.Model {
     public isUserOnline = false;
     public static associate(models)  {
-        console.log("Room-User.associate");
     }
     get test(){
         return "dsfsdfsdf";

@@ -2,10 +2,10 @@
  * Created by sasha on 7/12/17.
  */
 import {expect, use} from "chai";
-import {agent, SuperTest, Test} from "supertest";
+import {agent, Response, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {db} from "../../../src/sqldb/index";
-import {getToken} from "../../test.config";
+import {RoomEvents, RoomUserEvents} from "../../../src/models/message/IMessage";
+import {getSocketConnection, getToken, checkAllSockets} from "../../test.config";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 const httpAgent: SuperTest<Test> = agent(app.default);
@@ -17,151 +17,121 @@ use(require("chai-things"));
 use(require("chai-subset"));
 use(require("chai-arrays"));
 
-describe("Board API:", function() {
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening//////////////");
-    //         done();
-    //     });
-    // });
-
+describe("Message API:", function() {
+    // before((done) => app.default.on("listening", () => done()));
     this.timeout(5000);
-    describe("GET /api/boards/{boardId}", function() {
+    describe("POST /api/messages", function() {
         let tokenValid: string;
-        let tokenInvalid: string;
+        let userToken2: string;
+        let socket: SocketIOClient.Socket;
+        let socket2: SocketIOClient.Socket;
         before(async () => {
             await createTestProjectUser();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
-            tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
-            return tokenInvalid;
+            userToken2 = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(tokenValid, 1, RoomUserEvents.JOIN_ROOM, "rooms");
+            socket2 = await getSocketConnection(userToken2, 1, RoomUserEvents.JOIN_ROOM, "rooms");
         });
-        after(function() {
+        after(() => {
+            socket.close();
+            socket2.close();
             return cleadDBData();
         });
-        it("should respond with a 401 when not authenticated", function(done) {
-            httpAgent
-                .get(`/api/boards/1`)
-                .expect(401)
-                .end(done);
+        it("should respond with a 401 when not authenticated",async () => {
+            const resp = await httpAgent
+                .get("/api/messages");
+            expect(resp.status).to.be.equal(401);
         });
-        it("should respond with a 403 when user not have access to edit project", function(done) {
-            httpAgent
-                .get(`/api/boards/1`)
-                .set("authorization", `Bearer ${tokenInvalid}`)
-                .expect(403)
-                .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for using this board"});
-                    done();
-                });
-        });
-        it("should return one board with status 200", function(done) {
-            httpAgent
-                .get(`/api/boards/1`)
-
-                .set("authorization", `Bearer ${tokenValid}`)
-                .expect(200)
-                .end((err, res) => {
-                    // debug("%0",res.body);
-                    expect(res.status).to.be.equal(200);
-                    expect(res.body).to.containSubset(
-                        {
-                            _id: 1,
-                            name: "board 1",
-                            projectId: 1,
-                            description: "description 1",
-                        });
-                    expect(res.body.columns).to.be.an("array").length(5);
-                    expect(res.body.columns.map(c => c.position)).to.be.sorted();
-
-                    expect(res.body.columns[0].cards).to.be.an("array").length(4);
-                    expect(res.body.columns[3].cards).to.be.an("array").length(4);
-                    done();
-                });
-        });
-    });
-    describe("POST /api/boards", function() {
+    })
+    describe("POST /api/messages", function() {
         let tokenValid: string;
-        let tokenInvalid: string;
-        before(function() {
-            return createTestProjectUser()
-                .then(() => getToken(httpAgent, "test@example.com", "password"))
-                .then((token) => (tokenValid = token))
-                .then(() => getToken(httpAgent, "test2@example.com", "password"))
-                .then((token) => (tokenInvalid = token))
-                .catch((err) => {
-                    console.error(err);
-                    return err;
-                });
+        let userToken2: string;
+        let socket: SocketIOClient.Socket;
+        let socket2: SocketIOClient.Socket;
+        before(async () => {
+            await createTestProjectUser();
+            tokenValid = await getToken(httpAgent, "test@example.com", "password");
+            userToken2 = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(tokenValid, 1, RoomUserEvents.JOIN_ROOM, "rooms");
+            socket2 = await getSocketConnection(userToken2, 1, RoomUserEvents.JOIN_ROOM, "rooms");
         });
-        after(function() {
+        after(() => {
+            socket.close();
+            socket2.close();
             return cleadDBData();
         });
-        it("should respond with a 401 when not authenticated", function(done) {
+        it("should respond with a 401 when not authenticated", (done) => {
             httpAgent
-                .post("/api/boards")
+                .post("/api/messages")
                 .expect(401)
                 .end(done);
         });
-        it("should respond with a 403 when user not have access to edit project", function(done) {
+        it("should respond with a 403 when user not have access to save message in room", (done) => {
             httpAgent
-                .post("/api/boards")
-                .set("authorization", `Bearer ${tokenInvalid}`)
+                .post("/api/messages")
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    roomId: 3,
+                    message: "first message",
+                })
                 .expect(403)
                 .end((err, res) => {
-                    expect(res.body).to.be.deep.equal({message: "Forbidden"});
+                    expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this room"});
                     done();
                 });
         });
-        it("should respond with a 422 if board validation failed", function(done) {
-            httpAgent
-                .post("/api/boards")
+        it("should respond with a 422 if board validation failed", async () => {
+            const res: Response = await httpAgent
+                .post("/api/messages")
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
-                    projectId: 1,
-                })
-                .expect(422)
-                .end((err, res) => {
-                    // console.log(res.body);
-                    expect(res.body).to.be.deep.equal([
-                        {
-                            context: {
-                                key: "name",
-                            },
-                            message: "\"name\" is required",
-                            path: "name",
-                            type: "any.required",
-                        },
-                    ]);
-                    done();
+                    roomId: 1,
                 });
+            expect(res.status).to.be.equal(422);
+            expect(res.body).to.be.deep.equal([
+                {
+                    context: {
+                        key: "message",
+                    },
+                    message: "\"message\" is required",
+                    path: "message",
+                    type: "any.required",
+                },
+            ]);
         });
-        it("should respond with a 200 if new board was created", function(done) {
-            httpAgent
-                .post(`/api/boards`)
+        it("should respond with a 200 if new message was created", async () => {
+            const res: Response = await httpAgent
+                .post(`/api/messages`)
                 .set("authorization", `Bearer ${tokenValid}`)
                 .send({
-                    name: "test board",
-                    projectId: 1,
-                })
-                .expect(200)
-                .end((err, res) => {
-                    const boardId: number = res.body._id;
-                    expect(res.body).to.containSubset({
-                        name: "test board",
-                        projectId: 1,
-                    });
-                    db.BoardToUser.findOne({
-                        where: {
-                            userId: 1,
-                            boardId,
-                        },
-                    })
-                        .then((boardToUser) => {
-                            expect(boardToUser).to.not.null;
-                            done();
-                        });
+                    message: "first messge",
+                    roomId: 1,
+                });
+            expect(res.status).to.be.equal(200);
+            expect(res.body).to.containSubset({
+                _id: 1,
+                message: "first messge",
+                roomId: 1,
+                userId: 1,
+            });
+        });
+        it("should notify all users in room by sockets", (done) => {
+            checkAllSockets([socket, socket2], RoomEvents.ADD_MESSAGE, (data) => {
+                expect(data).to.containSubset({
+                    message: "first message shared",
+                    roomId: 1,
+                    userId: 1,
+                });
+            }).then(() => done());
 
-                });
+            httpAgent
+                .post(`/api/messages`)
+                .set("authorization", `Bearer ${tokenValid}`)
+                .send({
+                    message: "first message shared",
+                    roomId: 1,
+                }).end();
+
         });
     });
 

@@ -5,6 +5,7 @@ import {spy, stub} from "sinon";
 import * as io from "socket.io-client";
 import {SuperTest, Test} from "supertest";
 import {RoomUserEvents} from "../src/models/message/IMessage";
+import {date} from "joi";
 export const config = {
     projectName: "TEST PROJECT name 777",
     testEmail: "test_email@trellolo.com",
@@ -23,7 +24,7 @@ export let res: any = {
     json: stub(),
     end: spy(),
 };
-export function timeoutPromise(time: number): Promise<void>{
+export function timeoutPromise(time: number): Promise<void> {
     return new Promise((resolve: () => void, reject: () => void) => {
         setTimeout(resolve, time);
     });
@@ -45,29 +46,39 @@ export function getToken(agent: SuperTest<Test>, email: string, password: string
             });
     });
 }
-export function getSocketConnection(jwt: string, boardId: number): Promise<SocketIOClient.Socket> {
-    const socket = io.connect(`http://localhost:3000/boards`, {
-        path: "/sockets",
-        query: `token=${jwt}`,
-    });
-    return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
-        socket.emit("join_board", boardId, (status: number, mess: string) => {
-            if (status === 200) return resolve(socket);
-            return reject(socket);
-        });
-    });
-}
-export function getRoomConnection(jwt: string, roomId: number): Promise<SocketIOClient.Socket> {
-    const socket = io.connect(`http://localhost:3000/rooms`, {
+
+/**
+ * Create client socket stream
+ * @param {string} jwt
+ * @param {number} id
+ * @param {string} event
+ * @param {string} namespace
+ * @returns {Promise<SocketIOClient.Socket>}
+ */
+export function getSocketConnection(jwt: string,
+                                    id: number,
+                                    event: string = "join_board",
+                                    namespace: string = "boards"): Promise<SocketIOClient.Socket> {
+    const socket = io.connect(`http://localhost:3000/${namespace}`, {
         path: "/sockets",
         query: `token=${jwt}`,
         forceNew: true,
     });
     return new Promise((resolve: (socket: any) => any, reject: (socket: any) => any) => {
-        socket.emit(RoomUserEvents.JOIN_ROOM, roomId, (status: number, mess: string) => {
-            console.log("CONNECT", status, mess);
+        socket.emit(event, id, (status: number, mess: string) => {
             if (status === 200) return resolve(socket);
-            return //re(socket);
+            return reject(socket);
         });
     });
+}
+
+export function checkAllSockets(sockets: SocketIOClient.Socket[], event: string,  clb: (data: any) => void) {
+    return Promise.all(
+        sockets.map((socket) => new Promise((resolve: () => void, reject: () => void) => {
+            socket.on(event, (data) => {
+                clb(data);
+                resolve();
+            });
+        })
+    ));
 }

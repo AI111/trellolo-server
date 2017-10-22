@@ -15,7 +15,7 @@ export class GoogleCaptchaService{
     public verifyCaptcha(token: string): Promise<any>{
         if (!token || !token.length) return Promise.reject("token is not defined");
         return new Promise((resolve: () => void, reject: (resp: any) => void) => {
-            if (config.env === "test" || config.env === "production") return resolve();
+            if (config.env === "test" || config.env === "development") return resolve();
             post(API_URL, {form: {secret: config.secrets.reCaptchaSecrer, response: token}} ,
                 (error, res: RequestResponse, body) => {
                 if (error || !JSON.parse(body).success) return reject(error || body);

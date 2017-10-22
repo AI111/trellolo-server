@@ -47,7 +47,6 @@ describe("Project API:", function() {
                 .expect(200)
                 .expect("Content-Type", /json/)
                 .end((err, res) => {
-                    debug(res.body);
                     expect(res.body).to.containSubset([
                         {
                             _id: 1,

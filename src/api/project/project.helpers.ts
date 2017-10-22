@@ -18,7 +18,7 @@ export function  checkProjectAccessRights(userId: number, projectId: number,
             },
         },
     }).then((team) => {
-        if(!team.length)return Promise.reject(new ServerError("Yo not have access rights for editing this project", 403));
+        if (!team.length) return Promise.reject(new ServerError("Yo not have access rights for editing this project", 403));
         return team;
     });
 }

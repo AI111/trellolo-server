@@ -6,7 +6,6 @@ const Sequilize = require("sequelize");
 
 export class Invite extends Sequilize.Model {
     public static associate(models)  {
-        console.log("Invite.associate");
     }
 }
 export default function(sequelize, DataTypes) {

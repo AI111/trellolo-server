@@ -4,13 +4,13 @@
 import {expect, use} from "chai";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {config, getRoomConnection, getSocketConnection, getToken} from "../../test.config";
+import {RoomUserEvents} from "../../../src/models/message/IMessage";
+import {db} from "../../../src/sqldb/index";
+import {getSocketConnection, getToken} from "../../test.config";
+import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 const debug = require("debug")("test:columns:module");
 const httpAgent: SuperTest<Test> = agent(app.default);
-import * as Promise from "bluebird";
-import {db} from "../../../src/sqldb/index";
-import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -84,7 +84,7 @@ describe("Room API:", function() {
             await createTestProjectUser();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
-            socket = await getRoomConnection(tokenInvalid, 3);
+            socket = await getSocketConnection(tokenInvalid, 3, RoomUserEvents.JOIN_ROOM, "rooms");
             return;
         });
         after(() => {
@@ -247,7 +247,7 @@ describe("Room API:", function() {
                     done();
                 });
         });
-        it("should respond with a 200 when ew room was created", (done) => {
+        it("should respond with a 200 when room was created", (done) => {
             httpAgent
                 .post(`/api/rooms`)
                 .set("authorization", `Bearer ${tokenValid}`)
@@ -258,7 +258,6 @@ describe("Room API:", function() {
                 })
                 .expect(403)
                 .end( async (err, res) => {
-                    debug(res.body);
                     const room = await db.Room.findOne({
                         where: {
                             _id: res.body._id,

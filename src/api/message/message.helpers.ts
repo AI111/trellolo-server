@@ -11,7 +11,8 @@ import {ScocketServiceInstance as notify} from "../../common/socket.service";
  */
 export function checkRoomAccessRights(userId: number,
                                       roomId: number,
-                                      roles: [RoomAccessRights] = ["admin", "creator", "user"]): Promise<IBoardToUserAttributes[]> {
+                                      roles: [RoomAccessRights] = ["admin", "creator", "user"]):
+Promise<IBoardToUserAttributes[]> {
     return db.UserToRoom.findAll({
         where: {
             roomId,

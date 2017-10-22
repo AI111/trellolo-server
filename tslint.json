@@ -11,7 +11,8 @@
         "no-var-requires": false,
         "only-arrow-functions": false,
         "cyclomatic-complexity": [true, 8],
-        "curly": [true, "ignore-same-line"]
+        "curly": [true, "ignore-same-line"],
+        "no-unused-expression": ["allow-fast-null-checks"]
 
     },
     "rulesDirectory": []

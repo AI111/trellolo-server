@@ -110,7 +110,7 @@ export function hasRoomAccess(roles: [ProjectAccessRights] = ["user", "admin", "
             const roomId = (clb && clb(req))
                 || req.params.roomId
                 || req.body.roomId;
-            if (!roomId) return res.status(403).json({message: "boardId is required field"});
+            if (!roomId) return res.status(403).json({message: "roomId is required field"});
             checkRoomAccessRights(req.user._id, roomId, roles)
                 .then(() => next())
                 .catch((err) => {

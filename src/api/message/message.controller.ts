@@ -14,7 +14,7 @@ const debug = require("debug")("test.room.controller");
  */
 export class MessageController extends BaseController<Sequelize.Model<IMessageInstance, IMessageAttributes>> {
     constructor() {
-        super(db.Room);
+        super(db.Message);
     }
 
     public create = (req: Request, res: Response) => {

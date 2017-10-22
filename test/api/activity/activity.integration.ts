@@ -19,12 +19,7 @@ use(require("chai-arrays"));
 
 describe("Activity API:", function() {
     this.timeout(5000);
-    before((done) => {
-        app.default.on("listening", () => {
-            console.log("listening//////////////");
-            done();
-        });
-    });
+    before((done) => app.default.on("listening", () => done()));
     describe("GET /api/activities", () => {
         let tokenValid: string;
         let tokenInvalid: string;

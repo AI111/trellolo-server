@@ -5,35 +5,35 @@ import {checkRoomAccessRights} from "./message.helpers";
 
 export class MessageService {
     constructor(private room: SocketIO.Namespace) {
-        this.room.on("connection", (socket: ISocket) => {
-            this.onConnect(socket);
-            socket.on("disconnect", () => this.onDisconnect(socket));
+        this.room.on("connection", async (socket: ISocket) => {
+            this.joinToMainRoom(socket, socket.decoded_token._id);
             this.setListeners(socket);
+            // await this.onConnect(socket);
+            socket.on("disconnect", () => this.onDisconnect(socket));
         });
     }
 
-    public sendMessageToRoom(roomId: number, method: string, message: any): boolean{
-        return this.room.to(`room:${roomId}`).emit(method, message);
+    public sendMessageToRoom(roomId: number, method: string, message: any): boolean {
+        const roomName = `room:${roomId}`;
+        if (!this.room.adapter.rooms[roomName]) return false;
+        return this.room.to(roomName).emit(method, message);
     }
     public getConnectedUsersId(roomId: number): Set<number> {
-        const a = this.room;
         const socketRoom = this.room.adapter.rooms[`room:${roomId}`];
         return new Set(Object.keys((socketRoom && socketRoom.sockets) || {})
             .map((id) => (this.room.connected[id] as ISocket).decoded_token._id));
     }
-    private onConnect(socket: ISocket) {
+    private async onConnect(socket: ISocket) {
         this.joinToMainRoom(socket, socket.decoded_token._id);
-        db.BoardToUser.findAll({
+        const rooms = await  db.BoardToUser.findAll({
             where: {
                 userId: socket.decoded_token._id,
             },
             raw: true,
-        })
-            .then((rooms) => rooms.forEach((room) =>
-                this.sendMessageToRoom(room._id, RoomEvents.USER_JOIN, socket.decoded_token)));
+        });
+        rooms.forEach((room) => this.sendMessageToRoom(room._id, RoomEvents.USER_JOIN, socket.decoded_token));
     }
     private onDisconnect(socket: ISocket) {
-        this.joinToMainRoom(socket, socket.decoded_token._id);
         db.BoardToUser.findAll({
             where: {
                 userId: socket.decoded_token._id,

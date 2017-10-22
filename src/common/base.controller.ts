@@ -36,7 +36,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
         options.where = buildQueryByParams(options.where || {}, query, rules);
         options.limit = parseInt(query["limit"], 10) || 50;
         options.offset = parseInt(query["offset"], 10) || 0;
-        if(query["sort"] && rules.length
+        if (query["sort"] && rules.length
             && typeof rules[0] === "string") options.order = sortSortParrams(rules as string[], query["sort"]);
         return model.findAndCount(options)
             .then((data: any) => {
