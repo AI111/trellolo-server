@@ -109,7 +109,6 @@ describe("Message API:", function() {
                 });
             expect(res.status).to.be.equal(200);
             expect(res.body).to.containSubset({
-                _id: 1,
                 message: "first messge",
                 roomId: 1,
                 userId: 1,

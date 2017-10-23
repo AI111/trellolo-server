@@ -2,9 +2,8 @@
  * Created by sasha on 7/8/17.
  */
 const Sequilize = require("sequelize");
-
 import {expect, use} from "chai";
-import {Promise} from "sequelize";
+import {Op, Promise} from "sequelize";
 import {spy, stub} from "sinon";
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
@@ -30,7 +29,7 @@ describe("Check card.model", function() {
         ModelStub.update.reset();
         const card: any = new cardCtrl.Card();
         ModelStub.update.returns(Promise.resolve(card));
-        literalStub.callsFake(str => str);
+        literalStub.callsFake((str) => str);
         card.position = 1;
         card.columnId = 1;
         card.boardId = 2;
@@ -54,10 +53,10 @@ describe("Check card.model", function() {
         ModelStub.update.reset();
         const card: any = new cardCtrl.Card();
         ModelStub.update.returns(Promise.resolve(card));
-        literalStub.callsFake(str => str);
+        literalStub.callsFake((str) => str);
         card.position = 1;
         card.columnId = 1;
-        card.boardId = 2
+        card.boardId = 2;
         expect(card.updateCard(2, 3)).to.be.fulfilled;
         expect(ModelStub.update).to.be.calledWith(
             {
@@ -78,7 +77,7 @@ describe("Check card.model", function() {
         ModelStub.update.reset();
         const card: any = new cardCtrl.Card();
         ModelStub.update.returns(Promise.resolve(card));
-        literalStub.callsFake(str => str);
+        literalStub.callsFake((str) => str);
         card.position = 3;
         card.columnId = 1;
         card.boardId = 2;
@@ -102,7 +101,7 @@ describe("Check card.model", function() {
         ModelStub.update.reset();
         const card: any = new cardCtrl.Card();
         ModelStub.update.returns(Promise.resolve(card));
-        literalStub.callsFake(str => str);
+        literalStub.callsFake((str) => str);
         card.position = 7;
         card.columnId = 1;
         card.boardId = 2;

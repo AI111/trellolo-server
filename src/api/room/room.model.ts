@@ -16,6 +16,11 @@ export const createValidator =  Joi.object().keys({
     projectId: Joi.number().integer().required(),
     users: Joi.array().unique().items(Joi.number().integer()).optional(),
 });
+export const retrieveValidator =  Joi.object().keys({
+    messageId: Joi.number().integer().optional(),
+    limit: Joi.number().integer().optional(),
+    offset: Joi.number().integer().optional(),
+});
 export const updateValidator =  Joi.object().keys({
     name: Joi.string().min(1).max(255).optional(),
     projectId: Joi.number().integer().optional(),

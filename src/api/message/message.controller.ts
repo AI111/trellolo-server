@@ -16,7 +16,6 @@ export class MessageController extends BaseController<Sequelize.Model<IMessageIn
     constructor() {
         super(db.Message);
     }
-
     public create = (req: Request, res: Response) => {
         const message = this.entity.build(req.body);
         message.setDataValue("userId", req.user._id);

@@ -1,19 +1,31 @@
-import * as Promise from "bluebird";
 import {Response} from "express";
 import * as Sequelize from "sequelize";
-import {where} from "sequelize";
+import {Op} from "sequelize";
 import {BaseController} from "../../common/base.controller";
-import {ServerError} from "../../models/IError";
 import {Request} from "../../models/IExpress";
 import {IRoomAttributes, IRoomInstance} from "../../models/room/IRoom";
 import {db} from "../../sqldb/index";
 import {checkUsersOnline} from "./room.helper";
+
 const debug = require("debug")("test.room.controller");
 
 /**
  * Created by sasha on 6/22/17.
  */
 export class RoomController extends BaseController<Sequelize.Model<IRoomInstance, IRoomAttributes>> {
+
+    public static async getMessageOffset(req: Request) {
+        if (typeof req.query.messageId  === "undefined") return req.query.offset || 0;
+        const offset = await db.Message.count({
+            where: {
+                roomId: req.params.roomId,
+                _id: {
+                    [Op.lt]:  req.query.messageId,
+                },
+            },
+        });
+        return offset; // Math.max(offset - req.query.limit || 50, 0);
+    }
     constructor() {
         super(db.Room);
     }
@@ -80,16 +92,20 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
             this.handleErrorSync(res, error);
         }
     }
-    public getRoomMessages = (req: Request, res: Response) => {
+
+    public getRoomMessages = async (req: Request, res: Response) => {
+        req.query.offset = await RoomController.getMessageOffset(req);
         return this.findWithPagination({
             where: {
                 roomId: req.params.roomId,
             },
+            raw: true,
             order: [["createdAt", "DESC"]],
         }, req.query, [], db.Message)
             .then(this.handleEntityNotFound(res))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
+
 }
 export const controller = new RoomController();

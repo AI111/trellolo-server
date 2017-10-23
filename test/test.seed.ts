@@ -1,5 +1,6 @@
 import  * as Promise from "bluebird";
 import {db} from "../src/sqldb/index";
+import {IMessageAttributes} from "../src/models/message/IMessage";
 export function createTestActivitys() {
     const tables = ["cards", "column", "boards"];
     return db.Activity.bulkCreate(
@@ -24,10 +25,11 @@ export async function createTestProjectUser() {
     await creteBoardData();
     await createInviteData();
     await createActivityData();
-    return createRoomData();
+    await createRoomData();
+    await createTestMessages();
 }
 
-async function creteBoardData(){
+async function creteBoardData() {
     await db.Team.bulkCreate([
         {
             _id: 1,
@@ -199,7 +201,7 @@ function createInviteData() {
         },
     ]);
 }
-function createProjectData(){
+function createProjectData() {
     return db.Project.bulkCreate([
         {
             _id: 1,
@@ -218,7 +220,7 @@ function createProjectData(){
         },
     ]);
 }
-function createActivityData(){
+function createActivityData() {
     return db.ActivityMessage.bulkCreate([
         {
             _id: 1,
@@ -241,7 +243,7 @@ function createActivityData(){
         },
     ]);
 }
-function createUsersData(){
+function createUsersData() {
     return db.User.bulkCreate([
         {
             _id: 1,
@@ -267,7 +269,7 @@ function createUsersData(){
         },
     ]);
 }
-async function createRoomData(){
+async function createRoomData() {
     await db.Room.bulkCreate([
         {
             _id: 1,
@@ -315,16 +317,30 @@ async function createRoomData(){
         },
     ]);
 }
-export function cleadDBData() {
-    return  db.User.destroy({where: {}})
-        .then(() => db.Invite.destroy({where: {}}))
-        .then(() => db.Team.destroy({where: {}}))
-        .then(() => db.Board.destroy({where: {}}))
-        .then(() => db.Project.destroy({where: {}}))
-        // .then(() => db.Card.destroy({where: {}}))
-        .then(() => db.BoardToUser.destroy({where: {}}))
-        .then(() => db.ActivityMessage.destroy({where: {}}))
-        .then(() => db.Activity.destroy({where: {}}))
-        .then(() => db.Room.destroy({where: {}}));
+
+function createTestMessages(size: number = 100) {
+    const timestamp = new  Date();
+    const messages: IMessageAttributes[] = Array.from(Array(size).keys()).map((index) => ({
+        _id: index,
+        roomId: 1,
+        message: `test message ${index}`,
+        senderId: (index % 2 === 0 ? 1 : 3),
+        createdAt: (new Date(timestamp.getTime() + 5000 * index)),
+        updatedAt: (new Date(timestamp.getTime() + 5000 * index)),
+    }));
+    return db.Message.bulkCreate(messages);
+}
+export async function cleadDBData() {
+        await  db.User.destroy({where: {}});
+        await db.Invite.destroy({where: {}});
+        await db.Team.destroy({where: {}});
+        await db.Board.destroy({where: {}});
+        await db.Project.destroy({where: {}});
+        // await db.Card.destroy({where: {}}))
+        await db.BoardToUser.destroy({where: {}});
+        await db.ActivityMessage.destroy({where: {}});
+        await db.Activity.destroy({where: {}});
+        await db.Room.destroy({where: {}});
+        await db.Message.destroy({where: {}});
 
 }
