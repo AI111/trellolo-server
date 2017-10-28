@@ -36,5 +36,5 @@ export async function expressErrorHeandler(err: any, req: Request, res: Response
     } else if (err instanceof JoiValidationError) {
         res.status(422).json(err.details);
     }
-    next(err);
+     next(err);
 }

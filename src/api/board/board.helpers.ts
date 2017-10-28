@@ -24,7 +24,7 @@ export function checkBoardUsers( projectId: number, users: [number] ){
         },
     })
         .then((usersModels) => {
-            if (users.length !== usersModels.length) return Promise.reject(new ServerError("This users not assigned to this project", 403));
+            if (users.length !== usersModels.length) throw new ServerError("This users not assigned to this project", 403);
             return usersModels;
         });
 }

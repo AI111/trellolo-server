@@ -1,14 +1,14 @@
 /**
  * Created by sasha on 5/12/17.
  */
+import * as Promise from "bluebird";
 import {NextFunction, Request, Response} from "express";
 import * as jsonpatch from "fast-json-patch";
+import {string} from "joi";
 import {FindOptions, ValidationError} from "sequelize";
 import * as Sequelize from "sequelize";
-import * as Promise from "bluebird";
 import {ServerError} from "../models/IError";
 import {buildQueryByParams, ISearchParams, sortSortParrams} from "./query.builder";
-import {string} from "joi";
 const debug = require("debug")("test.base.controller");
 
 export class BaseController<Entity extends Sequelize.Model<any, any>> {
@@ -20,7 +20,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
         return this.entity.findAll()
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
-    };
+    }
     /**
      * Model pagination function
      * @param {sequelize.FindOptions<any>} options
@@ -44,7 +44,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
                 data.offset = options.offset;
                 return data;
             });
-    };
+    }
 // Gets a single Thing from the DB
     public show = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.find({
@@ -58,7 +58,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
     }
 
 // Creates a new Thing in the DB
-    public create = (req: Request, res: Response, next: NextFunction) => {
+    public create = (req: Request, res: Response, next: NextFunction): Promise<any> => {
         return this.entity.create(req.body)
             .then(this.respondWithResult(res, 201))
             .catch(this.handleError(res));
