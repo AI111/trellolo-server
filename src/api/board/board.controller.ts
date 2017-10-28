@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
@@ -21,7 +21,7 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
     constructor() {
         super(db.Board);
     }
-    public show = (req: Request, res: Response) => {
+    public show = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findOne({
             where: {
                 _id: req.params.id,
@@ -47,13 +47,13 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.create(req.body)
             .then(setBoardUsers(req.user._id, req.body.users))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public getColumns = (req: Request, res: Response) => {
+    public getColumns = (req: Request, res: Response, next: NextFunction) => {
         return db.BoardColumn.findAll({
             where: {
                 boardId: req.params.boardId,

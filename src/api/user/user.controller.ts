@@ -28,7 +28,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
     /**
      * Authentication callback
      */
-    public index = (req: Request, res: Response) => {
+    public index = (req: Request, res: Response, next: NextFunction) => {
     return db.User.findAll({
             where: buildQueryByParams({}, req.query, ["email"]),
             attributes: [
@@ -44,7 +44,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
     /**
      * Creates a new user
      */
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         req.body.avatar = (req.file && req.file.path) || req.filePath;
         const User = this.entity.build(req.body);
         User.setDataValue("provider", "local");
@@ -57,7 +57,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
                 return {token, ...User.profile};
             })
             .then(this.respondWithResult(res))
-            .catch(this.handleError(res));
+            .catch(next);
     }
 
     /**
@@ -83,7 +83,7 @@ export class UserController extends BaseController<Sequelize.Model<IUserInstance
     /**
      * Change a users password
      */
-    public changePassword = (req: Request, res: Response) => {
+    public changePassword = (req: Request, res: Response, next: NextFunction) => {
         const userId = req.user._id;
         const oldPass = String(req.body.oldPassword);
         const newPass = String(req.body.newPassword);

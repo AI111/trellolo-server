@@ -2,12 +2,12 @@
  * Created by sasha on 6/10/17.
  */
 
+
 "use strict";
 
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as cors from "cors";
-import * as errorHandler from "errorhandler";
 import {Application} from "express";
 import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
@@ -32,7 +32,7 @@ export function configExpress(app: Application) {
     app.use(methodOverride());
     app.use(cookieParser());
     app.use(initialize());
-    if (env === "development" || env === "test") {
-        app.use(errorHandler()); // Error handler - has to be last
-    }
+    // if (env === "development" || env === "test") {
+    //     app.use(errorHandler()); // Error handler - has to be last
+    // }
 }

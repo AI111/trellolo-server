@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {ServerError} from "../../models/IError";
@@ -16,7 +16,7 @@ export class MessageController extends BaseController<Sequelize.Model<IMessageIn
     constructor() {
         super(db.Message);
     }
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         const message = this.entity.build(req.body);
         message.setDataValue("userId", req.user._id);
         return message.save()
@@ -24,7 +24,7 @@ export class MessageController extends BaseController<Sequelize.Model<IMessageIn
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public path = (req: Request, res: Response) => {
+    public path = (req: Request, res: Response, next: NextFunction) => {
         if (req.body._id) Reflect.deleteProperty(req.body, "_id");
         return this.entity.findById(req.params.id)
             .then(this.handleEntityNotFound(res))

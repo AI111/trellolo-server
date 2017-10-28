@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {logActivity, saveActivity} from "../../common/activity.service";
@@ -25,7 +25,7 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
     constructor() {
         super(db.BoardColumn);
     }
-    public updateColumn = async (req: Request, res: Response) => {
+    public updateColumn = async (req: Request, res: Response, next: NextFunction) => {
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
@@ -48,14 +48,14 @@ export class BoardController extends BaseController<Sequelize.Model<IColumnInsta
         }
     }
 
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.create(req.body, {validate: true})
             .then(notify.board.emmitEvent(req))
             .then(logActivity(req, ActivityMessagesEnum.CREATE_COLUMN))
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public destroy = (req: Request, res: Response) => {
+    public destroy = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findById(req.params.id)
             .then(this.handleEntityNotFound(res))
             .then( async (card) => {

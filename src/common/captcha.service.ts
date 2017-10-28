@@ -9,6 +9,7 @@ import * as debug from "debug";
 import {NextFunction, Request, Response} from "express";
 import {post, RequestResponse} from "request";
 import {config} from "../config/environment";
+import {ServerError} from "../models/IError";
 const API_URL = "https://www.google.com/recaptcha/api/siteverify";
 debug("ts-express:server");
 export class GoogleCaptchaService{
@@ -29,5 +30,5 @@ export const captureServiceInstance = new GoogleCaptchaService();
 export const captchaMiddleware = (req: Request, res: Response, next: NextFunction) => {
     captureServiceInstance.verifyCaptcha(req.body.token)
             .then(() => next())
-            .catch((err) => res.status(403).json({message: "captcha token invalid"}));
+            .catch((err) => next(new ServerError("captcha token invalid", 403)));
 };

@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {buildQueryByParams} from "../../common/query.builder";
@@ -22,7 +22,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
     constructor() {
         super(db.Project);
     }
-    public show = (req: Request, res: Response) => {
+    public show = (req: Request, res: Response, next: NextFunction) => {
         return db.User.findOne({
             where: {
                 _id: req.user._id,
@@ -53,7 +53,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .catch(this.handleError(res));
     }
 
-    public update = (req: Request, res: Response) => {
+    public update = (req: Request, res: Response, next: NextFunction) => {
         if (req.file) req.body.icon = req.file.path;
         if (req.body._id) Reflect.deleteProperty(req.body, "_id");
         return this.entity.find({
@@ -64,10 +64,10 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .then(this.handleEntityNotFound(res))
             .then((project) => project.updateAttributes(req.body, {validate: true}))
             .then(this.respondWithResult(res))
-            .catch(this.handleError(res));
+            .catch(next);
     }
 
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         req.body.icon = (req.file && req.file.path) || req.filePath;
         return db.Project.create(req.body, {validate: true})
             .then((project) => db.Team.create({
@@ -76,9 +76,9 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
                 userId: req.user._id,
             }).then((t) => project))
             .then(this.respondWithResult(res))
-            .catch(this.handleError(res));
+            .catch(next);
     }
-    public latest = (req: Request, res: Response) => {
+    public latest = (req: Request, res: Response, next: NextFunction) => {
         return db.Project.findOne({
             include: [
                 {
@@ -100,7 +100,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public getBoards = (req: Request, res: Response) => {
+    public getBoards = (req: Request, res: Response, next: NextFunction) => {
         return db.User.findOne({
             where: {
                 _id: req.user._id,
@@ -131,7 +131,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public getUsers = (req: Request, res: Response) => {
+    public getUsers = (req: Request, res: Response, next: NextFunction) => {
         return db.User.findAll({
             where: buildQueryByParams({}, req.query, [
                 {type: "$like", name: "email", format: "%%%s%"},

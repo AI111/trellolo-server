@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {logActivity, saveActivity} from "../../common/activity.service";
@@ -27,7 +27,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
     constructor() {
         super(db.Card);
     }
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         const card = this.entity.build(req.body);
         card.setDataValue("userId", req.user._id);
         return card.save()
@@ -36,7 +36,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public updateCard = async (req: Request, res: Response) => {
+    public updateCard = async (req: Request, res: Response, next: NextFunction) => {
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
@@ -58,7 +58,7 @@ export class CardController extends BaseController<Sequelize.Model<ICardInstance
             this.handleErrorSync(res, e);
         }
     }
-    public destroy = (req: Request, res: Response) => {
+    public destroy = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findById(req.params.id)
             .then(this.handleEntityNotFound(res))
             .then( async (card) => {

@@ -16,7 +16,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
 
     }
 
-    public index = (req: Request, res: Response) => {
+    public index = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findAll()
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
@@ -46,7 +46,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
             });
     };
 // Gets a single Thing from the DB
-    public show = (req: Request, res: Response, next?: NextFunction) => {
+    public show = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.find({
             where: {
                 _id: req.params.id,
@@ -58,14 +58,14 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
     }
 
 // Creates a new Thing in the DB
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.create(req.body)
             .then(this.respondWithResult(res, 201))
             .catch(this.handleError(res));
     }
 
 // Updates an existing Thing in the DB
-    public patch = (req: Request, res: Response) => {
+    public patch = (req: Request, res: Response, next: NextFunction) => {
         if (req.body._id) {
             Reflect.deleteProperty(req.body, "_id");
         }
@@ -81,7 +81,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
     }
 
 // Deletes a Thing from the DB
-    public destroy = (req: Request, res: Response) => {
+    public destroy = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.find({
             where: {
                 _id: req.params.id,

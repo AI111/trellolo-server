@@ -7,8 +7,8 @@ import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import { config,  getToken, timeoutPromise} from "../../test.config";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
+import {deleteFiles} from "../../../src/common/utils";
 
-import {deleteFiles} from "../../test.helper";
 const debug = require("debug")("test.project");
 
 use(require("sinon-chai"));

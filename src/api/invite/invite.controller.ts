@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
@@ -21,7 +21,7 @@ export class BoardController extends BaseController<Sequelize.Model<ITInviteInst
     constructor() {
         super(db.Invite);
     }
-    public create = (req: Request, res: Response) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         return db.User.findAll({
             where: {
                 email: {
@@ -42,7 +42,7 @@ export class BoardController extends BaseController<Sequelize.Model<ITInviteInst
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public accept = (req: Request, res: Response) => {
+    public accept = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findById(req.params.id)
             .then( (invite) => {
                 if (invite.userToId !== req.user._id) return Promise.reject(new ServerError("You not have rights to accept this invite", 403));
@@ -57,7 +57,7 @@ export class BoardController extends BaseController<Sequelize.Model<ITInviteInst
             .then(() => res.status(200).end())
             .catch(this.handleError(res));
     }
-    public index = (req: Request, res: Response) => {
+    public index = (req: Request, res: Response, next: NextFunction) => {
         return this.findWithPagination<ITInviteInstance, IInviteAttributes>({
             where: {
                 userToId: req.user._id,

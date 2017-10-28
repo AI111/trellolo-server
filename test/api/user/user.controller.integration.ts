@@ -11,6 +11,7 @@ import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import {config,  getToken} from "../../test.config";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
+import {deleteFiles} from "../../../src/common/utils";
 
 use(require("chai-subset"));
 use(require("chai-as-promised"));
@@ -162,7 +163,7 @@ describe("User API:", function() {
         after(() =>  {
             return cleadDBData();
         });
-        let avatarPath: string ;
+        const avatars: string[] = [] ;
         it("should response with error when token not included", function(done) {
             agent.post("/api/users")
                 .expect(403)
@@ -233,6 +234,7 @@ describe("User API:", function() {
                 .expect(200)
                 .end((err, res) => {
                     expect(res.body.token.length).to.be.equal(139);
+                    avatars.push(res.body.avatar);
                     done();
                 });
         });
@@ -254,7 +256,7 @@ describe("User API:", function() {
                             email: config.testEmail,
                         },
                     }).then((user) => {
-                        avatarPath = user.dataValues.avatar;
+                        avatars.push(user.dataValues.avatar);
                         expect(user.dataValues.name).to.be.equal(config.projectName);
                         expect(user.dataValues.email).to.be.equal(config.testEmail);
                         stat(path.join(serverConfig.root, user.avatar), (err) => {
@@ -265,11 +267,6 @@ describe("User API:", function() {
                     // done();
                 });
         });
-        after(function(done) {
-            unlink(path.join(serverConfig.root, avatarPath), (err) => {
-                if (err)console.error(err);
-                return done();
-            });
-        });
+        after(() => deleteFiles(avatars));
     });
 });

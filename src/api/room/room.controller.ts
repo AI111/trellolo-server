@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Sequelize from "sequelize";
 import {Op} from "sequelize";
 import {BaseController} from "../../common/base.controller";
@@ -29,7 +29,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
     constructor() {
         super(db.Room);
     }
-    public index = (req: Request, res: Response) => {
+    public index = (req: Request, res: Response, next: NextFunction) => {
         return db.User.find({
             where: {
                 _id: req.user._id,
@@ -61,7 +61,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public show = (req: Request, res: Response) => {
+    public show = (req: Request, res: Response, next: NextFunction) => {
         return this.entity.findById(req.params.roomId, {
             include: [
                 {
@@ -78,7 +78,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
-    public createRoom = async (req: Request, res: Response) => {
+    public createRoom = async (req: Request, res: Response, next: NextFunction) => {
         const tr = await db.connection.transaction();
         try {
             req.body.creatorId = req.user._id;
@@ -93,7 +93,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
         }
     }
 
-    public getRoomMessages = async (req: Request, res: Response) => {
+    public getRoomMessages = async (req: Request, res: Response, next: NextFunction) => {
         req.query.offset = await RoomController.getMessageOffset(req);
         return this.findWithPagination({
             where: {

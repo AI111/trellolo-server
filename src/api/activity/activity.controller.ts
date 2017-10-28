@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import {Response} from "express";
+import {NextFunction, Response} from "express";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {ServerError} from "../../models/IError";
@@ -15,7 +15,7 @@ export class ActivityController extends BaseController<Sequelize.Model<IActivity
     constructor() {
         super(db.Activity);
     }
-    public index = (req: Request, res: Response) => {
+    public index = (req: Request, res: Response, next: NextFunction) => {
         return this.findWithPagination({
                 where: {
                     projectId: req.projectId,
