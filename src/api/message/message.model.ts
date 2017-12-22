@@ -29,7 +29,7 @@ export default function(sequelize, types: DataTypes) {
             primaryKey: true,
             autoIncrement: true,
         },
-        senderId: {
+        userId: {
             type: types.INTEGER,
             references: {
                 model: "Users",

@@ -8,7 +8,7 @@ export class MessageService {
         this.room.on("connection", async (socket: ISocket) => {
             this.joinToMainRoom(socket, socket.decoded_token._id);
             this.setListeners(socket);
-            // await this.onConnect(socket);
+            this.onConnect(socket);
             socket.on("disconnect", () => this.onDisconnect(socket));
         });
     }
@@ -23,25 +23,26 @@ export class MessageService {
         return new Set(Object.keys((socketRoom && socketRoom.sockets) || {})
             .map((id) => (this.room.connected[id] as ISocket).decoded_token._id));
     }
-    private async onConnect(socket: ISocket) {
+    private onConnect(socket: ISocket) {
         this.joinToMainRoom(socket, socket.decoded_token._id);
-        const rooms = await  db.BoardToUser.findAll({
-            where: {
-                userId: socket.decoded_token._id,
-            },
-            raw: true,
-        });
-        rooms.forEach((room) => this.sendMessageToRoom(room._id, RoomEvents.USER_JOIN, socket.decoded_token));
-    }
-    private onDisconnect(socket: ISocket) {
-        db.BoardToUser.findAll({
+        db.UserToRoom.findAll({
             where: {
                 userId: socket.decoded_token._id,
             },
             raw: true,
         })
             .then((rooms) => rooms.forEach((room) =>
-                this.sendMessageToRoom(room._id, RoomEvents.USER_LEAVE, socket.decoded_token)));
+                this.sendMessageToRoom(room.roomId, RoomEvents.USER_JOIN, socket.decoded_token)));
+    }
+    private onDisconnect(socket: ISocket) {
+        db.UserToRoom.findAll({
+            where: {
+                userId: socket.decoded_token._id,
+            },
+            raw: true,
+        })
+            .then((rooms) => rooms.forEach((room) =>
+                this.sendMessageToRoom(room.roomId, RoomEvents.USER_LEAVE, socket.decoded_token)));
     }
     private setListeners(socket: ISocket): void {
         socket.on(RoomUserEvents.JOIN_ROOM, this.joinToRoom(socket));

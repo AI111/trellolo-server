@@ -2,13 +2,12 @@
  * Created by sasha on 6/10/17.
  */
 
-
 "use strict";
 
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as cors from "cors";
-import {Application} from "express";
+import * as express from "express";
 import * as  methodOverride from "method-override";
 import * as  morgan from "morgan";
 import {initialize} from "passport";
@@ -19,7 +18,7 @@ import {config} from "./environment";
 
 const swaggerDocument = require(path.join(config.root, "swagger.json"));
 
-export function configExpress(app: Application) {
+export function configExpress(app: express.Application) {
     const env = app.get("env");
     app.use(cors());
     if (env !== "test") {
@@ -32,7 +31,8 @@ export function configExpress(app: Application) {
     app.use(methodOverride());
     app.use(cookieParser());
     app.use(initialize());
-    // if (env === "development" || env === "test") {
-    //     app.use(errorHandler()); // Error handler - has to be last
-    // }
+    if (env === "development" || env === "test") {
+        // app.use(errorHandler()); // Error handler - has to be last
+        app.use("/uploads", express.static("uploads"));
+    }
 }

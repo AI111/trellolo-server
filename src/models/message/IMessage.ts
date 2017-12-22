@@ -9,7 +9,7 @@ import {IUserAttributes} from "../user/IUser";
 export interface IMessageAttributes extends IDBInstance{
     _id?: number;
     message?: string;
-    senderId?: number;
+    userId?: number;
     sender?: IUserAttributes;
     roomId?: number;
     room?: IRoomAttributes;

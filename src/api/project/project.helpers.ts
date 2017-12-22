@@ -7,9 +7,10 @@ import {db} from "../../sqldb";
 /**
  * Created by sasha on 7/8/17.
  */
-export function  checkProjectAccessRights(userId: number,
-                                          projectId: number,
-                                          roles: [ProjectAccessRights] = ["admin", "creator"]): Promise<ITeamAttributes[]> {
+export function checkProjectAccessRights(userId: number,
+                                         projectId: number,
+                                         roles: [ProjectAccessRights]
+                                             = ["admin", "creator"]): Promise<ITeamAttributes[]> {
     return db.Team.findAll({
         where: {
             projectId,

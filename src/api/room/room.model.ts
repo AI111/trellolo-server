@@ -20,6 +20,7 @@ export const retrieveValidator =  Joi.object().keys({
     messageId: Joi.number().integer().optional(),
     limit: Joi.number().integer().optional(),
     offset: Joi.number().integer().optional(),
+    projectId: Joi.number().integer().optional(),
 });
 export const updateValidator =  Joi.object().keys({
     name: Joi.string().min(1).max(255).optional(),

@@ -1,3 +1,4 @@
+import {AnyWhereOptions} from "sequelize";
 import {format} from "util";
 export interface ISearchParams {
     name: string;
@@ -9,7 +10,8 @@ export function typeParser(type: string, mask: string, value: string): object {
     obj[type] =  format(mask, value);
     return obj;
 }
-export function buildQueryByParams( where: object, q: object, searchParams: [ISearchParams] | string[] ): object {
+export function buildQueryByParams( where: object,
+                                    q: object, searchParams: [ISearchParams] | string[] ): AnyWhereOptions | object {
     if (!searchParams.length) return where;
     const query = {};
     if (typeof searchParams[0] === "string") {

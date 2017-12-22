@@ -324,7 +324,7 @@ function createTestMessages(size: number = 100) {
         _id: index,
         roomId: 1,
         message: `test message ${index}`,
-        senderId: (index % 2 === 0 ? 1 : 3),
+        userId: (index % 2 === 0 ? 1 : 3),
         createdAt: (new Date(timestamp.getTime() + 5000 * index)),
         updatedAt: (new Date(timestamp.getTime() + 5000 * index)),
     }));

@@ -1,10 +1,11 @@
 import {NextFunction, Response} from "express";
 import * as Sequelize from "sequelize";
-import {Op} from "sequelize";
+import {AnyWhereOptions, Op} from "sequelize";
 import {BaseController} from "../../common/base.controller";
+import {buildQueryByParams} from "../../common/query.builder";
 import {Request} from "../../models/IExpress";
 import {IRoomAttributes, IRoomInstance} from "../../models/room/IRoom";
-import {db} from "../../sqldb/index";
+import {db} from "../../sqldb";
 import {checkUsersOnline} from "./room.helper";
 
 const debug = require("debug")("test.room.controller");
@@ -38,6 +39,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
                 {
                     model: db.Room,
                     as: "rooms",
+                    where: buildQueryByParams({}, req.query, ["projectId"]) as AnyWhereOptions,
                     through: {
                         attributes: [],
                     },
@@ -56,8 +58,8 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
                 },
             ],
         })
-            .then((user) => user.rooms)
             .then(this.handleEntityNotFound(res))
+            .then((user) => user.rooms)
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }

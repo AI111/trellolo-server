@@ -2,10 +2,11 @@
  * Created by sasha on 8/8/17.
  */
 import {expect, use} from "chai";
+import {token} from "morgan";
 import {agent, SuperTest, Test} from "supertest";
 import * as app from "../../../src/index";
-import {RoomUserEvents} from "../../../src/models/message/IMessage";
-import {db} from "../../../src/sqldb/index";
+import {RoomEvents, RoomUserEvents} from "../../../src/models/message/IMessage";
+import {db} from "../../../src/sqldb";
 import {getSocketConnection, getToken} from "../../test.config";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
 
@@ -26,14 +27,14 @@ describe("Room API:", function() {
         let tokenInvalid: string;
         let socket: SocketIOClient.Socket;
 
-        before(async () => {
+        beforeEach(async () => {
             await createTestProjectUser();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
             // socket = await getRoomConnection(tokenInvalid, 3);
             return;
         });
-        after(() => {
+        afterEach(() => {
             // socket.close();
             return cleadDBData();
         });
@@ -47,7 +48,7 @@ describe("Room API:", function() {
             httpAgent
                 .get(`/api/rooms`)
                 .set("authorization", `Bearer ${tokenInvalid}`)
-                .end((err, res) => {
+                .end( async (err, res) => {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.containSubset([
                         {
@@ -225,18 +226,18 @@ describe("Room API:", function() {
                         rows: [
                             {
                                 _id: 99,
-                                roomId:1,
+                                roomId: 1,
                                 message: "test message 99",
-                                senderId: 3,
+                                userId: 3,
                             },
                             {
                                 _id: 50,
                                 roomId: 1,
                                 message: "test message 50",
-                                senderId: 1,
+                                userId: 1,
                             },
                         ],
-                    })
+                    });
                     expect(res.body.rows.map((el) => el.createdAt).reverse()).to.be.sorted();
                     done();
                 });
@@ -259,18 +260,18 @@ describe("Room API:", function() {
                         rows: [
                             {
                                 _id: 89,
-                                roomId:1,
+                                roomId: 1,
                                 message: "test message 89",
-                                senderId: 3,
+                                userId: 3,
                             },
                             {
                                 _id: 30,
                                 roomId: 1,
                                 message: "test message 30",
-                                senderId: 1,
+                                userId: 1,
                             },
                         ],
-                    })
+                    });
                     expect(res.body.rows.map((el) => el.createdAt).reverse()).to.be.sorted();
                     done();
                 });
@@ -294,57 +295,22 @@ describe("Room API:", function() {
                         rows: [
                             {
                                 _id: 79,
-                                roomId:1,
+                                roomId: 1,
                                 message: "test message 79",
-                                senderId: 3,
+                                userId: 3,
                             },
                             {
                                 _id: 20,
                                 roomId: 1,
                                 message: "test message 20",
-                                senderId: 1,
+                                userId: 1,
                             },
                         ],
-                    })
+                    });
                     expect(res.body.rows.map((el) => el.createdAt).reverse()).to.be.sorted();
                     done();
                 });
         });
-        // it("should return room with users online", async () => {
-        //     const res = await httpAgent
-        //         .get(`/api/rooms/3`)
-        //         .set("authorization", `Bearer ${tokenInvalid}`)
-        //         .then();
-        //     expect(res.status).to.be.equal(200);
-        //     expect(res.body).to.containSubset({
-        //         _id: 3,
-        //         name: "room31",
-        //         creatorId: 2,
-        //         projectId: 1,
-        //         users: [
-        //             {
-        //                 UserToRoom: {
-        //                     online: true,
-        //                 },
-        //                 _id: 2,
-        //                 avatar: "uploads/pop.jpg",
-        //                 email: "test2@example.com",
-        //                 name: "Fake User 2",
-        //             }, {
-        //                 UserToRoom: {
-        //                     online: false,
-        //                 },
-        //                 _id: 3,
-        //                 avatar: "uploads/pop.jpg",
-        //                 email: "test3@example.com",
-        //                 name: "Fake User 3",
-        //             },
-        //         ],
-        //
-        //     });
-        //     return;
-        // });
-
     });
     describe("POST /api/rooms", () => {
         let tokenValid: string;
@@ -478,6 +444,38 @@ describe("Room API:", function() {
                     expect(res.body).to.be.deep.equal({message: "Yo not have access rights for editing this room"});
                     done();
                 });
+        });
+    });
+    describe("Check socket connection events", () => {
+        let user1Token: string;
+        let user2Token: string;
+        let socket: SocketIOClient.Socket;
+        beforeEach(async () => {
+            await createTestProjectUser();
+            user1Token = await getToken(httpAgent, "test@example.com", "password");
+            user2Token = await getToken(httpAgent, "test3@example.com", "password");
+            socket = await getSocketConnection(user1Token, 1, RoomUserEvents.JOIN_ROOM, "rooms");
+            return;
+        });
+        afterEach(() => {
+            socket.close();
+            return cleadDBData();
+        });
+        it("Should emmit event about user join to room", (done) => {
+            socket.on(RoomEvents.USER_JOIN, (user) => {
+                expect(user._id).to.be.equal(3);
+                done();
+            });
+            getSocketConnection(user2Token, 1, RoomUserEvents.JOIN_ROOM, "rooms")
+               .then((s) => s.close());
+        });
+        it("Should emmit event about user left room", (done) => {
+            socket.on(RoomEvents.USER_LEAVE, (user) => {
+                expect(user._id).to.be.equal(3);
+                done();
+            });
+            getSocketConnection(user2Token, 1, RoomUserEvents.JOIN_ROOM, "rooms")
+                .then((s) => s.close());
         });
     });
 });

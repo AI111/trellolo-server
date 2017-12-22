@@ -1,12 +1,12 @@
 import * as Promise from "bluebird";
 import {NextFunction, Response} from "express";
+import * as Joi from "joi";
 import * as Sequelize from "sequelize";
 import {BaseController} from "../../common/base.controller";
 import {buildQueryByParams} from "../../common/query.builder";
 import {Request} from "../../models/IExpress";
 import {IProjectAttributes, IProjectInstance} from "../../models/project/IProject";
 import {db} from "../../sqldb/index";
-import * as Joi from "joi";
 
 const debug = require("debug")("test:project.controller");
 
@@ -17,7 +17,7 @@ const debug = require("debug")("test:project.controller");
 export class ProjectController extends BaseController<Sequelize.Model<IProjectInstance, IProjectAttributes>> {
     public createValidator = Joi.object().keys({
         title: Joi.string().min(2).max(50).required(),
-        description: Joi.string().min(4).max(1000).optional()
+        description: Joi.string().min(4).max(1000).optional(),
     });
     constructor() {
         super(db.Project);
@@ -136,7 +136,7 @@ export class ProjectController extends BaseController<Sequelize.Model<IProjectIn
             where: buildQueryByParams({}, req.query, [
                 {type: "$like", name: "email", format: "%%%s%"},
             ]),
-            attributes:[
+            attributes: [
                 "email",
                 "name",
                 "avatar",

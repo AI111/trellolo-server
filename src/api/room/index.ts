@@ -9,7 +9,7 @@ import {createValidator, retrieveValidator} from "./room.model";
 
 export default function(): Router {
     const router =  Router();
-    router.get("/", isAuthenticated(), controller.index);
+    router.get("/", isAuthenticated(), validateReauest(retrieveValidator, "query"), controller.index);
     router.get("/:roomId", hasRoomAccess(), controller.show);
     router.get("/:roomId/messages", hasRoomAccess(), validateReauest(retrieveValidator, "query"), controller.getRoomMessages);
     router.delete("/:roomId", hasRoomAccess(), controller.destroy);

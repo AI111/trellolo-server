@@ -132,6 +132,7 @@ export class User extends Sequilize.Model {
     }
     get profile(){
             return {
+                _id: this._id,
                 name: this.name,
                 avatar: this.avatar,
                 email: this.email,
