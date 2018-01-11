@@ -15,7 +15,7 @@ const port = normalizePort(process.env.PORT || 3000);
 App.set("port", port);
 
 const server: http.Server = http.createServer(App);
-db.connection.sync({force: true})
+db.connection.sync()
     .then(startServer)
     .catch  (function(err) {
         console.log("Server failed to start due to error: %s", err);

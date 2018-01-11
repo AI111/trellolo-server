@@ -1,26 +1,27 @@
 /**
  * Created by sasha on 6/20/17.
  */
-'use strict';
 
-import {Router} from 'express';
-import {authenticate} from 'passport';
-import {setTokenCookie} from '../auth.service';
+"use strict";
+
+import {Router} from "express";
+import {authenticate} from "passport";
+import {setToken, setTokenCookie} from "../auth.service";
 
 const router = Router();
 
 router
-    .get('/', authenticate('github', {
-        failureRedirect: '/signup',
+    .get("/", authenticate("github", {
+        failureRedirect: "/signup",
         scope: [
-            'profile',
-            'email'
+            "profile",
+            "email",
         ],
-        session: false
+        session: false,
     }))
-    .get('/callback', authenticate('github', {
-        failureRedirect: '/signup',
-        session: false
-    }), setTokenCookie);
+    .get("/callback", authenticate("github", {
+        failureRedirect: "/signup",
+        session: false,
+    }), setToken);
 
 export default router;

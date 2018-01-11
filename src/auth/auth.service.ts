@@ -5,11 +5,11 @@ import {config} from "../config/environment";
 const  compose  = require("composable-middleware");
 import {NextFunction, Response} from "express";
 import {checkBoardAccessRights, checkBoardUsers} from "../api/board/board.helpers";
+import {checkRoomAccessRights} from "../api/message/message.helpers";
 import {checkProjectAccessRights} from "../api/project/project.helpers";
 import {Request} from "../models/IExpress";
 import {ProjectAccessRights} from "../models/team/ITeam";
 import {db} from "../sqldb/index";
-import {checkRoomAccessRights} from "../api/message/message.helpers";
 
 const validateJwt = expressJwt({
     secret: config.secrets.session,
@@ -84,7 +84,7 @@ export function hasProjectRoles(roles: [ProjectAccessRights] = ["user", "admin",
         });
 }
 export function hasBoardRoles(roles: [ProjectAccessRights] = ["user", "admin", "creator"],
-                              clb?: (req: Request) => number): NextFunction{
+                              clb?: (req: Request) => number): NextFunction {
     return compose()
         .use(isAuthenticated())
         .use((req: Request, res: Response, next: NextFunction) => {
@@ -135,7 +135,23 @@ export function setTokenCookie(req, res) {
     if (!req.user) {
         return res.status(404).send("It looks like you aren't logged in, please try again.");
     }
-    let token = signToken(req.user._id, req.user.role);
+    const token = signToken(req.user._id, req.user.role);
     res.cookie("token", token);
     res.redirect("/");
+}
+export function setToken(req, res) {
+    if (!req.user) {
+        return res.status(404).send("It looks like you aren't logged in, please try again.");
+    }
+    const token = signToken(req.user._id, req.user.role);
+    res.type("html")
+        .send(
+        `<html>
+            <script type="text/javascript">
+            console.log("asdasdasdasdasdasd")
+            window.localStorage.setItem('token', '${token}');
+            window.location.replace('/');
+            </script>
+        </html>`).end();
+
 }
