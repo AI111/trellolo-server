@@ -17,11 +17,10 @@ App.set("port", port);
 const server: http.Server = http.createServer(App);
 db.connection.sync()
     .then(startServer)
-    .catch  (function(err) {
+    .catch(function(err) {
         console.log("Server failed to start due to error: %s", err);
     });
-
-function startServer(){
+function startServer() {
     server.listen(port, onListening);
     server.on("error", onError);
     ScocketServiceInstance.init(server);
@@ -35,10 +34,9 @@ function normalizePort(val: number|string): number|string|boolean {
 
 function onError(error: NodeJS.ErrnoException): void {
     if (error.syscall !== "listen") throw error;
-    const bind = (typeof port === "string") ? "Pipe " + port : "Port " + port;
+    const bind = (typeof port === "string") ? `Pipe ${port}` : `Port ${port}`;
     switch (error.code) {
         case "EACCES":
-            console.error(`${bind} requires elevated privileges`);
             process.exit(1);
             break;
         case "EADDRINUSE":
