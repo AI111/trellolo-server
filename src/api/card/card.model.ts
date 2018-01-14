@@ -4,11 +4,24 @@
 
 import {number} from "joi";
 import {Transaction} from "sequelize";
+import * as Joi from "joi";
 
 const Sequilize = require("sequelize");
 const debug = require("debug")("test:card:model");
 
 export class Card extends Sequilize.Model {
+    public static createValidator = Joi.object().keys({
+        description: Joi.string().min(4).max(1000).required(),
+        boardId: Joi.number().integer().required(),
+        columnId: Joi.number().integer().required(),
+        active: Joi.boolean().allow(null),
+    });
+    public static updateValidator = Joi.object().keys({
+        description: Joi.string().min(4).max(1000).optional(),
+        columnId: Joi.number().integer().required(),
+        position: Joi.number().integer().required(),
+        active: Joi.boolean().allow(null),
+    });
     public static associate(models)  {
         console.log("Card.associate");
         Card.belongsTo(models.Board, {foreignKey: "boardId", as: "board" });

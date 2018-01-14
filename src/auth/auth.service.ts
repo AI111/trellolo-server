@@ -45,7 +45,7 @@ export function isAuthenticated() {
                         return res.status(401).json({message: "Forbidden"});
                     }
                     req.user = user;
-                    next();
+                    return next();
                 })
                 .catch((err) => next(err));
         });

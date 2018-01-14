@@ -5,7 +5,7 @@ import * as Promise from "bluebird";
 import {NextFunction, Request, Response} from "express";
 import * as jsonpatch from "fast-json-patch";
 import {string} from "joi";
-import {FindOptions, ValidationError} from "sequelize";
+import {FindOptions, ValidationError, where} from "sequelize";
 import * as Sequelize from "sequelize";
 import {ServerError} from "../models/IError";
 import {buildQueryByParams, ISearchParams, sortSortParrams} from "./query.builder";
@@ -33,7 +33,7 @@ export class BaseController<Entity extends Sequelize.Model<any, any>> {
                                                          rules: string[] | [ISearchParams] = [] as string[],
                                                          model: Sequelize.Model<TInstance, TAttributes> = this.entity):
         Promise<{ rows: TInstance[], count: number, limit?: number, offset?: number }> => {
-        options.where = buildQueryByParams(options.where || {}, query, rules);
+        options.where = buildQueryByParams(options.where || {}, query, rules) as where;
         options.limit = parseInt(query["limit"], 10) || 50;
         options.offset = parseInt(query["offset"], 10) || 0;
         if (query["sort"] && rules.length

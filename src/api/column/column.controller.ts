@@ -14,14 +14,6 @@ import {ActivityMessagesEnum} from "../../models/activity/IActivity";
  * Created by sasha on 6/22/17.
  */
 export class BoardController extends BaseController<Sequelize.Model<IColumnInstance, IColumnAttributes>> {
-    public createValidator = Joi.object().keys({
-        title: Joi.string().min(2).max(30).required(),
-        boardId: Joi.number().integer(),
-    });
-    public updateValidator = Joi.object().keys({
-        title: Joi.string().min(2).max(30).optional(),
-        position: Joi.number().integer().optional(),
-    });
     constructor() {
         super(db.BoardColumn);
     }

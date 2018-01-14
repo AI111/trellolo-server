@@ -82,7 +82,7 @@ module.exports = {
     },
 
     down: function (queryInterface, Sequelize) {
-        return queryInterface.bulkDelete('Projects', null, {})
+        return queryInterface.bulkDelete('Teams', null, {})
             .then(() =>  queryInterface.bulkDelete('Projects', null, {}));
     }
 };

@@ -14,16 +14,6 @@ import {checkBoardAccessRights} from "../board/board.helpers";
  * Created by sasha on 6/22/17.
  */
 export class CardController extends BaseController<Sequelize.Model<ICardInstance, ICardAttributes>> {
-    public createValidator = Joi.object().keys({
-        description: Joi.string().min(4).max(1000).required(),
-        boardId: Joi.number().integer().required(),
-        columnId: Joi.number().integer().required(),
-    });
-    public updateValidator = Joi.object().keys({
-        description: Joi.string().min(4).max(1000).optional(),
-        columnId: Joi.number().integer().required(),
-        position: Joi.number().integer().required(),
-    });
     constructor() {
         super(db.Card);
     }

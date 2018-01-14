@@ -2,10 +2,19 @@
  * Created by sasha on 6/20/17.
  */
 import {Transaction} from "sequelize";
+import * as Joi from "joi";
 
 const Sequilize = require("sequelize");
 
 export class BoardColumn extends Sequilize.Model {
+    public static createValidator = Joi.object().keys({
+        title: Joi.string().min(2).max(30).required(),
+        boardId: Joi.number().integer(),
+    });
+    public static updateValidator = Joi.object().keys({
+        title: Joi.string().min(2).max(30).optional(),
+        position: Joi.number().integer().optional(),
+    });
     public static associate(models) {
         BoardColumn.belongsTo(models.Board, {foreignKey: "boardId", as: "board"});
         BoardColumn.hasMany(models.Card, {foreignKey: "columnId", as: "cards"});

@@ -1,8 +1,4 @@
-/**
- * Created by sasha on 6/22/17.
- */
-
-import {expect, use} from "chai";
+dependedependenciesrt {expect, use} from "chai";
 import {stat, unlink} from "fs";
 import * as path from "path";
 import * as request from "supertest";
@@ -215,7 +211,7 @@ describe("User API:", function() {
                 .field("token", "token")
                 .expect(422)
                 .end((err, res) => {
-                    expect(res.body).to.be.deep.equal([
+                    expect(res.body).to.containSubset([
                         {
                             message: "The specified email address is already in use.",
                             path: "email",
