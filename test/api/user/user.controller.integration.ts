@@ -1,13 +1,13 @@
-dependedependenciesrt {expect, use} from "chai";
+import {expect, use} from "chai";
 import {stat, unlink} from "fs";
 import * as path from "path";
 import * as request from "supertest";
+import {deleteFiles} from "../../../src/common/utils";
 import {config as serverConfig} from "../../../src/config/environment/index";
 import * as app from "../../../src/index";
 import {db} from "../../../src/sqldb";
 import {config,  getToken} from "../../test.config";
 import {cleadDBData, createTestProjectUser} from "../../test.seed";
-import {deleteFiles} from "../../../src/common/utils";
 
 use(require("chai-subset"));
 use(require("chai-as-promised"));
@@ -17,13 +17,6 @@ const debug = require("debug")("test.user.controller.integration");
 
 describe("User API:", function() {
     let user;
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening//////////////");
-    //         done();
-    //     });
-    // });
-    // Clear users before testing
 
     describe("GET /api/users", () => {
         let user1Token: string;
