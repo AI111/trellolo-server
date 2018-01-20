@@ -12,11 +12,11 @@ export interface Request extends Request{
     user?: IUserInstance;
     filePath: string;
 }
-export interface CustomRedisAdaptor extends RedisAdapter{
-    clients(clb: (err, clients) => void): void;
+export interface CustomRedisAdaptor extends RedisAdapter {
+    clients(rooms: string[], callback: (err: any, clients: string[]) => void): void;
+    clients(callback: (err: any, clients: string[]) => void): void;
 }
-export interface ISocket extends SocketIO.Socket{
+export interface ISocket extends SocketIO.Socket {
     decoded_token: IUserAttributes;
     adapter: CustomRedisAdaptor;
-
 }

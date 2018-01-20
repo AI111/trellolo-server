@@ -5,7 +5,7 @@ import {BaseController} from "../../common/base.controller";
 import {IActivityAttributes, IActivityInstance} from "../../models/activity/IActivity";
 import {ServerError} from "../../models/IError";
 import {Request} from "../../models/IExpress";
-import {db} from "../../sqldb/index";
+import {db} from "../../sqldb";
 const debug = require("debug")("test.invite.controller");
 
 /**
