@@ -18,12 +18,7 @@ use(require("chai-subset"));
 
 describe("Card API:", function() {
     this.timeout(5000);
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening//////////////");
-    //         done();
-    //     });
-    // });
+    // before((done) => app.default.on("listening", () => done()));
     describe("POST /api/cards", () => {
         let tokenValid: string;
         let tokenInvalid: string;

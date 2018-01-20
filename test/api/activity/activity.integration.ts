@@ -10,7 +10,7 @@ const httpAgent: SuperTest<Test> = agent(app.default);
 import * as Promise from "bluebird";
 import {ActivityMessagesEnum as msg} from "../../../src/models/activity/IActivity";
 import {db} from "../../../src/sqldb/index";
-import {cleadDBData, createTestActivitys, createTestProjectUser} from "../../test.seed";
+import {cleadDBData, createTestActivates, createTestProjectUser} from "../../test.seed";
 use(require("sinon-chai"));
 use(require("chai-as-promised"));
 use(require("chai-things"));
@@ -26,7 +26,7 @@ describe("Activity API:", function() {
         let socket: SocketIOClient.Socket;
         beforeEach(async () =>  {
             await createTestProjectUser();
-            await createTestActivitys();
+            await createTestActivates();
             tokenValid = await getToken(httpAgent, "test@example.com", "password");
             tokenInvalid = await getToken(httpAgent, "test2@example.com", "password");
             return ;

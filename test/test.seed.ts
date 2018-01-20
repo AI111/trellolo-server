@@ -1,7 +1,7 @@
-import  * as Promise from "bluebird";
+import * as Promise from "bluebird";
 import {db} from "../src/sqldb/index";
 import {IMessageAttributes} from "../src/models/message/IMessage";
-export function createTestActivitys() {
+export function createTestActivates() {
     const tables = ["cards", "column", "boards"];
     return db.Activity.bulkCreate(
         [...Array(330).keys()].map((i) => {

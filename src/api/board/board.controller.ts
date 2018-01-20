@@ -37,6 +37,16 @@ export class BoardController extends BaseController<Sequelize.Model<IBoardInstan
                         } ,
                     ],
                 },
+                {
+                    model: db.User,
+                    as: "users",
+                    attributes: [
+                        "name", "email", "avatar", "_id",
+                    ],
+                    through: {
+                        attributes: [],
+                    },
+                },
             ],
             order:  [
                 [{model: db.BoardColumn, as: "columns"}, "position"],

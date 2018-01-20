@@ -18,13 +18,7 @@ use(require("chai-subset"));
 use(require("chai-arrays"));
 
 describe("Board API:", function() {
-    // before((done) => {
-    //     app.default.on("listening", () => {
-    //         console.log("listening//////////////");
-    //         done();
-    //     });
-    // });
-
+    // before((done) => app.default.on("listening", () => done()));
     this.timeout(5000);
     describe("GET /api/boards/{boardId}", function() {
         let tokenValid: string;
@@ -70,8 +64,10 @@ describe("Board API:", function() {
                             projectId: 1,
                             description: "description 1",
                         });
+                    expect(res.body.users).to.containSubset([
+                        {name: "Fake User"}]);
                     expect(res.body.columns).to.be.an("array").length(5);
-                    expect(res.body.columns.map(c => c.position)).to.be.sorted();
+                    expect(res.body.columns.map((c) => c.position)).to.be.sorted();
 
                     expect(res.body.columns[0].cards).to.be.an("array").length(4);
                     expect(res.body.columns[3].cards).to.be.an("array").length(4);
@@ -89,7 +85,6 @@ describe("Board API:", function() {
                 .then(() => getToken(httpAgent, "test2@example.com", "password"))
                 .then((token) => (tokenInvalid = token))
                 .catch((err) => {
-                    console.error(err);
                     return err;
                 });
         });
