@@ -1,6 +1,6 @@
 #!/bin/sh
 npm install
-npm i mysql2
+npm i pg@6 pg-hstore
 npm run build
 #npm run test
 #npm run test:integration

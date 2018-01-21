@@ -27,19 +27,27 @@ const connection = config.env === "test"
 
 export class DBConnection {
     public connection: Sequelize.Sequelize = connection;
-    public Activity: Sequelize.Model<IActivityInstance, IActivityAttributes>= connection.import("../api/activity/activity.model");
-    public ActivityMessage: Sequelize.Model<IActivityMessageInstance, IActivityMessageAttributes> = connection.import("../api/activity/activity.message.model");
+    public Activity: Sequelize.Model<IActivityInstance, IActivityAttributes> =
+        connection.import("../api/activity/activity.model");
+    public ActivityMessage: Sequelize.Model<IActivityMessageInstance, IActivityMessageAttributes> =
+        connection.import("../api/activity/activity.message.model");
     public User: Sequelize.Model<IUserInstance, IUserAttributes> =  connection.import("../api/user/user.model");
-    public Project: Sequelize.Model<IProjectInstance, IProjectAttributes> = connection.import("../api/project/project.model");
+    public Project: Sequelize.Model<IProjectInstance, IProjectAttributes> =
+        connection.import("../api/project/project.model");
     public Board: Sequelize.Model<IBoardInstance, IBoardAttributes> =  connection.import("../api/board/board.model");
-    public BoardToUser: Sequelize.Model<IBoardToUserInstance, IBoardToUserAttributes> = connection.import("../api/board/board-user.model");
-    public BoardColumn: Sequelize.Model<IColumnInstance, IColumnAttributes> = connection.import("../api/column/column.model");
+    public BoardToUser: Sequelize.Model<IBoardToUserInstance, IBoardToUserAttributes> =
+        connection.import("../api/board/board-user.model");
+    public BoardColumn: Sequelize.Model<IColumnInstance, IColumnAttributes> =
+        connection.import("../api/column/column.model");
     public Card: Sequelize.Model<ICardInstance, ICardAttributes> =  connection.import("../api/card/card.model");
     public Team: Sequelize.Model<ITeamInstance, ITeamAttributes> =  connection.import("../api/team/team.model");
-    public Invite: Sequelize.Model<ITInviteInstance, IInviteAttributes> = connection.import("../api/invite/invite.model");
+    public Invite: Sequelize.Model<ITInviteInstance, IInviteAttributes> =
+        connection.import("../api/invite/invite.model");
     public Room: Sequelize.Model<IRoomInstance, IRoomAttributes> = connection.import("../api/room/room.model");
-    public UserToRoom: Sequelize.Model<IRoomToUserMessageInstance, IRoomToUserAttributes> = connection.import("../api/room/user-room.model");
-    public Message: Sequelize.Model<IMessageInstance, IMessageAttributes> = connection.import("../api/message/message.model");
+    public UserToRoom: Sequelize.Model<IRoomToUserMessageInstance, IRoomToUserAttributes> =
+        connection.import("../api/room/user-room.model");
+    public Message: Sequelize.Model<IMessageInstance, IMessageAttributes> =
+        connection.import("../api/message/message.model");
     constructor() {
         for (const pr in this) {
             if ((this[pr] as any).associate)(this[pr] as any).associate(connection.models);

@@ -12,12 +12,12 @@ const config: IConfig = {
     },
     dbConfig: {
         dbName: "trellolo-prod",
-        name: "root",
+        name: "sasha",
         password: "hello",
         options: {
             host: "localhost",
-            port: 3306,
-            dialect: "mysql",
+            port: 5432,
+            dialect: "postgres",
             logging: console.log,
         },
     },
