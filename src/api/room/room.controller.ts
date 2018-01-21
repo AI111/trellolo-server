@@ -59,7 +59,7 @@ export class RoomController extends BaseController<Sequelize.Model<IRoomInstance
             ],
         })
             .then(this.handleEntityNotFound(res))
-            .then((user) => user.rooms)
+            .then((user) => user && user.rooms)
             .then(this.respondWithResult(res))
             .catch(this.handleError(res));
     }
