@@ -24,7 +24,7 @@ const config: IConfig = {
     authConfig: {
         google: {
             clientID: "209851744107-j0gtt5vg2i3gm8fej04d0s3gjc91ji11.apps.googleusercontent.com",
-            clientSecret: "f4sJYEIjFVy2XBsYousePlef",
+            clientSecret: "5SWrdNGCF_zFaSt6m2I7G-4n",
             callbackURL: "/auth/google/callback",
         },
         github: {
