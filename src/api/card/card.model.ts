@@ -11,13 +11,15 @@ const debug = require("debug")("test:card:model");
 
 export class Card extends Sequilize.Model {
     public static createValidator = Joi.object().keys({
-        description: Joi.string().min(4).max(1000).required(),
+        title: Joi.string().min(4).max(1000).required(),
+        description: Joi.string().min(4).max(1000).optional().allow(null),
         boardId: Joi.number().integer().required(),
         columnId: Joi.number().integer().required(),
-        active: Joi.boolean().allow(null),
+        active: Joi.boolean().allow(null).optional(),
     });
     public static updateValidator = Joi.object().keys({
-        description: Joi.string().min(4).max(1000).optional(),
+        title: Joi.string().min(4).max(1000).optional(),
+        description: Joi.string().min(4).max(1000).optional().allow(null),
         columnId: Joi.number().integer().required(),
         position: Joi.number().integer().required(),
         active: Joi.boolean().allow(null),
@@ -33,6 +35,9 @@ export class Card extends Sequilize.Model {
                 boardId,
                 columnId,
             },
+        }).then((position) => {
+            if (isNaN(position) || !position) return 0;
+            return position;
         });
     }
 
@@ -100,6 +105,7 @@ export default function(sequelize, DataTypes) {
             primaryKey: true,
             autoIncrement: true,
         },
+        title: DataTypes.STRING,
         description: DataTypes.STRING,
         active: DataTypes.BOOLEAN,
         columnId: {

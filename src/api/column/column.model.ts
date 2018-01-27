@@ -25,6 +25,9 @@ export class BoardColumn extends Sequilize.Model {
             where: {
                 boardId,
             },
+        }).then((position) => {
+          if (isNaN(position) || !position) return 0;
+          return position;
         });
     }
 

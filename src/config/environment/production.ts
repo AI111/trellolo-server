@@ -19,6 +19,7 @@ const config: IConfig = {
             port: 3306,
             dialect: "mysql",
             logging: console.log,
+            omitNull: true,
         },
     },
     authConfig: {

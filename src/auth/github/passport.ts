@@ -25,7 +25,7 @@ export function setup(User, config?: IConfig) {
                         provider: "google",
                         google: profile.id,
                     });
-                    user.save()
+                    return user.save()
                         .then((savedUser) => done(null, savedUser))
                         .catch((err) => done(err));
                 })
